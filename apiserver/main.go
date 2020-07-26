@@ -6,8 +6,9 @@ import (
     "database/sql"
     "encoding/json"
     "fmt"
-    "log"
+    "github.com/filipsladek/einvoice/storage"
     "io/ioutil"
+    "log"
     "net/http"
 
     "github.com/gorilla/mux"
@@ -91,6 +92,10 @@ func handleRequests() {
 }
 
 func main() {
+    storage := storage.InitStorage()
+    storage.SaveObject("abc", "def")
+    fmt.Println("stored")
+
     psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
         "password=%s dbname=%s sslmode=disable",
         host, port, user, password, dbname)
