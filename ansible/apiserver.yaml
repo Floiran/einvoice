@@ -1,0 +1,20 @@
+# ansible-playbook apiserver.yaml
+---
+- hosts: localhost
+  tasks:
+    - service: name=docker state=started
+    - name: Docker Login
+      docker_login:
+        registry: gcr.io/webserver1-283520/apiserver
+        username: _json_key
+        debug: true
+        password: " {{ lookup('file', '/home/filip/webserver1-283520-386230d8738c.json')}}"
+    - name: Build an image and push it to a private repo
+      docker_image:
+        build:
+          path: ../
+          dockerfile: Dockerfile-apiserver
+        name: gcr.io/webserver1-283520/apiserver
+        tag: v1
+        push: yes
+        source: build
