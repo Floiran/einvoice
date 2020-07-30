@@ -8,3 +8,10 @@ services:
       - "8080:8080"
     environment:
       - SLOW_STORAGE_TYPE=local
+      - LOCAL_STORAGE_BASE_PATH=/tmp/einvoice
+  einvoice-web-app:
+    build:
+      context: ./
+      dockerfile: ./einvoice-web-app.Dockerfile
+    ports:
+      - "8081:8081"

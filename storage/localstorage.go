@@ -1,8 +1,8 @@
 package storage
 
 import (
-	"io/ioutil"
 	"github.com/filipsladek/einvoice/common"
+	"io/ioutil"
 )
 
 type LocalStorage struct {
@@ -15,11 +15,11 @@ func (storage LocalStorage) SaveObject(path, value string) error {
 }
 
 func (storage LocalStorage) ReadObject(path string) (string, error) {
-	_, err := ioutil.ReadFile(storage.basePath + path)
-	return "", err
+	bytes, err := ioutil.ReadFile(storage.basePath + path)
+	return string(bytes), err
 }
 
-func InitLocalStorage() LocalStorage {
+func NewLocalStorage() LocalStorage {
 	var basePath = common.GetRequiredEnvVariable("LOCAL_STORAGE_BASE_PATH")
 	if basePath[len(basePath)-1] != '/' {
 		basePath = basePath + "/"
