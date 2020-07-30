@@ -14,3 +14,4 @@ Run backend in next tab, rerun after server update.
 cd server
 go build && ./server
 ```
+
