@@ -11,5 +11,6 @@ npm start
 
 Run backend in next tab, rerun after server update.
 ```shell script
+cd server
 go build && ./server
 ```
