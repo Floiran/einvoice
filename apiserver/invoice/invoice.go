@@ -1,4 +1,4 @@
-package common
+package invoice
 
 type Invoice struct {
 	Id       string `json:"id"`

@@ -2,21 +2,19 @@
 package main
 
 import (
-	"database/sql"
 	"encoding/json"
 	"fmt"
-	"github.com/filipsladek/einvoice/common"
+	apiHanglers "github.com/filipsladek/einvoice/apiserver/handlers"
+	"github.com/filipsladek/einvoice/apiserver/invoice"
+	"github.com/filipsladek/einvoice/apiserver/postgres"
 	"github.com/filipsladek/einvoice/storage"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
-	"io"
 	"io/ioutil"
 	"log"
-	"math/rand"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 )
 
@@ -85,7 +83,7 @@ func deleteArticle(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func handleRequests() {
+func handleRequests(storage storage.Storage, db postgres.DBConnector) {
 	router := mux.NewRouter()
 
 	router.HandleFunc("/", homePage)
@@ -94,8 +92,9 @@ func handleRequests() {
 	router.HandleFunc("/article/{id}", deleteArticle).Methods("DELETE")
 	router.HandleFunc("/article/{id}", returnSingleArticle)
 
-	router.PathPrefix("/api/invoice/{id}").Methods("GET").HandlerFunc(GetInvoiceHandler)
-	router.PathPrefix("/api/invoice").Methods("POST").HandlerFunc(CreateInvoiceHandler)
+	router.PathPrefix("/api/invoice/{id}").Methods("GET").HandlerFunc(apiHanglers.GetInvoiceHandler(storage, db))
+	router.PathPrefix("/api/invoice").Methods("POST").HandlerFunc(apiHanglers.CreateInvoiceHandler(storage, db))
+	router.PathPrefix("/api/invoices").Methods("GET").HandlerFunc(apiHanglers.GetAllInvoicesHandler(storage, db))
 
 	srv := &http.Server{
 		Handler:      handlers.LoggingHandler(os.Stdout, handlers.CORS(corsOptions...)(router)),
@@ -112,62 +111,46 @@ func main() {
 	storage.SaveObject("abc", "def")
 	fmt.Println("stored")
 
-	psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
-		"password=%s dbname=%s sslmode=disable",
-		host, port, user, password, dbname)
-	db, err := sql.Open("postgres", psqlInfo)
-	if err != nil {
-		panic(err)
+	//psqlInfo := fmt.Sprintf("host=%s port=%d user=%s "+
+	//	"password=%s dbname=%s sslmode=disable",
+	//	host, port, user, password, dbname)
+	//db, err := sql.Open("postgres", psqlInfo)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//defer db.Close()
+	//err = db.Ping()
+	//if err != nil {
+	//	panic(err)
+	//}
+	//fmt.Println("pinged")
+	//
+	//Articles = []Article{
+	//	Article{Id: "1", Title: "Hello", Desc: "Article Description", Content: "Article Content"},
+	//	Article{Id: "2", Title: "Hello 2", Desc: "Article Description", Content: "Article Content"},
+	//}
+
+	dbConf := postgres.ConnectionConfig{
+		Host:     "localhost",
+		Port:     5432,
+		User:     "postgres",
+		Password: "a",
+		Database: "einvoice",
 	}
+
+	db := postgres.Connect(dbConf)
 	defer db.Close()
-	err = db.Ping()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("pinged")
 
-	Articles = []Article{
-		Article{Id: "1", Title: "Hello", Desc: "Article Description", Content: "Article Content"},
-		Article{Id: "2", Title: "Hello 2", Desc: "Article Description", Content: "Article Content"},
-	}
-	handleRequests()
-}
+	dbConnector := postgres.DBConnector{DB: db}
 
-func GetInvoiceHandler(w http.ResponseWriter, r *http.Request) {
-
-	vars := mux.Vars(r)
-	invoiceId := vars["id"]
-
-	invoice := common.NewInvoice(invoiceId, "subject"+strconv.Itoa(rand.Intn(100)), "subject"+strconv.Itoa(rand.Intn(100)))
-
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(invoice)
-}
-
-func CreateInvoiceHandler(w http.ResponseWriter, r *http.Request) {
-	var invoice common.Invoice
-	body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
-	if err != nil {
-		panic(err)
-	}
-	if err := r.Body.Close(); err != nil {
-		panic(err)
-	}
-	invoice.Id = strconv.Itoa(rand.Intn(100000))
-
-	if err := json.Unmarshal(body, &invoice); err != nil {
-		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-		w.WriteHeader(422)
-		if err := json.NewEncoder(w).Encode(err); err != nil {
-			panic(err)
-		}
+	// dummy data
+	if len(dbConnector.GetAllInvoice()) == 0 {
+		dbConnector.CreateInvoice(&invoice.Invoice{Sender: "SubjectA", Receiver: "SubjectB"})
+		dbConnector.CreateInvoice(&invoice.Invoice{Sender: "SubjectA", Receiver: "SubjectC"})
+		dbConnector.CreateInvoice(&invoice.Invoice{Sender: "SubjectA", Receiver: "SubjectD"})
 	}
 
-	w.Header().Set("Content-Type", "application/json; charset=UTF-8")
-	w.WriteHeader(http.StatusCreated)
-	if err := json.NewEncoder(w).Encode(invoice); err != nil {
-		panic(err)
-	}
+	handleRequests(storage, dbConnector)
 }
 
 var corsOptions = []handlers.CORSOption{

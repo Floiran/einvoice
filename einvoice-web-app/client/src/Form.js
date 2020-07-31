@@ -14,7 +14,6 @@ class Form extends Component {
 
         this.state = {
             getInvoice: null,
-            postInvoice: null,
             getInvoiceId: "",
             postInvoiceSender: "",
             postInvoiceReceiver: ""
@@ -49,32 +48,39 @@ class Form extends Component {
             })
         })
             .then( response => response.json())
-            .then( data => this.setState({postInvoice: data}));
+            .then( data => {
+                this.props.addInvoice(data);
+                this.setState({postInvoiceSender: "", postInvoiceReceiver: ""})
+            });
     }
 
     render() {
         let { getInvoice, postInvoice } = this.state;
 
         return (
-            <div>
-                <h2>Get invoice</h2>
-                <label>
-                    Invoice id:
-                    <input type="text" name="getInvoiceId" value={this.state.getInvoiceId} onChange={this.handleInputChange} />
-                </label>
-                <button className='btn btn-primary' onClick={this.submitGetInvoice}>Submit</button>
-                {getInvoice && <Invoice {...getInvoice} />}
-                <h2>Post invoice</h2>
-                <p>
-                    Sender:
-                    <input type="text" name="postInvoiceSender" value={this.state.postInvoiceSender} onChange={this.handleInputChange} />
-                </p>
-                <p>
-                    Receiver:
-                    <input type="text" name="postInvoiceReceiver" value={this.state.postInvoiceReceiver} onChange={this.handleInputChange} />
-                </p>
-                <button className='btn btn-primary' onClick={this.submitPostInvoice}>Submit</button>
-                {postInvoice && <Invoice {...postInvoice} />}
+            <div className="container">
+                {/*<h2>Get invoice</h2>*/}
+                {/*Invoice id*/}
+                {/*<input type="text" name="getInvoiceId" value={this.state.getInvoiceId} onChange={this.handleInputChange} />*/}
+                {/*<button class="btn btn-primary" onClick={this.submitGetInvoice}>Submit</button>*/}
+                {/*{getInvoice && <Invoice {...getInvoice} />}*/}
+                <h2 className="row"><div className="col">Create invoice</div></h2>
+                <div className="row">
+                    <div className="col"><p>
+                        Sender
+                        <input type="text" name="postInvoiceSender" value={this.state.postInvoiceSender} onChange={this.handleInputChange} />
+                    </p>
+                    </div>
+                </div>
+                <div className="row">
+                    <div className="col">
+                        <p>
+                            Receiver
+                            <input type="text" name="postInvoiceReceiver" value={this.state.postInvoiceReceiver} onChange={this.handleInputChange} />
+                        </p>
+                        <button className='btn btn-primary' onClick={this.submitPostInvoice}>Submit</button>
+                    </div>
+                </div>
             </div>
         )
     }
