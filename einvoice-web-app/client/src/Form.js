@@ -34,14 +34,13 @@ class Form extends Component {
     }
 
     submitGetInvoice() {
-        console.log("get");
-        fetch('/invoice/' + this.state.getInvoiceId)
+        fetch(this.props.apiUrl + '/api/invoice/' + this.state.getInvoiceId)
             .then( response => response.json())
             .then( data => this.setState({getInvoice: data}));
     }
 
     submitPostInvoice() {
-        fetch('/invoice' + this.state.getInvoiceId, {
+        fetch(this.props.apiUrl + '/api/invoice' + this.state.getInvoiceId, {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
