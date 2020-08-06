@@ -9,6 +9,11 @@ services:
     environment:
       - SLOW_STORAGE_TYPE=local
       - LOCAL_STORAGE_BASE_PATH=/tmp/einvoice
+      - DB_HOST=localhost
+      - DB_PORT=5432
+      - DB_USER=postgres
+      - DB_PASSWORD=a
+      - DB_NAME=einvoice
   einvoice-web-app:
     build:
       context: ./
