@@ -62,10 +62,6 @@
         database_version: '{{ sql_instance.database_version }}'
         settings:
           tier: '{{ sql_instance.tier }}'
-          ip_configuration:
-            authorized_networks:
-              - name: google dns server
-                value: 8.8.8.8/32
         region: '{{ sql_instance.region }}'
         project: '{{ project_id }}'
         state: present
@@ -97,7 +93,7 @@
         username: _json_key
         debug: true
         password: " {{ lookup('file', '/home/filip/mfsr/webserver1-283520-386230d8738c.json')}}"
-    - name: Build an image and push it to a private repo
+    - name: Build apiserver and push it to a private repo
       docker_image:
         build:
           path: ../
@@ -145,7 +141,6 @@
                       - name: LOCAL_STORAGE_BASE_PATH
                         value: /tmp/einvoice
                       - name: DB_HOST
-                       # value: '{{ instance.connectionName }}'
                         value: 127.0.0.1
                       - name: DB_PORT
                         value: "5432"
@@ -179,6 +174,101 @@
             ports:
               - name: "apiserver-http"
                 port: 80
-                targetPort: 8000
+                targetPort: 8080
             selector:
               app: apiserver
+      register: apiserver_service
+    - debug:
+        msg: '{{ apiserver_service }}'
+# web-app
+    - name: Build web-app and push it to a private repo
+      docker_image:
+        build:
+          path: ../
+          dockerfile: einvoice-web-app.Dockerfile
+        name: gcr.io/webserver1-283520/web-app
+        tag: latest
+        push: yes
+        force: yes
+        source: build
+        state: present
+    - name: create apiserver deployment
+      k8s:
+        state: present
+        name: develop
+        api_version: v1
+        definition:
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            labels:
+              app: web-app
+            name: web-app
+            namespace: default
+          spec:
+            replicas: 1
+            strategy:
+              type: Recreate
+            selector:
+              matchLabels:
+                app: web-app
+            template:
+              metadata:
+                labels:
+                  app: web-app
+              spec:
+                enableServiceLinks: false
+                restartPolicy: Always
+                containers:
+                  - name: web-app
+                    image: gcr.io/webserver1-283520/web-app:latest
+                    imagePullPolicy: Always
+                    env:
+                      - name: API_SERVER_URL
+                        value: '{{ apiserver_service.result.spec.clusterIP }}:{{ apiserver_service.result.spec.ports[0].port }}'
+    - name: create web-app service
+      k8s:
+        state: present
+        name: develop
+        api_version: v1
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            labels:
+              app: web-app
+            name: web-app
+            namespace: default
+          spec:
+            ports:
+              - name: "web-app-http"
+                port: 80
+                targetPort: 8081
+            selector:
+              app: web-app
+    - name: create web-app loadbalancer
+      k8s:
+        state: present
+        name: develop
+        api_version: v1
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            labels:
+              app: web-app
+            name: web-app-loadbalancer
+            namespace: default
+          spec:
+            externalTrafficPolicy: Cluster
+            ports:
+            - port: 80
+              protocol: TCP
+              targetPort: 8081
+            selector:
+              app: web-app
+            sessionAffinity: None
+            type: LoadBalancer
+      register: loadbalancer
+    - debug:
+        msg: '{{ loadbalancer }}'

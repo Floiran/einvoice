@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"github.com/filipsladek/einvoice/common"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -28,6 +29,8 @@ func main() {
 	r.Path("/api/url").HandlerFunc(ApiUrlHandler(apiServerUrl))
 
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir(clientBuildDir)))
+
+	fmt.Println("server start")
 
 	srv := &http.Server{
 		Handler:      handlers.LoggingHandler(os.Stdout, r),
