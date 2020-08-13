@@ -15,21 +15,22 @@
       database_version: POSTGRES_12
       region: us-west1
       tier: db-g1-small
+    cluster_name: my-cluster1
   tasks:
 # kubernetes cluster
     - name: create a cluster
       gcp_container_cluster:
-        name: my-cluster1
+        name: '{{ cluster_name }}'
         initial_node_count: 2
         master_auth:
           username: cluster_admin
           password: my-secret-password
         location: '{{ location }}'
         project: webserver1-283520
-        #        auth_kind: serviceaccount
-        #        service_account_file: "/home/filip/webserver1-283520-386230d8738c.json"
         state: present
       register: cluster
+    - name: setup kubect
+      command: gcloud container clusters get-credentials '{{ cluster_name }}' --region us-west1 --project '{{ project_id }}'
     - name: create a node pool
       gcp_container_node_pool:
         name: my-pool
@@ -38,7 +39,10 @@
         location: '{{ location }}'
         project: '{{ project_id }}'
         config:
-          oauth_scopes: ['https://www.googleapis.com/auth/devstorage.read_only']
+          oauth_scopes: [
+            'https://www.googleapis.com/auth/devstorage.read_only',
+            'https://www.googleapis.com/auth/sqlservice.admin'
+          ]
           machine_type: n1-standard-4
           disk_size_gb: 500
         state: present
@@ -101,6 +105,7 @@
         name: gcr.io/webserver1-283520/apiserver
         tag: latest
         push: yes
+        force: yes
         source: build
         state: present
     - name: create apiserver deployment
@@ -140,7 +145,8 @@
                       - name: LOCAL_STORAGE_BASE_PATH
                         value: /tmp/einvoice
                       - name: DB_HOST
-                        value: '{{ instance.connectionName }}'
+                       # value: '{{ instance.connectionName }}'
+                        value: 127.0.0.1
                       - name: DB_PORT
                         value: "5432"
                       - name: DB_USER
@@ -149,23 +155,30 @@
                         value: "12345"
                       - name: DB_NAME
                         value: einvoice
-#    - name: create apiserver service
-#        k8s:
-#          state: present
-#          name: develop
-#          api_version: v1
-#          definition:
-#            apiVersion: v1
-#            kind: Service
-#            metadata:
-#              labels:
-#                app: apiserver
-#              name: apiserver
-#              namespace: default
-#            spec:
-#              ports:
-#                - name: "apiserver-http"
-#                  port: 80
-#                  targetPort: 8000
-#              selector:
-#                app: apiserver
+                  - name: cloud-sql-proxy
+                    image: gcr.io/cloudsql-docker/gce-proxy:1.17
+                    command:
+                      - "/cloud_sql_proxy"
+                      - '-instances={{instance.connectionName}}=tcp:5432'
+                    securityContext:
+                      runAsNonRoot: true
+    - name: create apiserver service
+      k8s:
+        state: present
+        name: develop
+        api_version: v1
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            labels:
+              app: apiserver
+            name: apiserver
+            namespace: default
+          spec:
+            ports:
+              - name: "apiserver-http"
+                port: 80
+                targetPort: 8000
+            selector:
+              app: apiserver

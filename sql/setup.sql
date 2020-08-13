@@ -1,5 +1,5 @@
-CREATE TABLE invoices (
-	id serial PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS invoices (
+	id SERIAL PRIMARY KEY,
 	sender VARCHAR ( 50 ) NOT NULL,
 	receiver VARCHAR ( 50 ) NOT NULL
 );

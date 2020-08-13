@@ -34,9 +34,11 @@ func handleRequests(storage storage.Storage, db postgres.DBConnector) {
 }
 
 func main() {
+	fmt.Println("start")
 	storage := storage.InitStorage()
 	storage.SaveObject("abc", "def")
 	fmt.Println("stored")
+	fmt.Println("aaaaa")
 
 	dbConf := postgres.NewConnectionConfig()
 
@@ -44,6 +46,8 @@ func main() {
 	defer db.Close()
 
 	dbConnector := postgres.DBConnector{DB: db}
+
+	postgres.InitDB(dbConnector)
 
 	// dummy data
 	if len(dbConnector.GetAllInvoice()) == 0 {
