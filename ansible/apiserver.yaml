@@ -8,7 +8,7 @@
         registry: gcr.io/webserver1-283520/apiserver
         username: _json_key
         debug: true
-        password: " {{ lookup('file', '/home/filip/webserver1-283520-386230d8738c.json')}}"
+        password: " {{ lookup('file', '/home/filip/mfsr/webserver1-283520-386230d8738c.json')}}"
     - name: Build an image and push it to a private repo
       docker_image:
         build:
@@ -19,15 +19,6 @@
         push: yes
         source: build
         state: present
-#    - name: create a trigger
-#      gcp_cloudbuild_trigger:
-#        trigger_template:
-#          branch_name: master
-#          project_id: webserver1-283520
-#          repo_name: https://github.com/filipsladek/einvoice
-#        filename: cloudbuild.yaml
-#        project: webserver1
-#        state: present
     - name: Create a Deployment by reading the definition from a local file
       k8s:
         state: present
