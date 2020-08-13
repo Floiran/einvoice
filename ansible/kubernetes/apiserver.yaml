@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: apiserver
+  name: apiserver
+  namespace: default
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: apiserver
+  template:
+    metadata:
+      labels:
+        app: apiserver
+    spec:
+      enableServiceLinks: false
+      restartPolicy: Always
+      containers:
+        - name: apiserver
+          image: gcr.io/webserver1-283520/apiserver:latest
+          imagePullPolicy: Always
+          env:
+            - name: SLOW_STORAGE_TYPE
+              value: local
+            - name: LOCAL_STORAGE_BASE_PATH
+              value: /tmp/einvoice
+            - name: DB_HOST
+              value: localhost
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_USER
+              value: postgres
+            - name: DB_PASSWORD
+              value: "12345"
+            - name: DB_NAME
+              value: einvoice
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: apiserver
+  name: apiserver
+  namespace: default
+spec:
+  ports:
+    - name: "apiserver-http"
+      port: 80
+      targetPort: 8000
+  selector:
+    app: apiserver

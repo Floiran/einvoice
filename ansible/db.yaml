@@ -10,7 +10,7 @@
     # database_version: MYSQL_5_5 / MYSQL_5_6 / MYSQL_587 / POSTGRESQL_9_6
     # tier: db-g1-smal / db-pg-g1-small / custom-2-2048
     sql_instance:
-      name: webserverdb1
+      name: webserverdb5
       backend_type: SECOND_GEN
       database_version: POSTGRES_12
       region: us-west1
@@ -24,6 +24,29 @@
         database_version: '{{ sql_instance.database_version }}'
         settings:
           tier: '{{ sql_instance.tier }}'
+          ip_configuration:
+            authorized_networks:
+              - name: google dns server
+                value: 8.8.8.8/32
         region: '{{ sql_instance.region }}'
         project: '{{ project_id }}'
         state: present
+      register: instance
+    - debug:
+        msg: '{{ instance }}'
+    - name: Create database
+      gcp_sql_database:
+        name: einvoice
+        charset: utf8
+        instance: "{{ instance.name }}"
+        project: '{{ project_id }}'
+        state: present
+    - name: create a user
+      gcp_sql_user:
+        name: einvoice
+        host: '{{ instance.ipAddresses[0].ipAddress }}'
+        password: 12345
+        instance: "{{ instance }}"
+        project: '{{ project_id }}'
+        state: present
+
