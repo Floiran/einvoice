@@ -10,11 +10,14 @@
       name: webserverstorage1
     project_id: webserver1-283520
     sql_instance:
-      name: webserverdb5
+      name: webserverdb6
       backend_type: SECOND_GEN
       database_version: POSTGRES_12
       region: us-west1
       tier: db-g1-small
+      db_user: einvoice
+      db_password: 12345
+      db_name: einvoice
     cluster_name: my-cluster1
   tasks:
 # kubernetes cluster
@@ -107,7 +110,7 @@
     - name: create apiserver deployment
       k8s:
         state: present
-        name: develop
+        name: apiserver
         api_version: v1
         definition:
           apiVersion: apps/v1
@@ -129,7 +132,7 @@
                 labels:
                   app: apiserver
               spec:
-                enableServiceLinks: false
+#                enableServiceLinks: false
                 restartPolicy: Always
                 containers:
                   - name: apiserver
@@ -145,11 +148,13 @@
                       - name: DB_PORT
                         value: "5432"
                       - name: DB_USER
-                        value: einvoice
+                        value: '{{ sql_instance.db_user }}'
                       - name: DB_PASSWORD
-                        value: "12345"
+                        value: '{{ sql_instance.db_password }}'
                       - name: DB_NAME
-                        value: einvoice
+                        value: '{{ sql_instance.db_name }}'
+                    ports:
+                    - containerPort: 8080
                   - name: cloud-sql-proxy
                     image: gcr.io/cloudsql-docker/gce-proxy:1.17
                     command:
@@ -157,10 +162,10 @@
                       - '-instances={{instance.connectionName}}=tcp:5432'
                     securityContext:
                       runAsNonRoot: true
-    - name: create apiserver service
+    - name: create apiserver loadbalancer
       k8s:
         state: present
-        name: develop
+        name: apiserver-loadbalancer
         api_version: v1
         definition:
           apiVersion: v1
@@ -168,15 +173,22 @@
           metadata:
             labels:
               app: apiserver
-            name: apiserver
+            name: apiserver-loadbalancer
             namespace: default
           spec:
+            externalTrafficPolicy: Cluster
             ports:
-              - name: "apiserver-http"
-                port: 80
+              - port: 80
+                protocol: TCP
                 targetPort: 8080
             selector:
               app: apiserver
+            sessionAffinity: None
+            type: LoadBalancer
+#        wait: true
+#        wait_condition:
+#          status: True
+#          type: DeploymentPaused
       register: apiserver_service
     - debug:
         msg: '{{ apiserver_service }}'
@@ -192,7 +204,7 @@
         force: yes
         source: build
         state: present
-    - name: create apiserver deployment
+    - name: create web-app deployment
       k8s:
         state: present
         name: develop
@@ -217,7 +229,7 @@
                 labels:
                   app: web-app
               spec:
-                enableServiceLinks: false
+#                enableServiceLinks: false
                 restartPolicy: Always
                 containers:
                   - name: web-app
@@ -225,31 +237,13 @@
                     imagePullPolicy: Always
                     env:
                       - name: API_SERVER_URL
-                        value: '{{ apiserver_service.result.spec.clusterIP }}:{{ apiserver_service.result.spec.ports[0].port }}'
-    - name: create web-app service
-      k8s:
-        state: present
-        name: develop
-        api_version: v1
-        definition:
-          apiVersion: v1
-          kind: Service
-          metadata:
-            labels:
-              app: web-app
-            name: web-app
-            namespace: default
-          spec:
-            ports:
-              - name: "web-app-http"
-                port: 80
-                targetPort: 8081
-            selector:
-              app: web-app
+                        value: 'https://{{ apiserver_service.result.spec.clusterIP }}:{{ apiserver_service.result.spec.ports[0].port }}'
+                    ports:
+                    - containerPort: 8081
     - name: create web-app loadbalancer
       k8s:
         state: present
-        name: develop
+        name: web-app-loadbalancer
         api_version: v1
         definition:
           apiVersion: v1
