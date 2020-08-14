@@ -11,7 +11,6 @@
     project_id: webserver1-283520
     sql_instance:
       name: webserverdb7
-      initial_node_count: 1
       backend_type: SECOND_GEN
       database_version: POSTGRES_12
       region: us-west1
@@ -25,7 +24,7 @@
     - name: create a cluster
       gcp_container_cluster:
         name: '{{ cluster_name }}'
-        initial_node_count: 2
+        initial_node_count: 1
         master_auth:
           username: cluster_admin
           password: my-secret-password
@@ -184,7 +183,7 @@
             sessionAffinity: None
             type: LoadBalancer
       register: apiserver_service
-    - name: waiting fro apiserver loadbalancer ip
+    - name: waiting for apiserver loadbalancer ip
       command: bash -c 'external_ip="<pending>"; while [ $external_ip = "<pending>" ]; do result=$(kubectl get svc apiserver-loadbalancer | tail -n1); ip=($result); external_ip=${ip[3]}; [ $external_ip = "<pending>" ] && sleep 10; done; echo $external_ip;'
       register: result
     - set_fact: apiserver_loadbalancer_ip="{{ result.stdout_lines[0] }}"
@@ -227,7 +226,6 @@
                 labels:
                   app: web-app
               spec:
-#                enableServiceLinks: false
                 restartPolicy: Always
                 containers:
                   - name: web-app
@@ -269,4 +267,4 @@
       register: webapp_loadbalancer_result
     - set_fact: webapp_loadbalancer_ip="{{ webapp_loadbalancer_result.stdout_lines[0] }}"
     - debug:
-        msg: 'web-app-ip is{{ webapp_loadbalancer_ip }}'
+        msg: 'web-app-ip is {{ webapp_loadbalancer_ip }}'
