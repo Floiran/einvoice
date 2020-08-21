@@ -2,7 +2,7 @@
 package main
 
 import (
-	"encoding/json"
+	"encoding/xml"
 	"fmt"
 	apiHandlers "github.com/filipsladek/einvoice/apiserver/handlers"
 	"github.com/filipsladek/einvoice/apiserver/invoice"
@@ -20,10 +20,11 @@ import (
 func handleRequests(storage storage.Storage, db postgres.DBConnector) {
 	router := mux.NewRouter()
 
-	router.PathPrefix("/api/invoice/full/{id}").Methods("GET").HandlerFunc(apiHandlers.GetFullInvoiceHandler(storage, db))
-	router.PathPrefix("/api/invoice/{id}").Methods("GET").HandlerFunc(apiHandlers.GetInvoiceHandler(storage, db))
 	router.PathPrefix("/api/invoices").Methods("GET").HandlerFunc(apiHandlers.GetAllInvoicesHandler(storage, db))
-	router.PathPrefix("/api/invoice").Methods("POST").HandlerFunc(apiHandlers.CreateInvoiceHandler(storage, db))
+	router.PathPrefix("/api/invoice/full/{id}").Methods("GET").HandlerFunc(apiHandlers.GetFullInvoiceHandler(storage, db))
+	router.PathPrefix("/api/invoice/meta/{id}").Methods("GET").HandlerFunc(apiHandlers.GetInvoiceMetaHandler(storage, db))
+	router.PathPrefix("/api/invoice/json").Methods("POST").HandlerFunc(apiHandlers.CreateInvoiceJsonHandler(storage, db))
+	router.PathPrefix("/api/invoice/xml").Methods("POST").HandlerFunc(apiHandlers.CreateInvoiceXmlHandler(storage, db))
 
 	srv := &http.Server{
 		Handler:      handlers.LoggingHandler(os.Stdout, handlers.CORS(corsOptions...)(router)),
@@ -36,9 +37,11 @@ func handleRequests(storage storage.Storage, db postgres.DBConnector) {
 }
 
 func createDummyInvoice(invoice invoice.Invoice, dbConnector postgres.DBConnector, storage storage.Storage) {
-	dbConnector.CreateInvoice(&invoice)
-	json, _ := json.Marshal(invoice)
-	storage.SaveObject("invoice-"+invoice.Id, string(json))
+	meta := invoice.GetMeta()
+	dbConnector.CreateInvoice(meta)
+	invoice.Id = meta.Id
+	xmlString, _ := xml.Marshal(invoice)
+	storage.SaveObject("invoice-"+invoice.Id, string(xmlString))
 }
 
 func main() {

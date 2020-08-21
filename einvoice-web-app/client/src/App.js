@@ -1,7 +1,7 @@
-import React, {Component} from 'react'
-import './App.css'
-import Form from './Form'
-import InvoiceList from './InvoiceList'
+import React, {Component} from 'react';
+import './App.css';
+import Form from './Form';
+import InvoiceList from './InvoiceList';
 
 class App extends Component {
   constructor(props) {

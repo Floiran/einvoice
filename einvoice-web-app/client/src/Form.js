@@ -20,7 +20,7 @@ class Form extends Component {
     }
 
     this.handleInputChange = this.handleInputChange.bind(this);
-    this.submitGetInvoice = this.submitGetInvoice.bind(this);
+  //  this.submitGetInvoice = this.submitGetInvoice.bind(this);
     this.submitPostInvoice = this.submitPostInvoice.bind(this);
   }
 
@@ -32,14 +32,14 @@ class Form extends Component {
     });
   }
 
-  submitGetInvoice() {
-    fetch(this.props.apiUrl + '/api/invoice/' + this.state.getInvoiceId)
-      .then( response => response.json())
-      .then( data => this.setState({getInvoice: data}));
-  }
+  // submitGetInvoice() {
+  //   fetch(this.props.apiUrl + '/api/invoice/' + this.state.getInvoiceId)
+  //     .then( response => response.json())
+  //     .then( data => this.setState({getInvoice: data}));
+  // }
 
   submitPostInvoice() {
-    fetch(this.props.apiUrl + '/api/invoice' + this.state.getInvoiceId, {
+    fetch(this.props.apiUrl + '/api/invoice/json', {
       method: 'POST',
       headers: {'Content-Type': 'application/json'},
       body: JSON.stringify({

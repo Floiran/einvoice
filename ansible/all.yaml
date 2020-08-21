@@ -10,7 +10,7 @@
       name: webserverstorage1
     project_id: webserver1-283520
     sql_instance:
-      name: webserverdb9
+      name: webserverdb11
       backend_type: SECOND_GEN
       database_version: POSTGRES_12
       region: us-west1

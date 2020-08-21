@@ -1,7 +1,7 @@
 package postgres
 
 import (
-	. "github.com/filipsladek/einvoice/apiserver/invoice"
+	"github.com/filipsladek/einvoice/apiserver/invoice"
 	"github.com/filipsladek/einvoice/common"
 	"io/ioutil"
 	"strconv"
@@ -55,8 +55,8 @@ type DBConnector struct {
 	DB *pg.DB
 }
 
-func (connector DBConnector) GetAllInvoice() []Invoice {
-	var invoices []Invoice
+func (connector DBConnector) GetAllInvoice() []invoice.Meta {
+	var invoices []invoice.Meta
 	err := connector.DB.Model(&invoices).Select()
 	if err != nil {
 		panic(err)
@@ -64,8 +64,8 @@ func (connector DBConnector) GetAllInvoice() []Invoice {
 	return invoices
 }
 
-func (connector DBConnector) GetInvoice(id string) *Invoice {
-	invoice := &Invoice{}
+func (connector DBConnector) GetInvoice(id string) *invoice.Meta {
+	invoice := &invoice.Meta{}
 	err := connector.DB.Model(invoice).Where("id = ?", id).Select(invoice)
 	if err != nil {
 		panic(err)
@@ -73,7 +73,7 @@ func (connector DBConnector) GetInvoice(id string) *Invoice {
 	return invoice
 }
 
-func (connector DBConnector) CreateInvoice(invoice *Invoice) *Invoice {
+func (connector DBConnector) CreateInvoice(invoice *invoice.Meta) *invoice.Meta {
 	_, err := connector.DB.Model(invoice).Insert(invoice)
 	if err != nil {
 		panic(err)
