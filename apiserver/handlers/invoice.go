@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	. "github.com/filipsladek/einvoice/apiserver/invoice"
 	"github.com/filipsladek/einvoice/apiserver/postgres"
-	"github.com/filipsladek/einvoice/storage"
+	"github.com/filipsladek/einvoice/apiserver/storage"
 	"github.com/gorilla/mux"
 	"io"
 	"io/ioutil"
@@ -20,6 +20,21 @@ func GetInvoiceHandler(storage storage.Storage, db postgres.DBConnector) func(w 
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(invoice)
+	}
+}
+
+func GetFullInvoiceHandler(storage storage.Storage, db postgres.DBConnector) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		invoiceId := vars["id"]
+
+		invoice, err := storage.ReadObject("invoice-" + invoiceId)
+		if err != nil {
+			panic(err)
+		}
+
+		w.Header().Set("Content-Type", "application/json")
+		w.Write([]byte(invoice))
 	}
 }
 
@@ -53,6 +68,15 @@ func CreateInvoiceHandler(storage storage.Storage, db postgres.DBConnector) func
 		}
 
 		db.CreateInvoice(invoice)
+
+		jsonString, err := json.Marshal(invoice)
+		if err != nil {
+			panic(err)
+		}
+		err = storage.SaveObject("invoice-"+invoice.Id, string(jsonString))
+		if err != nil {
+			panic(err)
+		}
 
 		w.Header().Set("Content-Type", "application/json; charset=UTF-8")
 		w.WriteHeader(http.StatusCreated)

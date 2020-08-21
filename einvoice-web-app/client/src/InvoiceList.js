@@ -3,7 +3,7 @@ import './App.css';
 
 class InvoiceList extends Component {
     render() {
-        let { invoices } = this.props;
+        let { invoices, apiUrl } = this.props;
 
         let rows = [];
         if(invoices) {
@@ -13,6 +13,7 @@ class InvoiceList extends Component {
                     <td>{invoice.id}</td>
                     <td>{invoice.sender}</td>
                     <td>{invoice.receiver}</td>
+                    <td><a href={apiUrl + "/api/invoice/full/" + invoice.id}>download</a></td>
                 </tr>
             });
         }
@@ -27,6 +28,7 @@ class InvoiceList extends Component {
                         <th>ID</th>
                         <th>Sender</th>
                         <th>Receiver</th>
+                        <th></th>
                     </tr>
                     </thead>
                     <tbody>

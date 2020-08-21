@@ -1,7 +1,6 @@
 package postgres
 
 import (
-	"fmt"
 	. "github.com/filipsladek/einvoice/apiserver/invoice"
 	"github.com/filipsladek/einvoice/common"
 	"io/ioutil"
@@ -41,21 +40,11 @@ func Connect(config ConnectionConfig) *pg.DB {
 }
 
 func InitDB(connector DBConnector) {
-	//opts := &orm.CreateTableOptions{
-	//	IfNotExists: true,
-	//}
-	//err := connector.DB.Model(&Invoice{}).CreateTable(opts)
-	//
-	//if err != nil {
-	//	panic(err)
-	//}
 
 	query, err := ioutil.ReadFile("sql/setup.sql")
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Print(string(query))
 
 	if _, err := connector.DB.Exec(string(query)); err != nil {
 		panic(err)

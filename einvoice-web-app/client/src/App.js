@@ -42,7 +42,7 @@ class App extends Component {
                         <h1>E-invoice</h1>
                     </header>
                     <Form apiUrl={apiUrl} addInvoice={this.addInvoice} />
-                    <InvoiceList invoices={this.state.invoices}/>
+                    <InvoiceList invoices={this.state.invoices} apiUrl={apiUrl}/>
                 </div>
             );
         } else return <div></div>;

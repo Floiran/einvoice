@@ -18,8 +18,10 @@ func InitStorage() Storage {
 	switch storageType {
 	case "local":
 		storage = NewLocalStorage()
+	case "gcs":
+		storage = NewGSC()
 	default:
-		_ = errors.Unwrap(fmt.Errorf("unsupported storage type %q. Supported values are local, gcs, s3", storageType))
+		panic(errors.Unwrap(fmt.Errorf("unsupported storage type %q. Supported values are local, gcs, s3", storageType)))
 	}
 
 	return storage

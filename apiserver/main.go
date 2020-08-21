@@ -2,11 +2,12 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	apiHandlers "github.com/filipsladek/einvoice/apiserver/handlers"
 	"github.com/filipsladek/einvoice/apiserver/invoice"
 	"github.com/filipsladek/einvoice/apiserver/postgres"
-	"github.com/filipsladek/einvoice/storage"
+	"github.com/filipsladek/einvoice/apiserver/storage"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
@@ -19,9 +20,10 @@ import (
 func handleRequests(storage storage.Storage, db postgres.DBConnector) {
 	router := mux.NewRouter()
 
+	router.PathPrefix("/api/invoice/full/{id}").Methods("GET").HandlerFunc(apiHandlers.GetFullInvoiceHandler(storage, db))
 	router.PathPrefix("/api/invoice/{id}").Methods("GET").HandlerFunc(apiHandlers.GetInvoiceHandler(storage, db))
-	router.PathPrefix("/api/invoice").Methods("POST").HandlerFunc(apiHandlers.CreateInvoiceHandler(storage, db))
 	router.PathPrefix("/api/invoices").Methods("GET").HandlerFunc(apiHandlers.GetAllInvoicesHandler(storage, db))
+	router.PathPrefix("/api/invoice").Methods("POST").HandlerFunc(apiHandlers.CreateInvoiceHandler(storage, db))
 
 	srv := &http.Server{
 		Handler:      handlers.LoggingHandler(os.Stdout, handlers.CORS(corsOptions...)(router)),
@@ -33,12 +35,17 @@ func handleRequests(storage storage.Storage, db postgres.DBConnector) {
 	log.Fatal(srv.ListenAndServe())
 }
 
+func createDummyInvoice(invoice invoice.Invoice, dbConnector postgres.DBConnector, storage storage.Storage) {
+	dbConnector.CreateInvoice(&invoice)
+	json, _ := json.Marshal(invoice)
+	storage.SaveObject("invoice-"+invoice.Id, string(json))
+}
+
 func main() {
 	fmt.Println("start")
 	storage := storage.InitStorage()
 	storage.SaveObject("abc", "def")
 	fmt.Println("stored")
-	fmt.Println("aaaaa")
 
 	dbConf := postgres.NewConnectionConfig()
 
@@ -51,9 +58,9 @@ func main() {
 
 	// dummy data
 	if len(dbConnector.GetAllInvoice()) == 0 {
-		dbConnector.CreateInvoice(&invoice.Invoice{Sender: "SubjectA", Receiver: "SubjectB"})
-		dbConnector.CreateInvoice(&invoice.Invoice{Sender: "SubjectA", Receiver: "SubjectC"})
-		dbConnector.CreateInvoice(&invoice.Invoice{Sender: "SubjectA", Receiver: "SubjectD"})
+		createDummyInvoice(invoice.Invoice{Sender: "SubjectA", Receiver: "SubjectB"}, dbConnector, storage)
+		createDummyInvoice(invoice.Invoice{Sender: "SubjectA", Receiver: "SubjectC"}, dbConnector, storage)
+		createDummyInvoice(invoice.Invoice{Sender: "SubjectA", Receiver: "SubjectD"}, dbConnector, storage)
 	}
 
 	handleRequests(storage, dbConnector)
