@@ -64,7 +64,7 @@ func (connector DBConnector) GetAllInvoice() []invoice.Meta {
 	return invoices
 }
 
-func (connector DBConnector) GetInvoice(id string) *invoice.Meta {
+func (connector DBConnector) GetInvoiceMeta(id string) *invoice.Meta {
 	invoice := &invoice.Meta{}
 	err := connector.DB.Model(invoice).Where("id = ?", id).Select(invoice)
 	if err != nil {
