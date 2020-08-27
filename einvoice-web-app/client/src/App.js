@@ -1,6 +1,6 @@
 import React, {Component} from 'react';
 import './App.css';
-import Form from './Form';
+import CreateInvoice from './CreateInvoice';
 import InvoiceList from './InvoiceList';
 
 class App extends Component {
@@ -9,16 +9,22 @@ class App extends Component {
 
     this.state = {
       apiUrl: null,
-      invoices: []
+      invoices: [],
+      createInvoice: false
     }
 
     this.addInvoice = this.addInvoice.bind(this);
+    this.createInvoice = this.createInvoice.bind(this);
   }
 
   addInvoice(invoice) {
     let invoices = this.state.invoices;
     invoices.push(invoice);
     this.setState({invoices});
+  }
+
+  createInvoice(){
+    this.setState({ createInvoice: !this.state.createInvoice});
   }
 
   componentDidMount() {
@@ -38,10 +44,13 @@ class App extends Component {
     if(apiUrl) {
       return (
         <div className="App container">
-          <header className="App-header">
-            <h1>E-invoice</h1>
+          <header className="App-header row">
+            <h1 className='col'>E-invoice</h1>
           </header>
-          <Form apiUrl={apiUrl} addInvoice={this.addInvoice} />
+          <div className='row justify-content-center'>
+            <button className='btn btn-primary' onClick={this.createInvoice} >Create invoice</button>
+          </div>
+          { this.state.createInvoice && <CreateInvoice apiUrl={apiUrl} addInvoice={this.addInvoice} /> }
           <InvoiceList invoices={this.state.invoices} apiUrl={apiUrl}/>
         </div>
       );
