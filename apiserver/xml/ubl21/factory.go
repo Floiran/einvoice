@@ -1,4 +1,4 @@
-package ubl2_1
+package ubl21
 
 import (
 	"encoding/xml"

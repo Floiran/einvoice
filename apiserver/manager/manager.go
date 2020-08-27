@@ -5,12 +5,14 @@ import (
 	"github.com/filipsladek/einvoice/apiserver/invoice"
 	"github.com/filipsladek/einvoice/apiserver/postgres"
 	"github.com/filipsladek/einvoice/apiserver/storage"
-	ubl2_1 "github.com/filipsladek/einvoice/apiserver/xml/ubl2.1"
+	"github.com/filipsladek/einvoice/apiserver/xml/d16b"
+	"github.com/filipsladek/einvoice/apiserver/xml/ubl21"
 )
 
 type Manager interface {
 	Create(invoice *invoice.Invoice) (error, *invoice.Invoice, *invoice.Meta)
 	CreateUBL(value string) (error, *invoice.Invoice, *invoice.Meta)
+	CreateD16B(value string) (error, *invoice.Invoice, *invoice.Meta)
 	CreateJSON(value string) (error, *invoice.Invoice, *invoice.Meta)
 
 	Get(id string) (error, *invoice.Invoice)
@@ -65,7 +67,28 @@ func (manager managerImpl) CreateJSON(value string) (error, *invoice.Invoice, *i
 }
 
 func (manager managerImpl) CreateUBL(value string) (error, *invoice.Invoice, *invoice.Meta) {
-	err, inv := ubl2_1.Create(value)
+	err, inv := ubl21.Create(value)
+	if err != nil {
+		return err, nil, nil
+	}
+
+	meta := inv.GetMeta()
+	manager.db.CreateInvoice(meta)
+	inv.Id = meta.Id
+
+	jsonString, err := json.Marshal(inv)
+	if err != nil {
+		return err, nil, nil
+	}
+	err = manager.storage.SaveObject("invoice-"+inv.Id, string(jsonString))
+	if err != nil {
+		return err, nil, nil
+	}
+	return nil, inv, meta
+}
+
+func (manager managerImpl) CreateD16B(value string) (error, *invoice.Invoice, *invoice.Meta) {
+	err, inv := d16b.Create(value)
 	if err != nil {
 		return err, nil, nil
 	}
