@@ -5,6 +5,7 @@ import (
 	"github.com/filipsladek/einvoice/apiserver/invoice"
 	"github.com/filipsladek/einvoice/apiserver/postgres"
 	"github.com/filipsladek/einvoice/apiserver/storage"
+	ubl2_1 "github.com/filipsladek/einvoice/apiserver/xml/ubl2.1"
 )
 
 type Manager interface {
@@ -12,8 +13,8 @@ type Manager interface {
 	CreateUBL(value string) (error, *invoice.Invoice, *invoice.Meta)
 	CreateJSON(value string) (error, *invoice.Invoice, *invoice.Meta)
 
-	GetMeta(id string) (error, *invoice.Meta)
 	Get(id string) (error, *invoice.Invoice)
+	GetMeta(id string) (error, *invoice.Meta)
 	GetAllInvoiceMeta() []invoice.Meta
 }
 
@@ -64,7 +65,24 @@ func (manager managerImpl) CreateJSON(value string) (error, *invoice.Invoice, *i
 }
 
 func (manager managerImpl) CreateUBL(value string) (error, *invoice.Invoice, *invoice.Meta) {
-	return nil, nil, nil
+	err, inv := ubl2_1.Create(value)
+	if err != nil {
+		return err, nil, nil
+	}
+
+	meta := inv.GetMeta()
+	manager.db.CreateInvoice(meta)
+	inv.Id = meta.Id
+
+	jsonString, err := json.Marshal(inv)
+	if err != nil {
+		return err, nil, nil
+	}
+	err = manager.storage.SaveObject("invoice-"+inv.Id, string(jsonString))
+	if err != nil {
+		return err, nil, nil
+	}
+	return nil, inv, meta
 }
 
 func (manager managerImpl) GetMeta(id string) (error, *invoice.Meta) {

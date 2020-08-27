@@ -24,7 +24,7 @@ func handleRequests(manager manager.Manager) {
 	router.PathPrefix("/api/invoice/full/{id}").Methods("GET").HandlerFunc(apiHandlers.GetFullInvoiceHandler(manager))
 	router.PathPrefix("/api/invoice/meta/{id}").Methods("GET").HandlerFunc(apiHandlers.GetInvoiceMetaHandler(manager))
 	router.PathPrefix("/api/invoice/json").Methods("POST").HandlerFunc(apiHandlers.CreateInvoiceJsonHandler(manager))
-	//router.PathPrefix("/api/invoice/xml").Methods("POST").HandlerFunc(apiHandlers.CreateInvoiceXmlHandler(manager))
+	router.PathPrefix("/api/invoice/xml/ubl").Methods("POST").HandlerFunc(apiHandlers.CreateInvoiceXmlUblHandler(manager))
 
 	srv := &http.Server{
 		Handler:      handlers.LoggingHandler(os.Stdout, handlers.CORS(corsOptions...)(router)),
@@ -32,6 +32,8 @@ func handleRequests(manager manager.Manager) {
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
+
+	println("Server running on", srv.Addr)
 
 	log.Fatal(srv.ListenAndServe())
 }

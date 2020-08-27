@@ -1,14 +1,9 @@
 package invoice
 
-import (
-	"encoding/xml"
-)
-
 type Invoice struct {
-	XMLName  xml.Name `xml:"invoice"`
-	Id       string   `xml:"id" json:"id"`
-	Sender   string   `xml:"sender" json:"sender"`
-	Receiver string   `xml:"receiver" json:"receiver"`
+	Id       string `json:"id"`
+	Sender   string `json:"sender"`
+	Receiver string `json:"receiver"`
 }
 
 type Meta struct {
