@@ -58,9 +58,9 @@ func main() {
 
 	// dummy data
 	if len(dbConnector.GetAllInvoice()) == 0 {
-		manager.Create(&invoice.Invoice{Sender: "SubjectA", Receiver: "SubjectB"})
-		manager.Create(&invoice.Invoice{Sender: "SubjectA", Receiver: "SubjectC"})
-		manager.Create(&invoice.Invoice{Sender: "SubjectA", Receiver: "SubjectD"})
+		manager.Create(&invoice.Invoice{Sender: "SubjectA", Receiver: "SubjectB", Price: 100})
+		manager.Create(&invoice.Invoice{Sender: "SubjectA", Receiver: "SubjectC", Price: 200})
+		manager.Create(&invoice.Invoice{Sender: "SubjectA", Receiver: "SubjectD", Price: 300})
 	}
 
 	handleRequests(manager)

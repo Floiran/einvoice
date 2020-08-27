@@ -17,6 +17,9 @@ export let defaultUbl =
       </cac:PartyName>
     </cac:Party>
   </cac:AccountingCustomerParty>
+  <cac:LegalMonetaryTotal>
+     <cbc:PayableAmount>100.00</cbc:PayableAmount>
+  </cac:LegalMonetaryTotal>
 </Invoice>`
 
 export let defaultD16b =
@@ -33,5 +36,10 @@ export let defaultD16b =
                 <ram:Name>Buyercompany ltd</ram:Name>
             </ram:BuyerTradeParty>
         </ram:ApplicableHeaderTradeAgreement>
+        <ram:ApplicableHeaderTradeSettlement>
+            <ram:SpecifiedTradeSettlementHeaderMonetarySummation>
+                <ram:LineTotalAmount>4000</ram:LineTotalAmount>
+            </ram:SpecifiedTradeSettlementHeaderMonetarySummation>
+        </ram:ApplicableHeaderTradeSettlement>
     </rsm:SupplyChainTradeTransaction>
 </rsm:CrossIndustryInvoice>`

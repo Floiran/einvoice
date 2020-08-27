@@ -13,6 +13,7 @@ class InvoiceList extends Component {
           <td>{invoice.id}</td>
           <td>{invoice.sender}</td>
           <td>{invoice.receiver}</td>
+          <td>{invoice.price}</td>
           <td><a href={apiUrl + "/api/invoice/full/" + invoice.id}>download</a></td>
         </tr>
       });
@@ -28,6 +29,7 @@ class InvoiceList extends Component {
             <th>ID</th>
             <th>Sender</th>
             <th>Receiver</th>
+            <th>Price</th>
             <th></th>
           </tr>
           </thead>

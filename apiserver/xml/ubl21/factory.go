@@ -3,18 +3,21 @@ package ubl21
 import (
 	"encoding/xml"
 	"github.com/filipsladek/einvoice/apiserver/invoice"
+	"strconv"
 )
 
 func Create(value string) (error, *invoice.Meta) {
-	ublInvoice := &Invoice{}
-	err := xml.Unmarshal([]byte(value), &ublInvoice)
+	inv := &Invoice{}
+	err := xml.Unmarshal([]byte(value), &inv)
 	if err != nil {
 		return err, nil
 	}
 
+	price, _ := strconv.ParseFloat(inv.LegalMonetaryTotal.PayableAmount.Value, 64)
 	return nil, &invoice.Meta{
-		Sender:   ublInvoice.Supplier.Party.Name.Name,
-		Receiver: ublInvoice.Customer.Party.Name.Name,
+		Sender:   inv.Supplier.Party.Name.Name,
+		Receiver: inv.Customer.Party.Name.Name,
 		Format:   invoice.UblFormat,
+		Price:    price,
 	}
 }

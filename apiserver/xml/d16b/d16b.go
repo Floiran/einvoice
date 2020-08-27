@@ -8,14 +8,27 @@ type CrossIndustryInvoice struct {
 }
 
 type SupplyChainTradeTransaction struct {
-	ApplicableHeaderTradeAgreement HeaderTradeDeliveryType `xml:"ApplicableHeaderTradeAgreement"`
+	ApplicableHeaderTradeAgreement  HeaderTradeAgreementType  `xml:"ApplicableHeaderTradeAgreement"`
+	ApplicableHeaderTradeSettlement HeaderTradeSettlementType `xml:"ApplicableHeaderTradeSettlement"`
 }
 
-type HeaderTradeDeliveryType struct {
+type HeaderTradeAgreementType struct {
 	SellerTradeParty TradePartyType `xml:"SellerTradeParty"`
 	BuyerTradeParty  TradePartyType `xml:"BuyerTradeParty"`
 }
 
 type TradePartyType struct {
 	Name string `xml:"Name"`
+}
+
+type HeaderTradeSettlementType struct {
+	SpecifiedTradeSettlementHeaderMonetarySummation TradeSettlementHeaderMonetarySummationType `xml:"SpecifiedTradeSettlementHeaderMonetarySummation"`
+}
+
+type TradeSettlementHeaderMonetarySummationType struct {
+	LineTotalAmount AmountType `xml:"LineTotalAmount"`
+}
+
+type AmountType struct {
+	Value string `xml:",innerxml"`
 }

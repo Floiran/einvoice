@@ -3,18 +3,21 @@ package d16b
 import (
 	"encoding/xml"
 	"github.com/filipsladek/einvoice/apiserver/invoice"
+	"strconv"
 )
 
 func Create(value string) (error, *invoice.Meta) {
-	d16bInvoice := &CrossIndustryInvoice{}
-	err := xml.Unmarshal([]byte(value), &d16bInvoice)
+	inv := &CrossIndustryInvoice{}
+	err := xml.Unmarshal([]byte(value), &inv)
 	if err != nil {
 		return err, nil
 	}
 
+	price, _ := strconv.ParseFloat(inv.SupplyChainTradeTransaction.ApplicableHeaderTradeSettlement.SpecifiedTradeSettlementHeaderMonetarySummation.LineTotalAmount.Value, 64)
 	return nil, &invoice.Meta{
-		Sender:   d16bInvoice.SupplyChainTradeTransaction.ApplicableHeaderTradeAgreement.SellerTradeParty.Name,
-		Receiver: d16bInvoice.SupplyChainTradeTransaction.ApplicableHeaderTradeAgreement.BuyerTradeParty.Name,
+		Sender:   inv.SupplyChainTradeTransaction.ApplicableHeaderTradeAgreement.SellerTradeParty.Name,
+		Receiver: inv.SupplyChainTradeTransaction.ApplicableHeaderTradeAgreement.BuyerTradeParty.Name,
 		Format:   invoice.D16bFormat,
+		Price:    price,
 	}
 }

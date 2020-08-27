@@ -7,15 +7,17 @@ const (
 )
 
 type Invoice struct {
-	Sender   string `json:"sender"`
-	Receiver string `json:"receiver"`
+	Sender   string  `json:"sender"`
+	Receiver string  `json:"receiver"`
+	Price    float64 `json:"price"`
 }
 
 type Meta struct {
-	Id       string `json:"id"`
-	Sender   string `json:"sender"`
-	Receiver string `json:"receiver"`
-	Format   string `json:"format"`
+	Id       string  `json:"id"`
+	Sender   string  `json:"sender"`
+	Receiver string  `json:"receiver"`
+	Format   string  `json:"format"`
+	Price    float64 `json:"price"`
 }
 
 func (invoice *Invoice) GetMeta() *Meta {
@@ -23,5 +25,6 @@ func (invoice *Invoice) GetMeta() *Meta {
 		Sender:   invoice.Sender,
 		Receiver: invoice.Receiver,
 		Format:   JsonFormat,
+		Price:    invoice.Price,
 	}
 }
