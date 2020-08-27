@@ -1,7 +1,12 @@
 package invoice
 
+const (
+	JsonFormat = "json"
+	UblFormat  = "ubl2.1"
+	D16bFormat = "d16b"
+)
+
 type Invoice struct {
-	Id       string `json:"id"`
 	Sender   string `json:"sender"`
 	Receiver string `json:"receiver"`
 }
@@ -10,8 +15,13 @@ type Meta struct {
 	Id       string `json:"id"`
 	Sender   string `json:"sender"`
 	Receiver string `json:"receiver"`
+	Format   string `json:"format"`
 }
 
 func (invoice *Invoice) GetMeta() *Meta {
-	return &Meta{Id: invoice.Id, Sender: invoice.Sender, Receiver: invoice.Receiver}
+	return &Meta{
+		Sender:   invoice.Sender,
+		Receiver: invoice.Receiver,
+		Format:   JsonFormat,
+	}
 }

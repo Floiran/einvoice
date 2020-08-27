@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"github.com/filipsladek/einvoice/apiserver/invoice"
 	"github.com/filipsladek/einvoice/apiserver/manager"
 	"github.com/gorilla/mux"
 	"io"
@@ -29,13 +30,23 @@ func GetFullInvoiceHandler(manager manager.Manager) func(w http.ResponseWriter, 
 		vars := mux.Vars(r)
 		id := vars["id"]
 
-		err, inv := manager.Get(id)
+		err, meta := manager.GetMeta(id)
 		if err != nil {
 			panic(err)
 		}
 
-		w.Header().Set("Content-Type", "application/json")
-		json.NewEncoder(w).Encode(inv)
+		err, inv := manager.GetFull(id, meta.Format)
+		if err != nil {
+			panic(err)
+		}
+
+		format := "json"
+		if meta.Format != invoice.JsonFormat {
+			format = "xml"
+		}
+
+		w.Header().Set("Content-Type", "application/"+format)
+		w.Write([]byte(inv))
 	}
 }
 
@@ -59,7 +70,7 @@ func CreateInvoiceJsonHandler(manager manager.Manager) func(w http.ResponseWrite
 			panic(err)
 		}
 
-		err, _, meta := manager.CreateJSON(string(body))
+		err, meta := manager.CreateJSON(string(body))
 		if err != nil {
 			panic(err)
 		}
@@ -82,7 +93,7 @@ func CreateInvoiceXmlUblHandler(manager manager.Manager) func(w http.ResponseWri
 			panic(err)
 		}
 
-		err, _, meta := manager.CreateUBL(string(body))
+		err, meta := manager.CreateUBL(string(body))
 		if err != nil {
 			panic(err)
 		}
@@ -105,7 +116,7 @@ func CreateInvoiceXmlD16bHandler(manager manager.Manager) func(w http.ResponseWr
 			panic(err)
 		}
 
-		err, _, meta := manager.CreateD16B(string(body))
+		err, meta := manager.CreateD16B(string(body))
 		if err != nil {
 			panic(err)
 		}

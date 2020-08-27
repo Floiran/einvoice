@@ -10,12 +10,12 @@ import (
 )
 
 type Manager interface {
-	Create(invoice *invoice.Invoice) (error, *invoice.Invoice, *invoice.Meta)
-	CreateUBL(value string) (error, *invoice.Invoice, *invoice.Meta)
-	CreateD16B(value string) (error, *invoice.Invoice, *invoice.Meta)
-	CreateJSON(value string) (error, *invoice.Invoice, *invoice.Meta)
+	Create(invoice *invoice.Invoice) (error, *invoice.Meta)
+	CreateUBL(value string) (error, *invoice.Meta)
+	CreateD16B(value string) (error, *invoice.Meta)
+	CreateJSON(value string) (error, *invoice.Meta)
 
-	Get(id string) (error, *invoice.Invoice)
+	GetFull(id string, format string) (error, string)
 	GetMeta(id string) (error, *invoice.Meta)
 	GetAllInvoiceMeta() []invoice.Meta
 }
@@ -29,99 +29,82 @@ func NewManager(db postgres.DBConnector, storage storage.Storage) Manager {
 	return &managerImpl{db, storage}
 }
 
-func (manager managerImpl) Create(invoice *invoice.Invoice) (error, *invoice.Invoice, *invoice.Meta) {
+func (manager managerImpl) Create(invoice *invoice.Invoice) (error, *invoice.Meta) {
 	meta := invoice.GetMeta()
 	manager.db.CreateInvoice(meta)
-	invoice.Id = meta.Id
-	jsonString, err := json.Marshal(invoice)
-	if err != nil {
-		return err, nil, nil
-	}
-	err = manager.storage.SaveObject("invoice-"+invoice.Id, string(jsonString))
-	if err != nil {
-		return err, nil, nil
-	}
-	return nil, invoice, meta
-}
-
-func (manager managerImpl) CreateJSON(value string) (error, *invoice.Invoice, *invoice.Meta) {
-	var invoice = new(invoice.Invoice)
-
-	if err := json.Unmarshal([]byte(value), &invoice); err != nil {
-		return err, nil, nil
-	}
-
-	meta := invoice.GetMeta()
-	manager.db.CreateInvoice(meta)
-	invoice.Id = meta.Id
 
 	jsonString, err := json.Marshal(invoice)
 	if err != nil {
-		return err, nil, nil
+		return err, nil
 	}
-	err = manager.storage.SaveObject("invoice-"+invoice.Id, string(jsonString))
+	err = manager.storage.SaveObject("invoice-"+meta.Id+".json", string(jsonString))
 	if err != nil {
-		return err, nil, nil
+		return err, nil
 	}
-	return nil, invoice, meta
+	return nil, meta
 }
 
-func (manager managerImpl) CreateUBL(value string) (error, *invoice.Invoice, *invoice.Meta) {
-	err, inv := ubl21.Create(value)
-	if err != nil {
-		return err, nil, nil
+func (manager managerImpl) CreateJSON(value string) (error, *invoice.Meta) {
+	var inv = new(invoice.Invoice)
+
+	if err := json.Unmarshal([]byte(value), &inv); err != nil {
+		return err, nil
 	}
 
 	meta := inv.GetMeta()
 	manager.db.CreateInvoice(meta)
-	inv.Id = meta.Id
 
-	jsonString, err := json.Marshal(inv)
+	err := manager.storage.SaveObject("invoice-"+meta.Id+".json", value)
 	if err != nil {
-		return err, nil, nil
+		return err, nil
 	}
-	err = manager.storage.SaveObject("invoice-"+inv.Id, string(jsonString))
-	if err != nil {
-		return err, nil, nil
-	}
-	return nil, inv, meta
+	return nil, meta
 }
 
-func (manager managerImpl) CreateD16B(value string) (error, *invoice.Invoice, *invoice.Meta) {
-	err, inv := d16b.Create(value)
+func (manager managerImpl) CreateUBL(value string) (error, *invoice.Meta) {
+	err, meta := ubl21.Create(value)
 	if err != nil {
-		return err, nil, nil
+		return err, nil
 	}
 
-	meta := inv.GetMeta()
 	manager.db.CreateInvoice(meta)
-	inv.Id = meta.Id
 
-	jsonString, err := json.Marshal(inv)
+	err = manager.storage.SaveObject("invoice-"+meta.Id+".xml", value)
 	if err != nil {
-		return err, nil, nil
+		return err, nil
 	}
-	err = manager.storage.SaveObject("invoice-"+inv.Id, string(jsonString))
+	return nil, meta
+}
+
+func (manager managerImpl) CreateD16B(value string) (error, *invoice.Meta) {
+	err, meta := d16b.Create(value)
 	if err != nil {
-		return err, nil, nil
+		return err, nil
 	}
-	return nil, inv, meta
+
+	manager.db.CreateInvoice(meta)
+
+	err = manager.storage.SaveObject("invoice-"+meta.Id+".xml", value)
+	if err != nil {
+		return err, nil
+	}
+	return nil, meta
 }
 
 func (manager managerImpl) GetMeta(id string) (error, *invoice.Meta) {
 	return nil, manager.db.GetInvoiceMeta(id)
 }
 
-func (manager managerImpl) Get(id string) (error, *invoice.Invoice) {
-	invoiceStr, err := manager.storage.ReadObject("invoice-" + id)
+func (manager managerImpl) GetFull(id string, format string) (error, string) {
+	extension := "json"
+	if format != invoice.JsonFormat {
+		extension = "xml"
+	}
+	invoiceStr, err := manager.storage.ReadObject("invoice-" + id + "." + extension)
 	if err != nil {
-		return err, nil
+		return err, ""
 	}
-	invoice := &invoice.Invoice{}
-	if err := json.Unmarshal([]byte(invoiceStr), &invoice); err != nil {
-		return err, nil
-	}
-	return nil, invoice
+	return nil, invoiceStr
 }
 
 func (manager managerImpl) GetAllInvoiceMeta() []invoice.Meta {
