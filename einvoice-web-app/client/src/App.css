@@ -7,5 +7,14 @@
 }
 
 .btn {
+  margin-left: 5px;
+  margin-right: 5px;
+}
+
+p {
   margin: 10px;
+}
+
+.link {
+  color: blue;
 }

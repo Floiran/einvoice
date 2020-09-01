@@ -1,5 +1,5 @@
 # export GCP_AUTH_KIND=serviceaccount
-# export GCP_SERVICE_ACCOUNT_FILE=/home/filip/webserver1-283520-386230d8738c.json
+# export GCP_SERVICE_ACCOUNT_FILE=/home/filip/mfsr/webserver1-283520-386230d8738c.json
 # export GCP_SCOPES=https://www.googleapis.com/auth/compute,https://www.googleapis.com/auth/cloud-platform
 # ansible-playbook all.yaml
 ---
@@ -10,7 +10,7 @@
       name: webserverstorage1
     project_id: webserver1-283520
     sql_instance:
-      name: webserverdb11
+      name: webserverdb13
       backend_type: SECOND_GEN
       database_version: POSTGRES_12
       region: us-west1
@@ -19,6 +19,7 @@
       db_password: 12345
       db_name: einvoice
     cluster_name: my-cluster1
+    docker_password: " {{ lookup('file', '/home/filip/mfsr/webserver1-283520-386230d8738c.json')}}"
   tasks:
 # kubernetes cluster
     - name: create a cluster
@@ -30,6 +31,8 @@
           password: my-secret-password
         location: '{{ location }}'
         project: webserver1-283520
+        ip_allocation_policy:
+          use_ip_aliases: yes
         state: present
       register: cluster
     - name: setup kubect
@@ -93,7 +96,7 @@
         registry: gcr.io/webserver1-283520/apiserver
         username: _json_key
         debug: true
-        password: " {{ lookup('file', '/home/filip/mfsr/webserver1-283520-386230d8738c.json')}}"
+        password: '{{ docker_password }}'
     - name: Build apiserver and push it to a private repo
       docker_image:
         build:
@@ -173,28 +176,112 @@
             name: apiserver-loadbalancer
             namespace: default
           spec:
-            externalTrafficPolicy: Cluster
             ports:
               - port: 80
                 protocol: TCP
                 targetPort: 8080
             selector:
               app: apiserver
+            type: ClusterIP
+      register: apiserver_service
+# redis
+    - name: create redis instance
+      gcp_redis_instance:
+        name: instance1
+        tier: STANDARD_HA
+        memory_size_gb: 1
+        region: '{{ location }}'
+        redis_version: REDIS_3_2
+        display_name: Auth db
+        reserved_ip_range: 192.168.0.0/29
+        project: '{{ project_id }}'
+        state: present
+      register: redis
+# auth proxy
+    - name: Build authproxy and push it to a private repo
+      docker_image:
+        build:
+          path: ../
+          dockerfile: Dockerfile-authproxy
+        name: gcr.io/webserver1-283520/authproxy
+        tag: latest
+        push: yes
+        force: yes
+        source: build
+        state: present
+    - name: create authproxy deployment
+      k8s:
+        state: present
+        name: authproxy
+        api_version: v1
+        definition:
+          apiVersion: apps/v1
+          kind: Deployment
+          metadata:
+            labels:
+              app: authproxy
+            name: authproxy
+            namespace: default
+          spec:
+            replicas: 1
+            strategy:
+              type: Recreate
+            selector:
+              matchLabels:
+                app: authproxy
+            template:
+              metadata:
+                labels:
+                  app: authproxy
+              spec:
+                restartPolicy: Always
+                containers:
+                  - name: authproxy
+                    image: gcr.io/webserver1-283520/authproxy:latest
+                    imagePullPolicy: Always
+                    env:
+                      - name: APISERVER_URL
+                        value: 'http://{{apiserver_service.result.spec.clusterIP}}:80'
+                      - name: REDIS_URL
+                        value: '{{redis.host}}:{{redis.port}}'
+                    ports:
+                      - containerPort: 8082
+    - name: create authproxy loadbalancer
+      k8s:
+        state: present
+        name: authproxy-loadbalancer
+        api_version: v1
+        definition:
+          apiVersion: v1
+          kind: Service
+          metadata:
+            labels:
+              app: authproxy
+            name: authproxy-loadbalancer
+            namespace: default
+          spec:
+            externalTrafficPolicy: Cluster
+            ports:
+              - port: 80
+                protocol: TCP
+                targetPort: 8082
+            selector:
+              app: authproxy
             sessionAffinity: None
             type: LoadBalancer
-      register: apiserver_service
-    - name: waiting for apiserver loadbalancer ip
-      command: bash -c 'external_ip="<pending>"; while [ $external_ip = "<pending>" ]; do result=$(kubectl get svc apiserver-loadbalancer | tail -n1); ip=($result); external_ip=${ip[3]}; [ $external_ip = "<pending>" ] && sleep 10; done; echo $external_ip;'
+      register: authproxy_service
+    - name: waiting for authproxy loadbalancer ip
+      command: bash -c 'external_ip="<pending>"; while [ $external_ip = "<pending>" ]; do result=$(kubectl get svc authproxy-loadbalancer | tail -n1); ip=($result); external_ip=${ip[3]}; [ $external_ip = "<pending>" ] && sleep 5; done; echo $external_ip;'
       register: result
-    - set_fact: apiserver_loadbalancer_ip="{{ result.stdout_lines[0] }}"
+    - set_fact: authproxy_loadbalancer_ip="{{ result.stdout_lines[0] }}"
     - debug:
-        msg: '{{ apiserver_loadbalancer_ip }}'
+        msg: 'proxy ip: {{ authproxy_loadbalancer_ip }}'
 # web-app
     - name: Build web-app and push it to a private repo
       docker_image:
         build:
           path: ../
-          dockerfile: einvoice-web-app.Dockerfile
+          dockerfile: Dockerfile-einvoice-web-app
         name: gcr.io/webserver1-283520/web-app
         tag: latest
         push: yes
@@ -233,7 +320,7 @@
                     imagePullPolicy: Always
                     env:
                       - name: API_SERVER_URL
-                        value: 'http://{{ apiserver_loadbalancer_ip }}'
+                        value: 'http://{{ authproxy_loadbalancer_ip }}'
                     ports:
                     - containerPort: 8081
     - name: create web-app loadbalancer
@@ -260,11 +347,9 @@
             sessionAffinity: None
             type: LoadBalancer
       register: loadbalancer
-    - debug:
-        msg: '{{ loadbalancer }}'
     - name: waiting for web-app loadbalancer ip
-      command: bash -c 'external_ip="<pending>"; while [ $external_ip = "<pending>" ]; do result=$(kubectl get svc web-app-loadbalancer | tail -n1); ip=($result); external_ip=${ip[3]}; [ $external_ip = "<pending>" ] && sleep 10; done; echo $external_ip;'
+      command: bash -c 'external_ip="<pending>"; while [ $external_ip = "<pending>" ]; do result=$(kubectl get svc web-app-loadbalancer | tail -n1); ip=($result); external_ip=${ip[3]}; [ $external_ip = "<pending>" ] && sleep 5; done; echo $external_ip;'
       register: webapp_loadbalancer_result
     - set_fact: webapp_loadbalancer_ip="{{ webapp_loadbalancer_result.stdout_lines[0] }}"
     - debug:
-        msg: 'web-app-ip is {{ webapp_loadbalancer_ip }}'
+        msg: 'web-app ip: {{ webapp_loadbalancer_ip }}'

@@ -14,7 +14,8 @@ class InvoiceList extends Component {
           <td>{invoice.sender}</td>
           <td>{invoice.receiver}</td>
           <td>{invoice.price}</td>
-          <td><a href={apiUrl + "/api/invoice/full/" + invoice.id}>download</a></td>
+          <td>{invoice.format}</td>
+          <td><p className='link' onClick={() => this.props.viewInvoice(invoice.id)}>view</p></td>
         </tr>
       });
     }
@@ -30,6 +31,7 @@ class InvoiceList extends Component {
             <th>Sender</th>
             <th>Receiver</th>
             <th>Price</th>
+            <th>Format</th>
             <th></th>
           </tr>
           </thead>

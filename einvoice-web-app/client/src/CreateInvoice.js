@@ -45,7 +45,10 @@ class CreateInvoice extends Component {
   submitJsonInvoice() {
     fetch(this.props.apiUrl + '/api/invoice/json', {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': this.props.user.token
+      },
       body: JSON.stringify({
         sender: this.state.postInvoiceSender,
         receiver: this.state.postInvoiceReceiver
@@ -61,7 +64,10 @@ class CreateInvoice extends Component {
   submitXmlInvoice() {
     fetch(this.props.apiUrl + '/api/invoice/' + this.state.format, {
       method: 'POST',
-      headers: {'Content-Type': 'application/xml'},
+      headers: {
+        'Content-Type': 'application/xml',
+        'Authorization': this.props.user.token
+      },
       body: this.state.xmlInputValue
     })
       .then( response => response.json())

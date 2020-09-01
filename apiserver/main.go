@@ -28,7 +28,7 @@ func handleRequests(manager manager.Manager) {
 	router.PathPrefix("/api/invoice/d16b").Methods("POST").HandlerFunc(apiHandlers.CreateInvoiceXmlD16bHandler(manager))
 
 	srv := &http.Server{
-		Handler:      handlers.LoggingHandler(os.Stdout, handlers.CORS(corsOptions...)(router)),
+		Handler:      handlers.LoggingHandler(os.Stdout, router),
 		Addr:         "0.0.0.0:8080",
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
@@ -64,10 +64,4 @@ func main() {
 	}
 
 	handleRequests(manager)
-}
-
-var corsOptions = []handlers.CORSOption{
-	handlers.AllowedHeaders([]string{"Content-Type", "Origin", "Accept", "token"}),
-	handlers.AllowedOrigins([]string{"*"}),
-	handlers.AllowedMethods([]string{"GET", "POST", "OPTIONS"}),
 }
