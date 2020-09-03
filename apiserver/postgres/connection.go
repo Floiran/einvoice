@@ -39,7 +39,7 @@ func Connect(config ConnectionConfig) *pg.DB {
 	return db
 }
 
-func InitDB(connector DBConnector) {
+func InitDB(connector *DBConnector) {
 
 	query, err := ioutil.ReadFile("sql/setup.sql")
 	if err != nil {
@@ -55,7 +55,7 @@ type DBConnector struct {
 	DB *pg.DB
 }
 
-func (connector DBConnector) GetAllInvoice() []invoice.Meta {
+func (connector *DBConnector) GetAllInvoice() []invoice.Meta {
 	var invoices []invoice.Meta
 	err := connector.DB.Model(&invoices).Select()
 	if err != nil {
@@ -64,7 +64,7 @@ func (connector DBConnector) GetAllInvoice() []invoice.Meta {
 	return invoices
 }
 
-func (connector DBConnector) GetInvoiceMeta(id string) *invoice.Meta {
+func (connector *DBConnector) GetInvoiceMeta(id string) *invoice.Meta {
 	invoice := &invoice.Meta{}
 	err := connector.DB.Model(invoice).Where("id = ?", id).Select(invoice)
 	if err != nil {
@@ -73,7 +73,7 @@ func (connector DBConnector) GetInvoiceMeta(id string) *invoice.Meta {
 	return invoice
 }
 
-func (connector DBConnector) CreateInvoice(invoice *invoice.Meta) *invoice.Meta {
+func (connector *DBConnector) CreateInvoice(invoice *invoice.Meta) *invoice.Meta {
 	_, err := connector.DB.Model(invoice).Insert(invoice)
 	if err != nil {
 		panic(err)

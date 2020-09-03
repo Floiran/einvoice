@@ -21,15 +21,15 @@ type Manager interface {
 }
 
 type managerImpl struct {
-	db      postgres.DBConnector
+	db      *postgres.DBConnector
 	storage storage.Storage
 }
 
-func NewManager(db postgres.DBConnector, storage storage.Storage) Manager {
+func NewManager(db *postgres.DBConnector, storage storage.Storage) Manager {
 	return &managerImpl{db, storage}
 }
 
-func (manager managerImpl) Create(invoice *invoice.Invoice) (error, *invoice.Meta) {
+func (manager *managerImpl) Create(invoice *invoice.Invoice) (error, *invoice.Meta) {
 	meta := invoice.GetMeta()
 	manager.db.CreateInvoice(meta)
 
@@ -44,7 +44,7 @@ func (manager managerImpl) Create(invoice *invoice.Invoice) (error, *invoice.Met
 	return nil, meta
 }
 
-func (manager managerImpl) CreateJSON(value string) (error, *invoice.Meta) {
+func (manager *managerImpl) CreateJSON(value string) (error, *invoice.Meta) {
 	var inv = new(invoice.Invoice)
 
 	if err := json.Unmarshal([]byte(value), &inv); err != nil {
@@ -61,7 +61,7 @@ func (manager managerImpl) CreateJSON(value string) (error, *invoice.Meta) {
 	return nil, meta
 }
 
-func (manager managerImpl) CreateUBL(value string) (error, *invoice.Meta) {
+func (manager *managerImpl) CreateUBL(value string) (error, *invoice.Meta) {
 	err, meta := ubl21.Create(value)
 	if err != nil {
 		return err, nil
@@ -76,7 +76,7 @@ func (manager managerImpl) CreateUBL(value string) (error, *invoice.Meta) {
 	return nil, meta
 }
 
-func (manager managerImpl) CreateD16B(value string) (error, *invoice.Meta) {
+func (manager *managerImpl) CreateD16B(value string) (error, *invoice.Meta) {
 	err, meta := d16b.Create(value)
 	if err != nil {
 		return err, nil
@@ -91,11 +91,11 @@ func (manager managerImpl) CreateD16B(value string) (error, *invoice.Meta) {
 	return nil, meta
 }
 
-func (manager managerImpl) GetMeta(id string) (error, *invoice.Meta) {
+func (manager *managerImpl) GetMeta(id string) (error, *invoice.Meta) {
 	return nil, manager.db.GetInvoiceMeta(id)
 }
 
-func (manager managerImpl) GetFull(id string, format string) (error, string) {
+func (manager *managerImpl) GetFull(id string, format string) (error, string) {
 	extension := "json"
 	if format != invoice.JsonFormat {
 		extension = "xml"
@@ -107,6 +107,6 @@ func (manager managerImpl) GetFull(id string, format string) (error, string) {
 	return nil, invoiceStr
 }
 
-func (manager managerImpl) GetAllInvoiceMeta() []invoice.Meta {
+func (manager *managerImpl) GetAllInvoiceMeta() []invoice.Meta {
 	return manager.db.GetAllInvoice()
 }

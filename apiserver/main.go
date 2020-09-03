@@ -50,7 +50,7 @@ func main() {
 	db := postgres.Connect(dbConf)
 	defer db.Close()
 
-	dbConnector := postgres.DBConnector{DB: db}
+	dbConnector := &postgres.DBConnector{DB: db}
 
 	postgres.InitDB(dbConnector)
 

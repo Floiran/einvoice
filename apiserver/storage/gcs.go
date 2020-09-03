@@ -13,7 +13,7 @@ type GSC struct {
 	ctx context.Context
 }
 
-func (storage GSC) SaveObject(path, value string) error {
+func (storage *GSC) SaveObject(path, value string) error {
 	obj := storage.bkt.Object(path)
 	w := obj.NewWriter(storage.ctx)
 
@@ -28,7 +28,7 @@ func (storage GSC) SaveObject(path, value string) error {
 	return nil
 }
 
-func (storage GSC) ReadObject(path string) (string, error) {
+func (storage *GSC) ReadObject(path string) (string, error) {
 	obj := storage.bkt.Object(path)
 	r, err := obj.NewReader(storage.ctx)
 	if err != nil {
@@ -44,7 +44,7 @@ func (storage GSC) ReadObject(path string) (string, error) {
 	return string(res), err
 }
 
-func NewGSC() GSC {
+func NewGSC() *GSC {
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
 
@@ -55,5 +55,5 @@ func NewGSC() GSC {
 	bktName := common.GetRequiredEnvVariable("GCS_BUCKET")
 	bkt := client.Bucket(bktName)
 
-	return GSC{bkt, ctx}
+	return &GSC{bkt, ctx}
 }
