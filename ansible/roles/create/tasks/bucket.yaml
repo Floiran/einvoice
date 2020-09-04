@@ -1,0 +1,6 @@
+---
+- name: create bucket
+  gcp_storage_bucket:
+    name: '{{ storage_instance_name }}'
+    project: '{{ project_id }}'
+    state: present

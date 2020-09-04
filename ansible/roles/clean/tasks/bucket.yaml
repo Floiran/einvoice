@@ -1,6 +1,6 @@
 ---
-- name: create a bucket
+- name: delete bucket
   gcp_storage_bucket:
     name: '{{ storage_instance_name }}'
     project: '{{ project_id }}'
-    state: present
+    state: absent

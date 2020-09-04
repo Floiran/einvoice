@@ -1,0 +1,5 @@
+---
+- import_tasks: gke-cluster.yaml
+- import_tasks: bucket.yaml
+- import_tasks: sql.yaml
+- import_tasks: redis.yaml

@@ -1,5 +1,5 @@
 ---
-- name: Create GCP CloudSQL instance
+- name: Create sql instance
   gcp_sql_instance:
     name: '{{ sql_instance_name }}'
     backend_type: '{{ sql_instance.backend_type }}'

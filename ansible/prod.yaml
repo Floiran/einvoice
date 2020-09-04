@@ -1,11 +1,7 @@
-# export GCP_AUTH_KIND=serviceaccount
-# export GCP_SERVICE_ACCOUNT_FILE=/home/filip/mfsr/webserver1-283520-386230d8738c.json
-# export GCP_SCOPES=https://www.googleapis.com/auth/compute,https://www.googleapis.com/auth/cloud-platform
-# ansible-playbook prod.yaml
 ---
 - hosts: localhost
   tasks:
     - include_vars: vars/common.yaml
     - include_vars: vars/prod.yaml
     - import_role:
-        name: all
+        name: create

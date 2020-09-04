@@ -2,6 +2,6 @@
 - hosts: localhost
   tasks:
     - include_vars: vars/common.yaml
-    - include_vars: vars/dev.yaml
+    - include_vars: vars/prod.yaml
     - import_role:
-        name: create
+        name: clean

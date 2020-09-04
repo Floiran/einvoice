@@ -1,5 +1,5 @@
 ---
-- name: create a cluster
+- name: create cluster
   gcp_container_cluster:
     name: '{{ gke_cluster_name }}'
     initial_node_count: 1
@@ -16,7 +16,7 @@
 - name: setup kubect
   command: gcloud container clusters get-credentials '{{ gke_cluster_name }}' --region us-west1 --project '{{ project_id }}'
 
-- name: create a node pool
+- name: create node pool
   gcp_container_node_pool:
     name: '{{ gke_cluster_name }}-node-pool'
     initial_node_count: 1
