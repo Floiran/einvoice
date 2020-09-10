@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/filipsladek/einvoice/apiserver/invoice"
 	"github.com/filipsladek/einvoice/apiserver/manager"
+	"github.com/filipsladek/einvoice/apiserver/xml"
 	"github.com/gorilla/mux"
 	"io"
 	"io/ioutil"
@@ -83,13 +84,17 @@ func CreateInvoiceJsonHandler(manager manager.Manager) func(w http.ResponseWrite
 	}
 }
 
-func CreateInvoiceXmlUblHandler(manager manager.Manager) func(w http.ResponseWriter, r *http.Request) {
+func CreateInvoiceXmlUblHandler(manager manager.Manager, validator xml.Validator) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 		if err != nil {
 			panic(err)
 		}
 		if err := r.Body.Close(); err != nil {
+			panic(err)
+		}
+
+		if err := validator.ValidateUBL21(body); err != nil {
 			panic(err)
 		}
 
@@ -106,13 +111,17 @@ func CreateInvoiceXmlUblHandler(manager manager.Manager) func(w http.ResponseWri
 	}
 }
 
-func CreateInvoiceXmlD16bHandler(manager manager.Manager) func(w http.ResponseWriter, r *http.Request) {
+func CreateInvoiceXmlD16bHandler(manager manager.Manager, validator xml.Validator) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		body, err := ioutil.ReadAll(io.LimitReader(r.Body, 1048576))
 		if err != nil {
 			panic(err)
 		}
 		if err := r.Body.Close(); err != nil {
+			panic(err)
+		}
+
+		if err := validator.ValidateD16B(body); err != nil {
 			panic(err)
 		}
 

@@ -1,6 +1,6 @@
 ---
 project_id: webserver1-283520
 storage_instance_name: einvoice-dev
-sql_instance_name: einvoice-dev-1
+sql_instance_name: einvoice-dev-6
 gke_cluster_name: einvoice-dev
 redis_instance_name: einvocie-dev

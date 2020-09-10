@@ -2,8 +2,8 @@ package manager
 
 import (
 	"encoding/json"
+	"github.com/filipsladek/einvoice/apiserver/db"
 	"github.com/filipsladek/einvoice/apiserver/invoice"
-	"github.com/filipsladek/einvoice/apiserver/postgres"
 	"github.com/filipsladek/einvoice/apiserver/storage"
 	"github.com/filipsladek/einvoice/apiserver/xml/d16b"
 	"github.com/filipsladek/einvoice/apiserver/xml/ubl21"
@@ -21,11 +21,11 @@ type Manager interface {
 }
 
 type managerImpl struct {
-	db      *postgres.DBConnector
+	db      db.DBConnector
 	storage storage.Storage
 }
 
-func NewManager(db *postgres.DBConnector, storage storage.Storage) Manager {
+func NewManager(db db.DBConnector, storage storage.Storage) Manager {
 	return &managerImpl{db, storage}
 }
 

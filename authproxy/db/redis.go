@@ -26,7 +26,7 @@ func NewAuthDB() AuthDB {
 	rdb := redis.NewClient(&redis.Options{
 		Addr:     common.GetRequiredEnvVariable("REDIS_URL"),
 		Password: "", // no password set
-		DB:       0,  // use default DB
+		DB:       0,  // use default db
 	})
 
 	fmt.Println("ping", rdb.Ping(ctx).Val())

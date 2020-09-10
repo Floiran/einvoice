@@ -60,7 +60,8 @@ func ApiserverRequest(apiserver *url.URL) func(res http.ResponseWriter, req *htt
 		resp, err := client.Do(req)
 		if err != nil {
 			http.Error(res, "Server Error", http.StatusInternalServerError)
-			log.Fatal("ServeHTTP:", err)
+			log.Print("ServeHTTP:", err)
+			return
 		}
 		defer resp.Body.Close()
 

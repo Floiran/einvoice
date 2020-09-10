@@ -65,6 +65,10 @@
                    value: '{{ sql_instance.db_password }}'
                  - name: DB_NAME
                    value: '{{ sql_instance.db_name }}'
+                 - name: D16B_XSD_PATH
+                   value: xml/d16b/xsd
+                 - name: UBL21_XSD_PATH
+                   value: xml/ubl21/xsd
                ports:
                  - containerPort: 8080
              - name: cloud-sql-proxy
