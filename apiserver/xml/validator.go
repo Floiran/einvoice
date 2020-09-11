@@ -2,7 +2,6 @@ package xml
 
 import (
 	"fmt"
-	"github.com/filipsladek/einvoice/common"
 	"github.com/lestrrat-go/libxml2"
 	"github.com/lestrrat-go/libxml2/xsd"
 )
@@ -25,15 +24,15 @@ type validator struct {
 	ubl21Schema *xsd.Schema
 }
 
-func NewValidator() Validator {
-	d16bXsdPath := common.GetRequiredEnvVariable("D16B_XSD_PATH") + "/data/standard/CrossIndustryInvoice_100pD16B.xsd"
-	d16bSchema, err := xsd.ParseFromFile(d16bXsdPath)
+func NewValidator(d16bXsdPath, ubl21Path string) Validator {
+	d16bXsdMainFile := d16bXsdPath + "/data/standard/CrossIndustryInvoice_100pD16B.xsd"
+	d16bSchema, err := xsd.ParseFromFile(d16bXsdMainFile)
 	if err != nil {
 		panic(err)
 	}
 
-	ubl21Path := common.GetRequiredEnvVariable("UBL21_XSD_PATH") + "/maindoc/UBL-Invoice-2.1.xsd"
-	ubl21Schema, err := xsd.ParseFromFile(ubl21Path)
+	ubl21MainFile := ubl21Path + "/maindoc/UBL-Invoice-2.1.xsd"
+	ubl21Schema, err := xsd.ParseFromFile(ubl21MainFile)
 	if err != nil {
 		panic(err)
 	}

@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"github.com/filipsladek/einvoice/common"
+	"github.com/slovak-egov/einvoice/common"
 	"io/ioutil"
 )
 

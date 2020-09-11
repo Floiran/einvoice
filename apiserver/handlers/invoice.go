@@ -2,10 +2,10 @@ package handlers
 
 import (
 	"encoding/json"
-	"github.com/filipsladek/einvoice/apiserver/invoice"
-	"github.com/filipsladek/einvoice/apiserver/manager"
-	"github.com/filipsladek/einvoice/apiserver/xml"
 	"github.com/gorilla/mux"
+	"github.com/slovak-egov/einvoice/apiserver/invoice"
+	"github.com/slovak-egov/einvoice/apiserver/manager"
+	"github.com/slovak-egov/einvoice/apiserver/xml"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -31,12 +31,12 @@ func GetFullInvoiceHandler(manager manager.Manager) func(w http.ResponseWriter, 
 		vars := mux.Vars(r)
 		id := vars["id"]
 
-		err, meta := manager.GetMeta(id)
+		meta, err := manager.GetMeta(id)
 		if err != nil {
 			panic(err)
 		}
 
-		err, inv := manager.GetFull(id, meta.Format)
+		inv, err := manager.GetFull(id, meta.Format)
 		if err != nil {
 			panic(err)
 		}
@@ -54,7 +54,10 @@ func GetFullInvoiceHandler(manager manager.Manager) func(w http.ResponseWriter, 
 func GetAllInvoicesHandler(manager manager.Manager) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 
-		invoices := manager.GetAllInvoiceMeta()
+		invoices, err := manager.GetAllInvoiceMeta()
+		if err != nil {
+			panic(err)
+		}
 
 		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(invoices)
@@ -71,7 +74,7 @@ func CreateInvoiceJsonHandler(manager manager.Manager) func(w http.ResponseWrite
 			panic(err)
 		}
 
-		err, meta := manager.CreateJSON(string(body))
+		meta, err := manager.CreateJSON(string(body))
 		if err != nil {
 			panic(err)
 		}
@@ -98,7 +101,7 @@ func CreateInvoiceXmlUblHandler(manager manager.Manager, validator xml.Validator
 			panic(err)
 		}
 
-		err, meta := manager.CreateUBL(string(body))
+		meta, err := manager.CreateUBL(string(body))
 		if err != nil {
 			panic(err)
 		}
@@ -125,7 +128,7 @@ func CreateInvoiceXmlD16bHandler(manager manager.Manager, validator xml.Validato
 			panic(err)
 		}
 
-		err, meta := manager.CreateD16B(string(body))
+		meta, err := manager.CreateD16B(string(body))
 		if err != nil {
 			panic(err)
 		}

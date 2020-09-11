@@ -1,5 +1,5 @@
 ---
-- name: create bucket
+- name: Create bucket
   gcp_storage_bucket:
     name: '{{ storage_instance_name }}'
     project: '{{ project_id }}'

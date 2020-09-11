@@ -1,5 +1,5 @@
 ---
-- name: create redis instance
+- name: Create redis instance
   gcp_redis_instance:
     name: '{{ redis_instance_name }}'
     tier: STANDARD_HA

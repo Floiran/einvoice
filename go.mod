@@ -1,4 +1,4 @@
-module github.com/filipsladek/einvoice
+module github.com/slovak-egov/einvoice
 
 go 1.13
 

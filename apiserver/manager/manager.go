@@ -2,22 +2,22 @@ package manager
 
 import (
 	"encoding/json"
-	"github.com/filipsladek/einvoice/apiserver/db"
-	"github.com/filipsladek/einvoice/apiserver/invoice"
-	"github.com/filipsladek/einvoice/apiserver/storage"
-	"github.com/filipsladek/einvoice/apiserver/xml/d16b"
-	"github.com/filipsladek/einvoice/apiserver/xml/ubl21"
+	"github.com/slovak-egov/einvoice/apiserver/db"
+	"github.com/slovak-egov/einvoice/apiserver/invoice"
+	"github.com/slovak-egov/einvoice/apiserver/storage"
+	"github.com/slovak-egov/einvoice/apiserver/xml/d16b"
+	"github.com/slovak-egov/einvoice/apiserver/xml/ubl21"
 )
 
 type Manager interface {
-	Create(invoice *invoice.Invoice) (error, *invoice.Meta)
-	CreateUBL(value string) (error, *invoice.Meta)
-	CreateD16B(value string) (error, *invoice.Meta)
-	CreateJSON(value string) (error, *invoice.Meta)
+	Create(invoice *invoice.Invoice) (*invoice.Meta, error)
+	CreateUBL(value string) (*invoice.Meta, error)
+	CreateD16B(value string) (*invoice.Meta, error)
+	CreateJSON(value string) (*invoice.Meta, error)
 
-	GetFull(id string, format string) (error, string)
-	GetMeta(id string) (error, *invoice.Meta)
-	GetAllInvoiceMeta() []invoice.Meta
+	GetFull(id string, format string) (string, error)
+	GetMeta(id string) (*invoice.Meta, error)
+	GetAllInvoiceMeta() ([]invoice.Meta, error)
 }
 
 type managerImpl struct {
@@ -29,84 +29,103 @@ func NewManager(db db.DBConnector, storage storage.Storage) Manager {
 	return &managerImpl{db, storage}
 }
 
-func (manager *managerImpl) Create(invoice *invoice.Invoice) (error, *invoice.Meta) {
+func (manager *managerImpl) Create(invoice *invoice.Invoice) (*invoice.Meta, error) {
 	meta := invoice.GetMeta()
-	manager.db.CreateInvoice(meta)
+
+	if err := manager.db.CreateInvoice(meta); err != nil {
+		return nil, err
+	}
 
 	jsonString, err := json.Marshal(invoice)
 	if err != nil {
-		return err, nil
+		return nil, err
 	}
-	err = manager.storage.SaveObject("invoice-"+meta.Id+".json", string(jsonString))
-	if err != nil {
-		return err, nil
+
+	if err = manager.storage.SaveObject("invoice-"+meta.Id+".json", string(jsonString)); err != nil {
+		return nil, err
 	}
-	return nil, meta
+
+	return meta, nil
 }
 
-func (manager *managerImpl) CreateJSON(value string) (error, *invoice.Meta) {
-	var inv = new(invoice.Invoice)
-
-	if err := json.Unmarshal([]byte(value), &inv); err != nil {
-		return err, nil
-	}
-
-	meta := inv.GetMeta()
-	manager.db.CreateInvoice(meta)
-
-	err := manager.storage.SaveObject("invoice-"+meta.Id+".json", value)
-	if err != nil {
-		return err, nil
-	}
-	return nil, meta
+func fileNameFromMeta(meta *invoice.Meta) string {
+	return fileName(meta.Id, meta.Format)
 }
 
-func (manager *managerImpl) CreateUBL(value string) (error, *invoice.Meta) {
-	err, meta := ubl21.Create(value)
-	if err != nil {
-		return err, nil
-	}
-
-	manager.db.CreateInvoice(meta)
-
-	err = manager.storage.SaveObject("invoice-"+meta.Id+".xml", value)
-	if err != nil {
-		return err, nil
-	}
-	return nil, meta
-}
-
-func (manager *managerImpl) CreateD16B(value string) (error, *invoice.Meta) {
-	err, meta := d16b.Create(value)
-	if err != nil {
-		return err, nil
-	}
-
-	manager.db.CreateInvoice(meta)
-
-	err = manager.storage.SaveObject("invoice-"+meta.Id+".xml", value)
-	if err != nil {
-		return err, nil
-	}
-	return nil, meta
-}
-
-func (manager *managerImpl) GetMeta(id string) (error, *invoice.Meta) {
-	return nil, manager.db.GetInvoiceMeta(id)
-}
-
-func (manager *managerImpl) GetFull(id string, format string) (error, string) {
+func fileName(id, format string) string {
 	extension := "json"
 	if format != invoice.JsonFormat {
 		extension = "xml"
 	}
-	invoiceStr, err := manager.storage.ReadObject("invoice-" + id + "." + extension)
-	if err != nil {
-		return err, ""
-	}
-	return nil, invoiceStr
+
+	return "invoice-" + id + "." + extension
 }
 
-func (manager *managerImpl) GetAllInvoiceMeta() []invoice.Meta {
+func (manager *managerImpl) CreateJSON(value string) (*invoice.Meta, error) {
+	var inv = new(invoice.Invoice)
+
+	if err := json.Unmarshal([]byte(value), &inv); err != nil {
+		return nil, err
+	}
+
+	meta := inv.GetMeta()
+
+	if err := manager.db.CreateInvoice(meta); err != nil {
+		return nil, err
+	}
+
+	if err := manager.storage.SaveObject(fileNameFromMeta(meta), value); err != nil {
+		return nil, err
+	}
+	return meta, nil
+}
+
+func (manager *managerImpl) CreateUBL(value string) (*invoice.Meta, error) {
+	err, meta := ubl21.Create(value)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = manager.db.CreateInvoice(meta); err != nil {
+		return nil, err
+	}
+
+	err = manager.storage.SaveObject(fileNameFromMeta(meta), value)
+	if err != nil {
+		return nil, err
+	}
+	return meta, nil
+}
+
+func (manager *managerImpl) CreateD16B(value string) (*invoice.Meta, error) {
+	err, meta := d16b.Create(value)
+	if err != nil {
+		return nil, err
+	}
+
+	if err = manager.db.CreateInvoice(meta); err != nil {
+		return nil, err
+	}
+
+	err = manager.storage.SaveObject(fileNameFromMeta(meta), value)
+	if err != nil {
+		return nil, err
+	}
+	return meta, err
+}
+
+func (manager *managerImpl) GetMeta(id string) (*invoice.Meta, error) {
+	return manager.db.GetInvoiceMeta(id)
+}
+
+func (manager *managerImpl) GetFull(id string, format string) (string, error) {
+	invoiceStr, err := manager.storage.ReadObject(fileName(id, format))
+	if err != nil {
+		return "", err
+	}
+	return invoiceStr, nil
+}
+
+func (manager *managerImpl) GetAllInvoiceMeta() ([]invoice.Meta, error) {
 	return manager.db.GetAllInvoice()
 }

@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"github.com/filipsladek/einvoice/common"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/slovak-egov/einvoice/common"
 	"log"
 	"math/rand"
 	"net/http"
@@ -43,17 +43,13 @@ func main() {
 }
 
 func IndexHandler(entrypoint string) func(w http.ResponseWriter, r *http.Request) {
-	fn := func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, entrypoint)
 	}
-
-	return http.HandlerFunc(fn)
 }
 
 func ApiUrlHandler(apiServerUrl string) func(w http.ResponseWriter, r *http.Request) {
-	fn := func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte(apiServerUrl))
 	}
-
-	return http.HandlerFunc(fn)
 }

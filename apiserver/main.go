@@ -2,15 +2,16 @@ package main
 
 import (
 	"fmt"
-	"github.com/filipsladek/einvoice/apiserver/db"
-	apiHandlers "github.com/filipsladek/einvoice/apiserver/handlers"
-	"github.com/filipsladek/einvoice/apiserver/invoice"
-	"github.com/filipsladek/einvoice/apiserver/manager"
-	"github.com/filipsladek/einvoice/apiserver/storage"
-	"github.com/filipsladek/einvoice/apiserver/xml"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	_ "github.com/lib/pq"
+	"github.com/slovak-egov/einvoice/apiserver/db"
+	apiHandlers "github.com/slovak-egov/einvoice/apiserver/handlers"
+	"github.com/slovak-egov/einvoice/apiserver/invoice"
+	"github.com/slovak-egov/einvoice/apiserver/manager"
+	"github.com/slovak-egov/einvoice/apiserver/storage"
+	"github.com/slovak-egov/einvoice/apiserver/xml"
+	"github.com/slovak-egov/einvoice/common"
 	"log"
 	"net/http"
 	"os"
@@ -51,14 +52,19 @@ func main() {
 	db.Connect(dbConf)
 	defer db.Close()
 
-	db.InitDB()
+	if err := db.InitDB(); err != nil {
+		panic(err)
+	}
 
-	validator := xml.NewValidator()
+	validator := xml.NewValidator(
+		common.GetRequiredEnvVariable("D16B_XSD_PATH"),
+		common.GetRequiredEnvVariable("UBL21_XSD_PATH"),
+	)
 
 	manager := manager.NewManager(db, storage)
 
 	// dummy data
-	if len(db.GetAllInvoice()) == 0 {
+	if all, _ := db.GetAllInvoice(); len(all) == 0 {
 		manager.Create(&invoice.Invoice{Sender: "SubjectA", Receiver: "SubjectB", Price: 100})
 		manager.Create(&invoice.Invoice{Sender: "SubjectA", Receiver: "SubjectC", Price: 200})
 		manager.Create(&invoice.Invoice{Sender: "SubjectA", Receiver: "SubjectD", Price: 300})

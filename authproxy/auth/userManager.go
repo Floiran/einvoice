@@ -2,9 +2,9 @@ package auth
 
 import (
 	"errors"
-	"github.com/filipsladek/einvoice/authproxy/db"
-	"github.com/filipsladek/einvoice/authproxy/user"
 	"github.com/google/uuid"
+	"github.com/slovak-egov/einvoice/authproxy/db"
+	"github.com/slovak-egov/einvoice/authproxy/user"
 	"math/rand"
 	"strconv"
 )

@@ -1,12 +1,12 @@
 package main
 
 import (
-	"github.com/filipsladek/einvoice/authproxy/auth"
-	"github.com/filipsladek/einvoice/authproxy/db"
-	"github.com/filipsladek/einvoice/authproxy/proxy"
-	"github.com/filipsladek/einvoice/common"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	"github.com/slovak-egov/einvoice/authproxy/auth"
+	"github.com/slovak-egov/einvoice/authproxy/db"
+	"github.com/slovak-egov/einvoice/authproxy/proxy"
+	"github.com/slovak-egov/einvoice/common"
 	"log"
 	"net/http"
 	"net/url"

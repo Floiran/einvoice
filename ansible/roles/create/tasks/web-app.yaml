@@ -10,7 +10,7 @@
     force: yes
     source: build
     state: present
-- name: create web-app deployment
+- name: Create web-app deployment
   k8s:
     state: present
     name: develop
@@ -45,7 +45,7 @@
                     value: 'http://{{ authproxy_loadbalancer_ip }}'
                 ports:
                   - containerPort: 8081
-- name: create web-app loadbalancer
+- name: Create web-app loadbalancer
   k8s:
     state: present
     name: web-app-loadbalancer
@@ -69,7 +69,7 @@
         sessionAffinity: None
         type: LoadBalancer
   register: loadbalancer
-- name: waiting for web-app loadbalancer ip
+- name: Waiting for web-app loadbalancer ip
   command: bash -c 'external_ip="<pending>"; while [ $external_ip = "<pending>" ]; do result=$(kubectl get svc web-app-loadbalancer | tail -n1); ip=($result); external_ip=${ip[3]}; [ $external_ip = "<pending>" ] && sleep 5; done; echo $external_ip;'
   register: webapp_loadbalancer_result
 - set_fact: webapp_loadbalancer_ip="{{ webapp_loadbalancer_result.stdout_lines[0] }}"

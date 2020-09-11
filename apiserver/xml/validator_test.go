@@ -7,7 +7,7 @@ import (
 )
 
 func TestD16BValidation(t *testing.T) {
-	validator := NewValidator()
+	validator := NewValidator("../../xml/d16b/xsd", "../../xml/ubl21/xsd")
 
 	bytes, err := ioutil.ReadFile("../../xml/d16b/example/d16b_invoice.xml")
 	if err != nil {
@@ -25,7 +25,7 @@ func TestD16BValidation(t *testing.T) {
 }
 
 func TestUBL21Validation(t *testing.T) {
-	validator := NewValidator()
+	validator := NewValidator("../../xml/d16b/xsd", "../../xml/ubl21/xsd")
 
 	bytes, err := ioutil.ReadFile("../../xml/ubl21/example/ubl21_invoice.xml")
 	if err != nil {

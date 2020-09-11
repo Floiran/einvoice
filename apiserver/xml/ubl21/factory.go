@@ -2,7 +2,7 @@ package ubl21
 
 import (
 	"encoding/xml"
-	"github.com/filipsladek/einvoice/apiserver/invoice"
+	"github.com/slovak-egov/einvoice/apiserver/invoice"
 	"strconv"
 )
 

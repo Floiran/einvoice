@@ -20,7 +20,7 @@
     project: '{{ project_id }}'
     state: present
 
-- name: create a user
+- name: Create a user
   ignore_errors: yes
   gcp_sql_user:
     name: '{{ sql_instance.db_user }}'

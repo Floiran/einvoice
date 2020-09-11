@@ -20,7 +20,7 @@
     source: build
     state: present
 
-- name: create apiserver deployment
+- name: Create apiserver deployment
   k8s:
    state: present
    name: apiserver
@@ -78,7 +78,7 @@
                  - '-instances={{sql_instance_res.connectionName}}=tcp:5432'
                securityContext:
                  runAsNonRoot: true
-- name: create apiserver loadbalancer
+- name: Create apiserver loadbalancer
   k8s:
    state: present
    name: apiserver-loadbalancer

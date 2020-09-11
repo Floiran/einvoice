@@ -3,7 +3,7 @@ package storage
 import (
 	"errors"
 	"fmt"
-	"github.com/filipsladek/einvoice/common"
+	"github.com/slovak-egov/einvoice/common"
 )
 
 type Storage interface {

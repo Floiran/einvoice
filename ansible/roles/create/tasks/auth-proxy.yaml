@@ -12,7 +12,7 @@
     force: yes
     source: build
     state: present
-- name: create authproxy deployment
+- name: Create authproxy deployment
   k8s:
     state: present
     name: authproxy
@@ -49,7 +49,7 @@
                     value: '{{redis.host}}:{{redis.port}}'
                 ports:
                   - containerPort: 8082
-- name: create authproxy loadbalancer
+- name: Create authproxy loadbalancer
   k8s:
     state: present
     name: authproxy-loadbalancer
@@ -73,7 +73,7 @@
         sessionAffinity: None
         type: LoadBalancer
   register: authproxy_service
-- name: waiting for authproxy loadbalancer ip
+- name: Waiting for authproxy loadbalancer ip
   command: bash -c 'external_ip="<pending>"; while [ $external_ip = "<pending>" ]; do result=$(kubectl get svc authproxy-loadbalancer | tail -n1); ip=($result); external_ip=${ip[3]}; [ $external_ip = "<pending>" ] && sleep 5; done; echo $external_ip;'
   register: result
 - set_fact: authproxy_loadbalancer_ip="{{ result.stdout_lines[0] }}"

@@ -4,9 +4,9 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/filipsladek/einvoice/authproxy/user"
-	"github.com/filipsladek/einvoice/common"
 	"github.com/go-redis/redis/v8"
+	"github.com/slovak-egov/einvoice/authproxy/user"
+	"github.com/slovak-egov/einvoice/common"
 )
 
 var ctx = context.Background()

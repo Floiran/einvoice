@@ -3,18 +3,18 @@ import './App.css'
 
 class InvoiceList extends Component {
   render() {
-    let { invoices, apiUrl } = this.props;
+    let { invoices } = this.props;
 
     let rows = [];
     if(invoices) {
       rows = invoices.map((invoice, i) => {
         return <tr key={i}>
-          <th scope="row">{i+1}</th>
-          <td>{invoice.id}</td>
-          <td>{invoice.sender}</td>
-          <td>{invoice.receiver}</td>
-          <td>{invoice.price}</td>
-          <td>{invoice.format}</td>
+          <th scope="row"><p>{i+1}</p></th>
+          <td><p>{invoice.id}</p></td>
+          <td><p>{invoice.sender}</p></td>
+          <td><p>{invoice.receiver}</p></td>
+          <td><p>{invoice.price}</p></td>
+          <td><p>{invoice.format}</p></td>
           <td><p className='link' onClick={() => this.props.viewInvoice(invoice.id)}>view</p></td>
         </tr>
       });

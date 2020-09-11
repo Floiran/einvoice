@@ -1,8 +1,8 @@
 package db
 
 import (
-	"github.com/filipsladek/einvoice/apiserver/invoice"
 	"github.com/go-pg/pg/v10"
+	"github.com/slovak-egov/einvoice/apiserver/invoice"
 	"io/ioutil"
 	"strconv"
 )
@@ -40,28 +40,26 @@ func (connector *dbConnector) InitDB() error {
 	return err
 }
 
-func (connector *dbConnector) GetAllInvoice() []invoice.Meta {
+func (connector *dbConnector) GetAllInvoice() ([]invoice.Meta, error) {
 	var invoices []invoice.Meta
 	err := connector.db.Model(&invoices).Select()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	return invoices
+	return invoices, nil
 }
 
-func (connector *dbConnector) GetInvoiceMeta(id string) *invoice.Meta {
-	invoice := &invoice.Meta{}
-	err := connector.db.Model(invoice).Where("id = ?", id).Select(invoice)
+func (connector *dbConnector) GetInvoiceMeta(id string) (*invoice.Meta, error) {
+	inv := &invoice.Meta{}
+	err := connector.db.Model(inv).Where("id = ?", id).Select(inv)
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	return invoice
+	return inv, nil
 }
 
-func (connector *dbConnector) CreateInvoice(invoice *invoice.Meta) *invoice.Meta {
+func (connector *dbConnector) CreateInvoice(invoice *invoice.Meta) error {
 	_, err := connector.db.Model(invoice).Insert(invoice)
-	if err != nil {
-		panic(err)
-	}
-	return invoice
+
+	return err
 }

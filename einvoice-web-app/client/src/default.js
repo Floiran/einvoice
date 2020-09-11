@@ -13,14 +13,14 @@ export let defaultUbl =
     <cac:AccountingSupplierParty>
         <cac:Party>
             <cac:PartyName>
-                <cbc:Name>Custom Cotter Pins</cbc:Name>
+                <cbc:Name>Subject A</cbc:Name>
             </cac:PartyName>
         </cac:Party>
     </cac:AccountingSupplierParty>
     <cac:AccountingCustomerParty>
         <cac:Party>
             <cac:PartyName>
-                <cbc:Name>North American Veeblefetzer</cbc:Name>
+                <cbc:Name>Subject B</cbc:Name>
             </cac:PartyName>
         </cac:Party>
     </cac:AccountingCustomerParty>
@@ -31,7 +31,7 @@ export let defaultUbl =
         <cbc:ID>1</cbc:ID>
         <cbc:LineExtensionAmount currencyID="CAD">100.00</cbc:LineExtensionAmount>
         <cac:Item>
-            <cbc:Description>Cotter pin, MIL-SPEC</cbc:Description>
+            <cbc:Description>something</cbc:Description>
         </cac:Item>
     </cac:InvoiceLine>
 </Invoice>`
@@ -61,7 +61,7 @@ export let defaultD16b =
             </ram:AssociatedDocumentLineDocument>
             <ram:SpecifiedTradeProduct>
                 <ram:SellerAssignedID>JB009</ram:SellerAssignedID>
-                <ram:Name>American Cookies</ram:Name>
+                <ram:Name>something</ram:Name>
             </ram:SpecifiedTradeProduct>
             <ram:SpecifiedLineTradeAgreement>
                 <ram:NetPriceProductTradePrice>
@@ -85,7 +85,7 @@ export let defaultD16b =
         <ram:ApplicableHeaderTradeAgreement>
             <ram:SellerTradeParty>
                 <ram:GlobalID schemeID="0088">5790000436101</ram:GlobalID>
-                <ram:Name>SellerCompany</ram:Name>
+                <ram:Name>Subject C</ram:Name>
                 <ram:SpecifiedLegalOrganization>
                     <ram:ID>DK16356706</ram:ID>
                 </ram:SpecifiedLegalOrganization>
@@ -110,7 +110,7 @@ export let defaultD16b =
             </ram:SellerTradeParty>
             <ram:BuyerTradeParty>
                 <ram:GlobalID schemeID="0088">5790000436057</ram:GlobalID>
-                <ram:Name>Buyercompany ltd</ram:Name>
+                <ram:Name>Subject D</ram:Name>
                 <ram:DefinedTradeContact>
                     <ram:PersonName>John Hansen</ram:PersonName>
                 </ram:DefinedTradeContact>

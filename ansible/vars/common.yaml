@@ -7,4 +7,5 @@ sql_instance:
   db_user: einvoice
   db_password: 12345
   db_name: einvoice
-docker_password: " {{ lookup('file', '/home/filip/mfsr/webserver1-283520-386230d8738c.json')}}"
+service_account_file: "{{ lookup('env', 'GCP_SERVICE_ACCOUNT_FILE') }}"
+docker_password: " {{ lookup('file', '{{ service_account_file }}' ) }}"

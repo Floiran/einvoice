@@ -1,8 +1,8 @@
 package db
 
 import (
-	"github.com/filipsladek/einvoice/apiserver/invoice"
-	"github.com/filipsladek/einvoice/common"
+	"github.com/slovak-egov/einvoice/apiserver/invoice"
+	"github.com/slovak-egov/einvoice/common"
 	"strconv"
 )
 
@@ -29,7 +29,7 @@ type DBConnector interface {
 	Connect(config ConnectionConfig)
 	Close()
 	InitDB() error
-	GetAllInvoice() []invoice.Meta
-	GetInvoiceMeta(id string) *invoice.Meta
-	CreateInvoice(invoice *invoice.Meta) *invoice.Meta
+	GetAllInvoice() ([]invoice.Meta, error)
+	GetInvoiceMeta(id string) (*invoice.Meta, error)
+	CreateInvoice(invoice *invoice.Meta) error
 }
