@@ -33,8 +33,4 @@ RUN apk add ca-certificates
 COPY --from=server_builder /out/server /server/server
 COPY --from=ui_builder /client/build /client/build
 
-
-# This container exposes port 8081 to the outside world
-EXPOSE 8081
-
 CMD ["/server/server"]

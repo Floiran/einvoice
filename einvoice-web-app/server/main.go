@@ -18,7 +18,7 @@ func main() {
 	var clientBuildDir = "../client/build/"
 	var entry = clientBuildDir + "/index.html"
 
-	var port = "8081"
+	port := os.Getenv("PORT")
 
 	rand.Seed(time.Now().Unix())
 
