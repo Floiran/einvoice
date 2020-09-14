@@ -1,0 +1,3 @@
+---
+- name: Delete cloud run
+  command: yes | gcloud run services delete web-app --platform managed --region europe-west1
