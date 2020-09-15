@@ -5,3 +5,9 @@
 
 /security/*
 /scripts/*
+/ansible/*
+
+/.circleci/*
+/.github/*
+
+Dockerfile*

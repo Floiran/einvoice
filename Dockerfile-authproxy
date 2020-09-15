@@ -24,7 +24,4 @@ RUN apk add ca-certificates
 
 COPY --from=build_base /tmp/out/authproxy /app/authproxy
 
-# This container exposes port 8082 to the outside world
-EXPOSE 8082
-
 CMD ["/app/authproxy"]

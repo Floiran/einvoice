@@ -1,3 +1,9 @@
 ---
-- name: Delete cloud run
-  command: yes | gcloud run services delete web-app --platform managed --region europe-west1
+- name: Delete cloud run web-app
+  command: yes | gcloud run services delete web-app --platform managed --region '{{ location }}'
+
+- name: Delete cloud run authproxy
+  command: yes | gcloud run services delete authproxy --platform managed --region '{{ location }}'
+
+- name: Delete cloud run apiserver
+  command: yes | gcloud run services delete apiserver --platform managed --region '{{ location }}'

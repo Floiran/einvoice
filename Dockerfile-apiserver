@@ -28,7 +28,4 @@ COPY --from=build_base /tmp/out/apiserver /app/apiserver
 COPY --from=build_base /tmp/einvoice/sql /sql
 COPY --from=build_base /tmp/einvoice/xml /xml
 
-# This container exposes port 8080 to the outside world
-EXPOSE 8080
-
 CMD ["/app/apiserver"]

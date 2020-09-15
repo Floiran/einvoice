@@ -1,5 +1,5 @@
 ---
-storage_instance_name: einvoice-prod
-sql_instance_name: "einvoice-prod-{{ sql_db_version | default('1')}}"
-gke_cluster_name: einvoice-prod
-redis_instance_name: einvocie-prod
+storage_instance_name: '{{ project_name }}-dev'
+sql_instance_name: "{{ project_name }}-prod-{{ sql_db_version | default('1')}}"
+gke_cluster_name: '{{ project_name }}-dev'
+redis_instance_name: '{{ project_name }}-dev'

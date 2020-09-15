@@ -3,22 +3,18 @@ package db
 import (
 	"github.com/slovak-egov/einvoice/apiserver/invoice"
 	"github.com/slovak-egov/einvoice/common"
-	"strconv"
 )
 
 type ConnectionConfig struct {
-	Host     string
-	Port     int
+	ConnectionName     string
 	User     string
 	Password string
 	Database string
 }
 
 func NewConnectionConfig() ConnectionConfig {
-	port, _ := strconv.Atoi(common.GetRequiredEnvVariable("DB_PORT"))
 	return ConnectionConfig{
-		Host:     common.GetRequiredEnvVariable("DB_HOST"),
-		Port:     port,
+		ConnectionName:     common.GetRequiredEnvVariable("DB_INSTANCE_CONNECTION_NAME"),
 		User:     common.GetRequiredEnvVariable("DB_USER"),
 		Password: common.GetRequiredEnvVariable("DB_PASSWORD"),
 		Database: common.GetRequiredEnvVariable("DB_NAME"),

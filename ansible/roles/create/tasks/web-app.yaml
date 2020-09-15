@@ -12,13 +12,13 @@
     state: present
 
 - name: Deploy cloud run
-  command: gcloud run deploy web-app --image gcr.io/{{ project_id }}/web-app:latest --platform managed --region europe-west1 --allow-unauthenticated --set-env-vars API_SERVER_URL='http://{{ authproxy_loadbalancer_ip }}'
+  command: gcloud run deploy web-app --image gcr.io/{{ project_id }}/web-app:latest --platform managed --region {{ location }} --allow-unauthenticated --set-env-vars API_SERVER_URL='{{ authproxy_url }}'
 
 - name: Deploy cloud get service
-  shell: gcloud run services list --platform managed --filter=app2 | grep http | egrep -o 'https?://[^ ]+'
-  register: shell_output
+  shell: gcloud run services describe web-app --platform managed --region '{{ location }}' | egrep -A 1 Traffic | egrep -B 1 LATEST | egrep -o 'https?://[^ ]+'
+  register: web_app_shell_output
 
-- set_fact: url="{{ shell_output.stdout }}"
+- set_fact: web_app_url="{{ web_app_shell_output.stdout }}"
 
 - debug:
-    msg: url={{ url }}
+    msg: web_app_url={{ web_app_url }}

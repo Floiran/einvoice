@@ -4,7 +4,6 @@ import (
 	"github.com/go-pg/pg/v10"
 	"github.com/slovak-egov/einvoice/apiserver/invoice"
 	"io/ioutil"
-	"strconv"
 )
 
 type dbConnector struct {
@@ -17,7 +16,8 @@ func NewDBConnector() DBConnector {
 
 func (connector *dbConnector) Connect(config ConnectionConfig) {
 	connector.db = pg.Connect(&pg.Options{
-		Addr:     config.Host + ":" + strconv.Itoa(config.Port),
+        Addr:     "/cloudsql/" + config.ConnectionName + "/.s.PGSQL.5432",
+		Network:  "unix",
 		User:     config.User,
 		Password: config.Password,
 		Database: config.Database,

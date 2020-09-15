@@ -30,7 +30,7 @@ func handleRequests(manager manager.Manager, validator xml.Validator) {
 
 	srv := &http.Server{
 		Handler:      handlers.LoggingHandler(os.Stdout, router),
-		Addr:         "0.0.0.0:8080",
+		Addr:         "0.0.0.0:" + os.Getenv("PORT"),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
