@@ -1,5 +1,2 @@
 ---
-storage_instance_name: '{{ project_name }}-dev'
-sql_instance_name: "einvoice-dev-{{ sql_db_version | default('1')}}"
-gke_cluster_name: '{{ project_name }}-dev'
-redis_instance_name: '{{ project_name }}-dev'
+project_id: '{{ project_name }}-dev'

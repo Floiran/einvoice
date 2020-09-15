@@ -1,5 +1,5 @@
 ---
-project_name: einvoice2
+project_name: einvoice
 location: europe-west1
 sql_instance:
   backend_type: SECOND_GEN
@@ -10,3 +10,7 @@ sql_instance:
   db_name: '{{ project_name }}'
 service_account_file: "{{ lookup('env', 'GCP_SERVICE_ACCOUNT_FILE') }}"
 docker_password: " {{ lookup('file', '{{ service_account_file }}' ) }}"
+storage_instance_name: '{{ project_name }}'
+sql_db_version: 1
+sql_instance_name: "{{ project_name }}-{{ sql_db_version }}"
+redis_instance_name: '{{ project_name }}'
