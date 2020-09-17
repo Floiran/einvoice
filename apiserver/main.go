@@ -46,10 +46,8 @@ func main() {
 	storage.SaveObject("abc", "def")
 	fmt.Println("stored")
 
-	dbConf := db.NewConnectionConfig()
-
 	db := db.NewDBConnector()
-	db.Connect(dbConf)
+	db.Connect()
 	defer db.Close()
 
 	if err := db.InitDB(); err != nil {

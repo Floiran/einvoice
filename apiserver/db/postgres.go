@@ -14,14 +14,27 @@ func NewDBConnector() DBConnector {
 	return &dbConnector{}
 }
 
-func (connector *dbConnector) Connect(config ConnectionConfig) {
-	connector.db = pg.Connect(&pg.Options{
-        Addr:     "/cloudsql/" + config.ConnectionName + "/.s.PGSQL.5432",
-		Network:  "unix",
-		User:     config.User,
-		Password: config.Password,
-		Database: config.Database,
-	})
+func (connector *dbConnector) Connect() {
+	_, ok := os.LookupEnv("DB_INSTANCE_CONNECTION_NAME")
+    if ok {
+        connector.db = pg.Connect(&pg.Options{
+            Addr:     "/cloudsql/" + common.GetRequiredEnvVariable("DB_INSTANCE_CONNECTION_NAME") + "/.s.PGSQL.5432",
+            Network:  "unix",
+            User:     common.GetRequiredEnvVariable("DB_USER"),
+            Password: common.GetRequiredEnvVariable("DB_PASSWORD"),
+            Database: common.GetRequiredEnvVariable("DB_NAME"),
+        })
+	} else {
+        port, _ := strconv.Atoi(common.GetRequiredEnvVariable("DB_PORT"))
+        connector.db = pg.Connect(&pg.Options{
+            Host:     common.GetRequiredEnvVariable("DB_HOST"),
+            Port:     port,
+            User:     common.GetRequiredEnvVariable("DB_USER"),
+            Password: common.GetRequiredEnvVariable("DB_PASSWORD"),
+            Database: common.GetRequiredEnvVariable("DB_NAME"),
+        })
+	}
+
 }
 
 func (connector *dbConnector) Close() {
