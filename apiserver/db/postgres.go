@@ -4,6 +4,8 @@ import (
 	"github.com/go-pg/pg/v10"
 	"github.com/slovak-egov/einvoice/apiserver/invoice"
 	"io/ioutil"
+	"github.com/slovak-egov/einvoice/common"
+	"os"
 )
 
 type dbConnector struct {
@@ -25,10 +27,8 @@ func (connector *dbConnector) Connect() {
             Database: common.GetRequiredEnvVariable("DB_NAME"),
         })
 	} else {
-        port, _ := strconv.Atoi(common.GetRequiredEnvVariable("DB_PORT"))
         connector.db = pg.Connect(&pg.Options{
-            Host:     common.GetRequiredEnvVariable("DB_HOST"),
-            Port:     port,
+            Addr:     common.GetRequiredEnvVariable("DB_HOST") + ":" + common.GetRequiredEnvVariable("DB_PORT"),
             User:     common.GetRequiredEnvVariable("DB_USER"),
             Password: common.GetRequiredEnvVariable("DB_PASSWORD"),
             Database: common.GetRequiredEnvVariable("DB_NAME"),
