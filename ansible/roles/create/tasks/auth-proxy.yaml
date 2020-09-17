@@ -14,10 +14,10 @@
     state: present
 
 - name: Deploy cloud run
-  command: gcloud run deploy authproxy --image gcr.io/{{ project_id }}/authproxy:latest --platform managed --region '{{ location }}' --allow-unauthenticated --set-env-vars APISERVER_URL='{{ apiserver_url }}' --set-env-vars REDIS_URL='{{redis.host}}:{{redis.port}}'
+  command: gcloud run deploy authproxy --project '{{ project_id }}' --image gcr.io/{{ project_id }}/authproxy:latest --platform managed --region '{{ location }}' --allow-unauthenticated --set-env-vars APISERVER_URL='{{ apiserver_url }}' --set-env-vars REDIS_URL='{{redis.host}}:{{redis.port}}'
 
 - name: Deploy cloud get service
-  shell: gcloud run services describe authproxy --platform managed --region '{{ location }}' | egrep -A 1 Traffic | egrep -B 1 LATEST | egrep -o 'https?://[^ ]+'
+  shell: gcloud run services describe authproxy --project '{{ project_id }}' --platform managed --region '{{ location }}' | egrep -A 1 Traffic | egrep -B 1 LATEST | egrep -o 'https?://[^ ]+'
   register: authproxy_output
 
 - set_fact: authproxy_url="{{ authproxy_output.stdout }}"
