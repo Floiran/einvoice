@@ -50,6 +50,7 @@ func ApiserverRequest(apiserver *url.URL) func(res http.ResponseWriter, req *htt
 		path := req.URL.Path
 		req.URL = apiserver
 		req.URL.Path = path
+		req.Host = apiserver.Host
 
 		delHopHeaders(req.Header)
 
