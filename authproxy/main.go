@@ -5,10 +5,10 @@ import (
 	"github.com/gorilla/mux"
 	"github.com/slovak-egov/einvoice/authproxy/auth"
 	"github.com/slovak-egov/einvoice/authproxy/db"
-	"github.com/slovak-egov/einvoice/authproxy/proxy"
 	"github.com/slovak-egov/einvoice/common"
 	"log"
 	"net/http"
+	"net/http/httputil"
 	"net/url"
 	"os"
 	"time"
@@ -28,7 +28,11 @@ func main() {
 	router.PathPrefix("/login").HandlerFunc(auth.HandleLogin(userManager))
 	router.PathPrefix("/logout").HandlerFunc(auth.HandleLogout(userManager))
 	router.PathPrefix("/me").HandlerFunc(auth.HandleMe(userManager))
-	router.PathPrefix("/").HandlerFunc(auth.WithToken(userManager, proxy.ApiserverRequest(apiserver)))
+
+	proxy := httputil.NewSingleHostReverseProxy(apiserver)
+	router.PathPrefix("/").HandlerFunc(auth.WithToken(userManager, func(res http.ResponseWriter, req *http.Request) {
+                                                                   		req.Host = req.URL.Host
+                                                                   		proxy.ServeHTTP(res, req)}))
 
 	srv := &http.Server{
 		Handler:      handlers.LoggingHandler(os.Stdout, handlers.CORS(corsOptions...)(router)),
