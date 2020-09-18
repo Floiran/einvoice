@@ -10,6 +10,7 @@ class CreateInvoice extends Component {
       getInvoiceId: "",
       postInvoiceSender: "",
       postInvoiceReceiver: "",
+      postInvoicePrice: "",
       format: "json",
       xmlInputValue: "",
     }
@@ -51,7 +52,8 @@ class CreateInvoice extends Component {
       },
       body: JSON.stringify({
         sender: this.state.postInvoiceSender,
-        receiver: this.state.postInvoiceReceiver
+        receiver: this.state.postInvoiceReceiver,
+        price: Number(this.state.postInvoicePrice)
       })
     })
       .then( response => response.json())
@@ -95,6 +97,15 @@ class CreateInvoice extends Component {
             <p>
               Receiver
               <input type="text" name="postInvoiceReceiver" value={this.state.postInvoiceReceiver}
+                     onChange={this.handleInputChange}/>
+            </p>
+          </div>
+        </div>
+        <div className="row">
+          <div className="col">
+            <p>
+              Receiver
+              <input type="number" name="postInvoicePrice" value={this.state.postInvoicePrice}
                      onChange={this.handleInputChange}/>
             </p>
             <button className='btn btn-primary' onClick={this.submitJsonInvoice}>Submit</button>
