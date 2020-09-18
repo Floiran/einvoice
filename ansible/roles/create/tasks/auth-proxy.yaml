@@ -17,7 +17,7 @@
   command: gcloud run deploy authproxy --project '{{ project_id }}' --image gcr.io/{{ project_id }}/authproxy:latest --platform managed --region '{{ location }}' --allow-unauthenticated --set-env-vars APISERVER_URL='{{ apiserver_url }}' --set-env-vars REDIS_URL='{{redis.host}}:{{redis.port}}' --vpc-connector redis-connector
 
 - name: Deploy cloud get service authproxy
-  shell: gcloud run services describe authproxy --project '{{ project_id }}' --platform managed --region '{{ location }}' | egrep -A 1 Traffic | egrep -B 1 LATEST | egrep -o 'https?://[^ ]+'
+  shell: gcloud run services describe authproxy --project '{{ project_id }}' --platform managed --region '{{ location }}' --format 'value(status.url)'
   register: authproxy_output
 
 - set_fact: authproxy_url="{{ authproxy_output.stdout }}"
