@@ -31,12 +31,13 @@ func main() {
 
 	proxy := httputil.NewSingleHostReverseProxy(apiserver)
 	router.PathPrefix("/").HandlerFunc(auth.WithToken(userManager, func(res http.ResponseWriter, req *http.Request) {
-                                                                   		req.Host = req.URL.Host
-                                                                   		proxy.ServeHTTP(res, req)}))
+		req.Host = req.URL.Host
+		proxy.ServeHTTP(res, req)
+	}))
 
 	srv := &http.Server{
 		Handler:      handlers.LoggingHandler(os.Stdout, handlers.CORS(corsOptions...)(router)),
-		Addr:         "0.0.0.0:" + os.Getenv("PORT"),
+		Addr:         "0.0.0.0:" + common.GetRequiredEnvVariable("PORT"),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}

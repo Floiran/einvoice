@@ -18,7 +18,7 @@ func main() {
 	var clientBuildDir = "../client/build/"
 	var entry = clientBuildDir + "/index.html"
 
-	port := os.Getenv("PORT")
+	port := common.GetRequiredEnvVariable("PORT")
 
 	rand.Seed(time.Now().Unix())
 

@@ -59,7 +59,7 @@ class CreateInvoice extends Component {
       .then( response => response.json())
       .then( data => {
         this.props.addInvoice(data);
-        this.setState({postInvoiceSender: "", postInvoiceReceiver: ""})
+        this.setState({postInvoiceSender: "", postInvoiceReceiver: "", postInvoicePrice: ""})
       });
   }
 
