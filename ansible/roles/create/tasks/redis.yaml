@@ -7,7 +7,6 @@
     region: '{{ location }}'
     redis_version: REDIS_3_2
     display_name: Auth db
-    reserved_ip_range: 192.168.0.0/28
     project: '{{ project_id }}'
     state: present
   register: redis
