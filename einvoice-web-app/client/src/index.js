@@ -1,17 +1,28 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import * as serviceWorker from './serviceWorker';
+import React from 'react'
+import {render} from 'react-dom'
+import Root from './Root'
+import configureStore from './configureStore'
+import * as serviceWorker from './serviceWorker'
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+const store = configureStore()
+
+const rootElement = document.getElementById('root')
+
+if (module.hot && typeof module.hot.accept === 'function') {
+  module.hot.accept('./Root', () => {
+    const NextRoot = require('./Root').default
+    render(
+      <NextRoot {...{store}} />,
+      rootElement)
+  })
+}
+
+render(
+  <Root {...{store}} />,
+  rootElement
+)
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.
 // Learn more about service workers: https://bit.ly/CRA-PWA
-serviceWorker.unregister();
+serviceWorker.unregister()

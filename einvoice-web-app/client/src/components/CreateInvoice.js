@@ -1,9 +1,11 @@
-import React, { Component } from "react";
-import { defaultUbl, defaultD16b } from "./default";
+import React from 'react'
+import {connect} from 'react-redux'
+import { defaultUbl, defaultD16b } from './default'
+import {addInvoice, createInvoice} from '../actions/invoices'
 
-class CreateInvoice extends Component {
+class CreateInvoice extends React.Component {
   constructor(props) {
-    super(props);
+    super(props)
 
     this.state = {
       getInvoice: null,
@@ -14,74 +16,46 @@ class CreateInvoice extends Component {
       format: "json",
       xmlInputValue: "",
     }
-
-    this.handleInputChange = this.handleInputChange.bind(this);
-    this.submitJsonInvoice = this.submitJsonInvoice.bind(this);
-    this.selectFormat = this.selectFormat.bind(this);
-    this.updateXmlInputValue = this.updateXmlInputValue.bind(this);
-    this.submitXmlInvoice = this.submitXmlInvoice.bind(this);
   }
 
-  handleInputChange(event) {
-    const target = event.target;
-    const name = target.name;
+  handleInputChange = (event) => {
+    const target = event.target
+    const name = target.name
     this.setState({
       [name]: target.value
-    });
+    })
   }
 
-  selectFormat(event) {
-    this.setState({ format: event.target.name });
+  selectFormat = (event) => {
+    this.setState({ format: event.target.name })
     if(event.target.name === 'ubl') {
-      this.setState({ xmlInputValue: defaultUbl });
+      this.setState({ xmlInputValue: defaultUbl })
     } else if(event.target.name === 'd16b') {
-      this.setState({ xmlInputValue: defaultD16b });
+      this.setState({ xmlInputValue: defaultD16b })
     }
   }
 
-  updateXmlInputValue(event) {
-    this.setState({ xmlInputValue: event.target.value });
+  updateXmlInputValue = (event) => {
+    this.setState({ xmlInputValue: event.target.value })
   }
 
-  submitJsonInvoice() {
-    fetch(this.props.apiUrl + '/api/invoice/json', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': this.props.user.token
-      },
-      body: JSON.stringify({
-        sender: this.state.postInvoiceSender,
-        receiver: this.state.postInvoiceReceiver,
-        price: Number(this.state.postInvoicePrice)
-      })
+  submitJsonInvoice = async () => {
+    await this.props.createInvoice('json', {
+      sender: this.state.postInvoiceSender,
+      receiver: this.state.postInvoiceReceiver,
+      price: Number(this.state.postInvoicePrice)
     })
-      .then( response => response.json())
-      .then( data => {
-        this.props.addInvoice(data);
-        this.setState({postInvoiceSender: "", postInvoiceReceiver: "", postInvoicePrice: ""})
-      });
+    this.setState({postInvoiceSender: "", postInvoiceReceiver: "", postInvoicePrice: ""})
   }
 
-  submitXmlInvoice() {
-    fetch(this.props.apiUrl + '/api/invoice/' + this.state.format, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/xml',
-        'Authorization': this.props.user.token
-      },
-      body: this.state.xmlInputValue
-    })
-      .then( response => response.json())
-      .then( data => {
-        this.props.addInvoice(data);
-        this.setState({postInvoiceSender: "", postInvoiceReceiver: ""})
-      });
+  submitXmlInvoice = async () => {
+    await this.props.createInvoice(this.state.format, this.state.xmlInputValue)
+    this.setState({postInvoiceSender: "", postInvoiceReceiver: ""})
   }
 
   render() {
-    let { format } = this.state;
-    let form = null;
+    let { format } = this.state
+    let form = null
     if(format === 'json') {
       form = <div>
         <div className="row">
@@ -139,4 +113,9 @@ class CreateInvoice extends Component {
   }
 }
 
-export default CreateInvoice;
+export default connect(
+  (state) => ({
+    user: state.user
+  }),
+  {addInvoice, createInvoice}
+)(CreateInvoice)
