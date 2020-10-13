@@ -1,5 +1,7 @@
 import React from 'react'
 import {connect} from 'react-redux'
+import {branch, compose, renderNothing} from 'recompose'
+import {withRouter} from 'react-router-dom'
 import { defaultUbl, defaultD16b } from './default'
 import {addInvoice, createInvoice} from '../actions/invoices'
 
@@ -40,17 +42,19 @@ class CreateInvoice extends React.Component {
   }
 
   submitJsonInvoice = async () => {
-    await this.props.createInvoice('json', {
+    const newInvoiceId = await this.props.createInvoice('json', {
       sender: this.state.postInvoiceSender,
       receiver: this.state.postInvoiceReceiver,
       price: Number(this.state.postInvoicePrice)
     })
     this.setState({postInvoiceSender: "", postInvoiceReceiver: "", postInvoicePrice: ""})
+    this.props.history.push(`/invoices/${newInvoiceId}`)
   }
 
   submitXmlInvoice = async () => {
-    await this.props.createInvoice(this.state.format, this.state.xmlInputValue)
+    const newInvoiceId = await this.props.createInvoice(this.state.format, this.state.xmlInputValue)
     this.setState({postInvoiceSender: "", postInvoiceReceiver: ""})
+    this.props.history.push(`/invoices/${newInvoiceId}`)
   }
 
   render() {
@@ -101,6 +105,7 @@ class CreateInvoice extends React.Component {
 
     return (
       <div className="container">
+        <h2>Create invoice</h2>
         <div className="row justify-content-center">
           <button className='btn btn-primary col-sm-2' name="json" onClick={this.selectFormat}>Json</button>
           <button className='btn btn-primary col-sm-2' name="ubl" onClick={this.selectFormat}>UBL2.1</button>
@@ -113,9 +118,18 @@ class CreateInvoice extends React.Component {
   }
 }
 
-export default connect(
-  (state) => ({
-    user: state.user
-  }),
-  {addInvoice, createInvoice}
-)(CreateInvoice)
+export default withRouter(
+  compose(
+    connect(
+    (state) => ({
+      user: state.user
+    }),
+    {addInvoice, createInvoice}
+    ),
+    branch(
+      ({user}) => !user,
+      // TODO: unauthorized component
+      renderNothing,
+    ),
+  )(CreateInvoice)
+)

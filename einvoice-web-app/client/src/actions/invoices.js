@@ -19,13 +19,6 @@ export const addInvoice = (invoice) => ({
   reducer: (state, invoice) => [...state, invoice],
 })
 
-export const toggleCreatingInvoice = () => ({
-  type: 'TOGGLE INVOICE CREATION',
-  path: ['isCreatingInvoice'],
-  payload: null,
-  reducer: (state) => !state,
-})
-
 export const getInvoices = () => (
   async (dispatch, getState, {api}) => {
     const invoices = await api.getInvoices(getState().user)
@@ -44,5 +37,6 @@ export const createInvoice = (format, data) => (
   async (dispatch, getState, {api}) => {
     const invoice = await api.createInvoice(getState().user, format, data)
     dispatch(addInvoice(invoice))
+    return invoice.id
   }
 )

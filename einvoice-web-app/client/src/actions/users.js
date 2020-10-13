@@ -1,4 +1,4 @@
-export const setUser = (user) => ({
+const setUser = (user) => ({
   type: 'SET USER',
   path: ['user'],
   payload: user,

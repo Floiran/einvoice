@@ -1,9 +1,10 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import {compose, lifecycle} from 'recompose'
-import {getInvoiceDetail, getInvoices} from '../actions/invoices'
+import {branch, compose, lifecycle, renderNothing} from 'recompose'
+import {NavLink} from 'react-router-dom'
+import {getInvoices} from '../actions/invoices'
 
-const InvoiceList = ({invoices, getInvoiceDetail})  => {
+const InvoiceList = ({invoices})  => {
   let rows = []
   if(invoices) {
     rows = invoices.map((invoice, i) => {
@@ -14,7 +15,9 @@ const InvoiceList = ({invoices, getInvoiceDetail})  => {
         <td><p>{invoice.receiver}</p></td>
         <td><p>{invoice.price}</p></td>
         <td><p>{invoice.format}</p></td>
-        <td><p className='link' onClick={() => getInvoiceDetail(invoice.id)}>view</p></td>
+        <td><p>
+          <NavLink to={`/invoices/${invoice.id}`}>view</NavLink>
+        </p></td>
       </tr>
     })
   }
@@ -31,11 +34,11 @@ const InvoiceList = ({invoices, getInvoiceDetail})  => {
           <th>Receiver</th>
           <th>Price</th>
           <th>Format</th>
-          <th></th>
+          <th />
         </tr>
         </thead>
         <tbody>
-        {rows}
+          {rows}
         </tbody>
       </table>
     </div>
@@ -46,8 +49,14 @@ export default compose(
   connect(
     (state) => ({
       invoices: state.invoices,
+      user: state.user,
     }),
-    {getInvoiceDetail, getInvoices}
+    {getInvoices}
+  ),
+  branch(
+    ({user}) => !user,
+    // TODO: this should be visible for everyone
+    renderNothing,
   ),
   lifecycle({
     componentDidMount() {

@@ -1,21 +1,44 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import {setCurrentInvoice} from '../actions/invoices'
+import {NavLink} from 'react-router-dom'
+import {branch, compose, lifecycle, renderNothing, withHandlers} from 'recompose'
+import {getInvoiceDetail, setCurrentInvoice} from '../actions/invoices'
 
-const InvoiceView = ({invoice, setCurrentInvoice}) => (
-  <div className="container">
+const InvoiceView = ({resetCurrentInvoice, invoice, match: {params: {id}}}) => (
+  <div>
+    <h2>Invoice {id}</h2>
     <div className='row justify-content-center'>
-      <button className='btn btn-primary col-sm-2' onClick={() => setCurrentInvoice(null)}>Close</button>
+      <NavLink to="/invoices">
+        <button className='btn btn-primary' onClick={resetCurrentInvoice}>Close</button>
+      </NavLink>
     </div>
-    <div className='row justify-content-center'>
-      <textarea rows="40" cols="100">{invoice}</textarea>
+    <div style={{borderStyle: 'solid'}}>
+      {invoice}
     </div>
   </div>
 )
 
-export default connect(
+export default compose(
+  connect(
   (state) => ({
     invoice: state.currentInvoice,
+    user: state.user,
   }),
-  {setCurrentInvoice}
+  {getInvoiceDetail, setCurrentInvoice}
+  ),
+  branch(
+    ({user}) => !user,
+    // TODO: this should be visible for everyone
+    renderNothing,
+  ),
+  lifecycle({
+    componentDidMount() {
+      this.props.getInvoiceDetail(this.props.match.params.id)
+    },
+  }),
+  withHandlers({
+    resetCurrentInvoice: ({setCurrentInvoice}) => () => {
+      setCurrentInvoice(null)
+    },
+  })
 )(InvoiceView)

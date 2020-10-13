@@ -1,62 +1,47 @@
+import 'bootstrap/dist/css/bootstrap.css'
 import './App.css'
 import React from 'react'
 import {connect} from 'react-redux'
-import {branch, compose, lifecycle, renderComponent, renderNothing} from 'recompose'
-import CreateInvoice from './CreateInvoice'
+import {branch, compose, lifecycle, renderNothing} from 'recompose'
+import {Route, withRouter} from 'react-router-dom'
 import InvoiceList from './InvoiceList'
-import Login from './Login'
+import LandingPage from './LandingPage'
+import TopBar from './TopBar'
+import CreateInvoice from './CreateInvoice'
 import InvoiceView from './InvoiceView'
 import {initializeApi} from '../actions/api'
-import {getMyInfo, setUser, logout} from '../actions/users'
-import {getInvoices, toggleCreatingInvoice} from '../actions/invoices'
+import {getMyInfo} from '../actions/users'
 
-const App = ({currentInvoice, isCreatingInvoice, logout, user, toggleCreatingInvoice}) => (
-  <div className="App container">
-    <header className="App-header row">
-      <h1 className='col'>E-invoice</h1>
-    </header>
-    <div className='row justify-content-center'>
-      <p className='col-sm-1'>User id:</p>
-      <p className='col-sm-1'>{user.id}</p>
-      <button className='btn btn-primary' onClick={logout}>Logout</button>
+const App = () => (
+  <div>
+    <TopBar />
+    <div className="App container">
+      <Route exact path="/" component={LandingPage} />
+      <Route path="/account" component={CreateInvoice} />
+      <Route exact path="/invoices" component={InvoiceList} />
+      <Route exact path="/invoices/:id" component={InvoiceView} />
     </div>
-    { !currentInvoice &&
-    <div>
-      <div className='row justify-content-center'>
-        <button className='btn btn-primary' onClick={toggleCreatingInvoice}>Create invoice</button>
-      </div>
-      {isCreatingInvoice && <CreateInvoice />}
-      <InvoiceList />
-    </div>
-    }
-    { currentInvoice && <InvoiceView /> }
   </div>
 )
 
-export default compose(
-  connect(
-    (state) => ({
-      user: state.user,
-      currentInvoice: state.currentInvoice,
-      apiInitialized: state.apiInitialized,
-      isCreatingInvoice: state.isCreatingInvoice,
+export default withRouter(
+  compose(
+    connect(
+      (state) => ({
+        apiInitialized: state.apiInitialized,
+      }),
+      {initializeApi, getMyInfo}
+    ),
+    lifecycle({
+      async componentDidMount() {
+        await this.props.initializeApi()
+        await this.props.getMyInfo()
+      },
     }),
-    {
-      initializeApi, getMyInfo, getInvoices, setUser, logout, toggleCreatingInvoice
-    }
-  ),
-  lifecycle({
-    async componentDidMount() {
-      await this.props.initializeApi()
-      await this.props.getMyInfo()
-    },
-  }),
-  branch(
-    ({apiInitialized}) => !apiInitialized,
-    renderNothing,
-  ),
-  branch(
-    ({user}) => !user,
-    renderComponent(Login),
-  ),
-)(App)
+    branch(
+      ({apiInitialized}) => !apiInitialized,
+      // TODO: loading component
+      renderNothing,
+    ),
+  )(App)
+)

@@ -5,6 +5,7 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/slovak-egov/einvoice/common"
+	apiHandlers "github.com/slovak-egov/einvoice/einvoice-web-app/server/handlers"
 	"log"
 	"math/rand"
 	"net/http"
@@ -13,43 +14,28 @@ import (
 )
 
 func main() {
-	var apiServerUrl = common.GetRequiredEnvVariable("API_SERVER_URL")
-
-	var clientBuildDir = "../client/build/"
-	var entry = clientBuildDir + "/index.html"
+	clientBuildDir := common.GetRequiredEnvVariable("CLIENT_BUILD_DIR")
 
 	port := common.GetRequiredEnvVariable("PORT")
 
 	rand.Seed(time.Now().Unix())
 
-	r := mux.NewRouter()
+	router := mux.NewRouter()
 
-	r.Path("/").HandlerFunc(IndexHandler(entry))
+	router.Path("/api/url").HandlerFunc(apiHandlers.ApiUrlHandler)
 
-	r.Path("/api/url").HandlerFunc(ApiUrlHandler(apiServerUrl))
-
-	r.PathPrefix("/").Handler(http.FileServer(http.Dir(clientBuildDir)))
+	router.PathPrefix("/").Handler(
+		apiHandlers.UiHandler{StaticPath: clientBuildDir, IndexPath: "index.html"},
+	)
 
 	fmt.Println("server start")
 
 	srv := &http.Server{
-		Handler:      handlers.LoggingHandler(os.Stdout, r),
+		Handler:      handlers.LoggingHandler(os.Stdout, router),
 		Addr:         "0.0.0.0:" + port,
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
 
 	log.Fatal(srv.ListenAndServe())
-}
-
-func IndexHandler(entrypoint string) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, entrypoint)
-	}
-}
-
-func ApiUrlHandler(apiServerUrl string) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte(apiServerUrl))
-	}
 }
