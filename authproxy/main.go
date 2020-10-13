@@ -1,11 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"github.com/slovak-egov/einvoice/authproxy/auth"
+	. "github.com/slovak-egov/einvoice/authproxy/config"
 	"github.com/slovak-egov/einvoice/authproxy/db"
-	"github.com/slovak-egov/einvoice/common"
 	"log"
 	"net/http"
 	"net/http/httputil"
@@ -15,7 +16,9 @@ import (
 )
 
 func main() {
-	apiserver, err := url.Parse(common.GetRequiredEnvVariable("APISERVER_URL"))
+	InitConfig()
+
+	apiserver, err := url.Parse(Config.ApiServerUrl)
 	if err != nil {
 		panic(err)
 	}
@@ -37,12 +40,12 @@ func main() {
 
 	srv := &http.Server{
 		Handler:      handlers.LoggingHandler(os.Stdout, handlers.CORS(corsOptions...)(router)),
-		Addr:         "0.0.0.0:" + common.GetRequiredEnvVariable("PORT"),
+		Addr:         fmt.Sprintf("%s:%d", "0.0.0.0", Config.Port),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
 
-	println("Server running on", srv.Addr)
+	log.Println("Server running on", srv.Addr)
 
 	log.Fatal(srv.ListenAndServe())
 }

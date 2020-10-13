@@ -1,10 +1,10 @@
 # Einvoice web UI
 
-##Development
+## Development
 
 Run react app.
 ```shell script
-cd client
+cd einvoice-web-app/client
 npm install
 npm start
 ```
@@ -14,4 +14,3 @@ Run backend in next tab, rerun after server update.
 cd server
 go build && ./server
 ```
-

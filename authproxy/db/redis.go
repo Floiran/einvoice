@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"github.com/go-redis/redis/v8"
+	. "github.com/slovak-egov/einvoice/authproxy/config"
 	"github.com/slovak-egov/einvoice/authproxy/user"
-	"github.com/slovak-egov/einvoice/common"
 )
 
 var ctx = context.Background()
@@ -24,7 +24,7 @@ type redisDB struct {
 
 func NewAuthDB() AuthDB {
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     common.GetRequiredEnvVariable("REDIS_URL"),
+		Addr:     Config.RedisUrl,
 		Password: "", // no password set
 		DB:       0,  // use default db
 	})

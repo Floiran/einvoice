@@ -1,7 +1,7 @@
 package storage
 
 import (
-	"github.com/slovak-egov/einvoice/common"
+	. "github.com/slovak-egov/einvoice/apiserver/config"
 	"io/ioutil"
 )
 
@@ -20,7 +20,7 @@ func (storage *LocalStorage) ReadObject(path string) (string, error) {
 }
 
 func NewLocalStorage() *LocalStorage {
-	var basePath = common.GetRequiredEnvVariable("LOCAL_STORAGE_BASE_PATH")
+	var basePath = Config.LocalStorageBasePath
 	if basePath[len(basePath)-1] != '/' {
 		basePath = basePath + "/"
 	}

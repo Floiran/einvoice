@@ -3,7 +3,7 @@ package storage
 import (
 	"errors"
 	"fmt"
-	"github.com/slovak-egov/einvoice/common"
+	. "github.com/slovak-egov/einvoice/apiserver/config"
 )
 
 type Storage interface {
@@ -13,7 +13,7 @@ type Storage interface {
 
 func InitStorage() Storage {
 	var storage Storage
-	var storageType = common.GetRequiredEnvVariable("SLOW_STORAGE_TYPE")
+	var storageType = Config.SlowStorageType
 
 	switch storageType {
 	case "local":

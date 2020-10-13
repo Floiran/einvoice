@@ -4,7 +4,7 @@ import (
 	"cloud.google.com/go/storage"
 	"context"
 	"fmt"
-	"github.com/slovak-egov/einvoice/common"
+	. "github.com/slovak-egov/einvoice/apiserver/config"
 	"io/ioutil"
 )
 
@@ -52,7 +52,7 @@ func NewGSC() *GSC {
 		panic(err)
 	}
 
-	bktName := common.GetRequiredEnvVariable("GCS_BUCKET")
+	bktName := Config.GcsBucket
 	bkt := client.Bucket(bktName)
 
 	return &GSC{bkt, ctx}

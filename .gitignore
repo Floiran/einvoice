@@ -15,3 +15,6 @@
 # vendor/
 
 .idea/
+
+# Custom env variables
+**/.env
