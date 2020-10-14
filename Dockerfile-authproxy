@@ -20,7 +20,7 @@ RUN go build -o /tmp/out/authproxy ./authproxy
 
 # Start fresh from a smaller image
 FROM alpine:3.9
-RUN apk add ca-certificates
+RUN apk add --no-cache ca-certificates
 
 COPY --from=build_base /tmp/out/authproxy /app/authproxy
 

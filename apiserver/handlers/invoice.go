@@ -16,7 +16,7 @@ func GetInvoiceMetaHandler(manager manager.Manager) func(w http.ResponseWriter, 
 		vars := mux.Vars(r)
 		invoiceId := vars["id"]
 
-		err, meta := manager.GetMeta(invoiceId)
+		meta, err := manager.GetMeta(invoiceId)
 		if err != nil {
 			panic(err)
 		}

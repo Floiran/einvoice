@@ -22,6 +22,7 @@ import (
 func handleRequests(manager manager.Manager, validator xml.Validator) {
 	router := mux.NewRouter()
 
+	// TODO: update URLs to follow REST conventions
 	router.PathPrefix("/api/invoices").Methods("GET").HandlerFunc(apiHandlers.GetAllInvoicesHandler(manager))
 	router.PathPrefix("/api/invoice/full/{id}").Methods("GET").HandlerFunc(apiHandlers.GetFullInvoiceHandler(manager))
 	router.PathPrefix("/api/invoice/meta/{id}").Methods("GET").HandlerFunc(apiHandlers.GetInvoiceMetaHandler(manager))

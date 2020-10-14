@@ -28,8 +28,16 @@ You can initialize it by `cp .env-template .env` and update for your use.
 
 [Maindoc](http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd)
 
-From maindoc you need only [this](http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/maindoc/UBL-Invoice-2.1.xsd) part.
+From maindoc you need only [this](http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/maindoc/UBL-Invoice-2.1.xsd)
+part.
 
 ### D16B
 
 Subset for [CrossIndustryInvoice](https://www.unece.org/fileadmin/DAM/cefact/xml_schemas/D16B_SCRDM__Subset__CII.zip)
+
+## Swagger
+
+While this repository is private we make this documentation public [here](https://github.com/filipsladek/slovensko-sk-api/blob/master/swagger.yml).
+You can view it on this [website](https://generator.swagger.io/?url=https://raw.githubusercontent.com/filipsladek/slovensko-sk-api/master/swagger.yml).
+
+Later REST API documentation will be [here](docs/swagger.yml).
