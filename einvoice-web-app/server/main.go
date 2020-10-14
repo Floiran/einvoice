@@ -17,7 +17,7 @@ func main() {
 
 	router := mux.NewRouter()
 
-	router.Path("/api/url").HandlerFunc(apiHandlers.ApiUrlHandler)
+	router.Path("/api/urls").HandlerFunc(apiHandlers.ApiUrlHandler)
 
 	router.PathPrefix("/").Handler(
 		apiHandlers.UiHandler{StaticPath: Config.ClientBuildDir, IndexPath: "index.html"},

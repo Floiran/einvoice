@@ -10,7 +10,9 @@ export default class Api {
   }
 
   getApiUrl = async () => {
-    this.baseUrl = await this.standardRequest({route: '/api/url', jsonResponse: false})
+    let conf = await this.standardRequest({route: '/api/urls'})
+    this.baseUrl = conf.apiServerUrl
+    this.slovenskoSkLoginUrl = conf.slovenskoSkLoginUrl
   }
 
   getUserInfo = async (user) => {
@@ -22,8 +24,28 @@ export default class Api {
     })
   }
 
-  login = async () => {
-    return await this.apiRequest({route: '/login'})
+  updateUser = async (user, data) => {
+    return await this.apiRequest({
+      method: "PUT",
+      route: '/me',
+      data: data,
+      headers: {
+        Authorization: user.token
+      }
+    })
+  }
+
+  login = () => {
+    window.location.href = this.slovenskoSkLoginUrl
+  }
+
+  loginWithSlovenskoSkToken = async (token) => {
+    return await this.apiRequest({
+      route: '/login',
+      headers: {
+        Authorization: token
+      }
+    })
   }
 
   logout = async (user) => {
@@ -38,19 +60,13 @@ export default class Api {
 
   getInvoices = async (user) => {
     return await this.apiRequest({
-      route: '/api/invoices',
-      headers: {
-        Authorization: user.token
-      }
+      route: '/api/invoices'
     })
   }
 
-  getInvoiceDetail = async (user, id) => {
+  getInvoiceDetail = async (id) => {
     return await this.apiRequest({
       route: `/api/invoice/full/${id}`,
-      headers: {
-        Authorization: user.token
-      },
       jsonResponse: false,
     })
   }

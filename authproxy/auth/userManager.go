@@ -1,19 +1,19 @@
 package auth
 
 import (
-	"errors"
-	"github.com/google/uuid"
 	"github.com/slovak-egov/einvoice/authproxy/db"
 	"github.com/slovak-egov/einvoice/authproxy/user"
-	"math/rand"
-	"strconv"
+	"github.com/slovak-egov/einvoice/common"
 )
 
 type UserManager interface {
-	Create() *user.User
-	Remove(token string) error
-	Exists(token string) bool
-	GetUser(token string) *user.User
+	Create(id, name string) *user.User
+	GetUserByToken(token string) *user.User
+	GetUser(id string) *user.User
+	UpdateUser(user, updates *user.User)
+
+	CreateToken(user *user.User) error
+	RemoveToken(user *user.User) error
 }
 
 type userManager struct {
@@ -24,32 +24,38 @@ func NewUserManager(db db.AuthDB) UserManager {
 	return userManager{db}
 }
 
-func (userManager userManager) Create() *user.User {
-	random, _ := uuid.NewRandom()
-	token := random.String()
+func (userManager userManager) Create(id, name string) *user.User {
+	usr := &user.User{Id: id, Name: name}
 
-	random, _ = uuid.NewRandom()
-	id := strconv.Itoa(rand.Intn(10000000))
-
-	usr := &user.User{Token: token, Id: id}
-
-	userManager.db.Add(usr)
+	userManager.db.SaveUser(usr)
 
 	return usr
 }
 
-func (userManager userManager) Remove(token string) error {
-	err := userManager.db.Remove(token)
-	if err != nil {
-		return errors.New("Invalid token")
+func (userManager userManager) GetUserByToken(token string) *user.User {
+	return userManager.db.GetUserByToken(token)
+}
+
+func (userManager userManager) GetUser(id string) *user.User {
+	return userManager.db.GetUser(id)
+}
+
+func (userManager userManager) UpdateUser(user, updates *user.User) {
+	if updates.Email != "" {
+		user.Email = updates.Email
 	}
-	return nil
+	if updates.ServiceAccountKey != "" {
+		user.ServiceAccountKey = updates.ServiceAccountKey
+	}
+	userManager.db.SaveUser(user)
+	return
 }
 
-func (userManager userManager) Exists(token string) bool {
-	return userManager.db.Exists(token)
+func (userManager userManager) CreateToken(user *user.User) error {
+	user.Token = common.RandomString(50)
+	return userManager.db.AddToken(user.Id, user.Token)
 }
 
-func (userManager userManager) GetUser(token string) *user.User {
-	return userManager.db.GetUser(token)
+func (userManager userManager) RemoveToken(user *user.User) error {
+	return userManager.db.RemoveToken(user.Id, user.Token)
 }

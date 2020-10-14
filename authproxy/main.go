@@ -25,18 +25,24 @@ func main() {
 
 	authDB := db.NewAuthDB()
 	userManager := auth.NewUserManager(authDB)
+	authenticator := auth.NewAuthenticator(userManager)
+
+	keys := auth.NewKeys()
 
 	router := mux.NewRouter()
 
-	router.PathPrefix("/login").HandlerFunc(auth.HandleLogin(userManager))
-	router.PathPrefix("/logout").HandlerFunc(auth.HandleLogout(userManager))
-	router.PathPrefix("/me").HandlerFunc(auth.HandleMe(userManager))
+	router.PathPrefix("/login").HandlerFunc(auth.HandleLogin(userManager, keys))
+	router.PathPrefix("/logout").HandlerFunc(authenticator.WithUser(auth.HandleLogout(userManager)))
+	router.PathPrefix("/me").Methods("GET").HandlerFunc(authenticator.WithUser(auth.HandleMe))
+	router.PathPrefix("/me").Methods("PUT").HandlerFunc(authenticator.WithUser(auth.HandleUpdateUser(userManager)))
 
 	proxy := httputil.NewSingleHostReverseProxy(apiserver)
-	router.PathPrefix("/").HandlerFunc(auth.WithToken(userManager, func(res http.ResponseWriter, req *http.Request) {
-		req.Host = req.URL.Host
-		proxy.ServeHTTP(res, req)
-	}))
+
+	router.PathPrefix("/api/invoices").Methods("GET").HandlerFunc(auth.HandleOpenProxy(proxy))
+	router.PathPrefix("/api/invoice/full/").Methods("GET").HandlerFunc(auth.HandleOpenProxy(proxy))
+	router.PathPrefix("/api/invoice/meta/").Methods("GET").HandlerFunc(auth.HandleOpenProxy(proxy))
+
+	router.PathPrefix("/").HandlerFunc(authenticator.WithUser(auth.HandleAuthProxy(proxy)))
 
 	srv := &http.Server{
 		Handler:      handlers.LoggingHandler(os.Stdout, handlers.CORS(corsOptions...)(router)),
@@ -53,5 +59,5 @@ func main() {
 var corsOptions = []handlers.CORSOption{
 	handlers.AllowedHeaders([]string{"Content-Type", "Origin", "Accept", "token", "Authorization"}),
 	handlers.AllowedOrigins([]string{"*"}),
-	handlers.AllowedMethods([]string{"GET", "POST", "OPTIONS"}),
+	handlers.AllowedMethods([]string{"GET", "POST", "OPTIONS", "DELETE", "PUT"}),
 }

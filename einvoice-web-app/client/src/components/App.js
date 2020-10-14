@@ -11,13 +11,15 @@ import CreateInvoice from './CreateInvoice'
 import InvoiceView from './InvoiceView'
 import {initializeApi} from '../actions/api'
 import {getMyInfo} from '../actions/users'
+import AccountSettings from "./AccountSettings";
 
 const App = () => (
   <div>
     <TopBar />
     <div className="App container">
       <Route exact path="/" component={LandingPage} />
-      <Route path="/account" component={CreateInvoice} />
+      <Route path="/account" component={AccountSettings} />
+      <Route path="/create-invoice" component={CreateInvoice} />
       <Route exact path="/invoices" component={InvoiceList} />
       <Route exact path="/invoices/:id" component={InvoiceView} />
     </div>
@@ -35,7 +37,7 @@ export default withRouter(
     lifecycle({
       async componentDidMount() {
         await this.props.initializeApi()
-        await this.props.getMyInfo()
+        await this.props.getMyInfo(this.props.location, this.props.history)
       },
     }),
     branch(

@@ -53,11 +53,6 @@ export default compose(
     }),
     {getInvoices}
   ),
-  branch(
-    ({user}) => !user,
-    // TODO: this should be visible for everyone
-    renderNothing,
-  ),
   lifecycle({
     componentDidMount() {
       this.props.getInvoices()

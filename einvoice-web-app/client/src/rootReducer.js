@@ -3,6 +3,7 @@ import {forwardReducerTo} from "./utils/helpers"
 export const getInitialState = () => ({
   user: null,
   invoices: [],
+  serviceAccounts: [],
   // TODO: be smarter and create cache
   currentInvoice: null,
   // TODO: get rid of this

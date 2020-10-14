@@ -2,40 +2,59 @@ package auth
 
 import (
 	"encoding/json"
+	"github.com/slovak-egov/einvoice/authproxy/user"
+	"io"
+	"io/ioutil"
 	"net/http"
+	"net/http/httputil"
 )
 
-func WithToken(manager UserManager, f func(res http.ResponseWriter, req *http.Request)) func(res http.ResponseWriter, req *http.Request) {
-	return func(res http.ResponseWriter, req *http.Request) {
-		token := req.Header.Get("Authorization")
-		if manager.Exists(token) {
-			req.Header.Del("Authorization")
-			f(res, req)
-		} else {
-			res.WriteHeader(401)
-		}
+type UserInfo struct {
+	Token             string `json:"token,omitempty"`
+	Id                string `json:"id"`
+	Name              string `json:"name"`
+	ServiceAccountKey string `json:"serviceAccountKey,omitempty"`
+	Email             string `json:"email,omitempty"`
+}
+
+func userInfo(user *user.User) *UserInfo {
+	return &UserInfo{
+		Token:             user.Token,
+		Id:                user.Id,
+		Name:              user.Name,
+		ServiceAccountKey: user.ServiceAccountKey,
+		Email:             user.Email,
 	}
 }
 
-type UserInfo struct {
-	Token string `json:"token"`
-	Id    string `json:"id"`
-}
-
-func HandleLogin(manager UserManager) func(res http.ResponseWriter, req *http.Request) {
+func HandleLogin(manager UserManager, keys *Keys) func(res http.ResponseWriter, req *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
-		user := manager.Create()
+		tokenString := req.Header.Get("Authorization")
+		slovenskoSkUser, err := GetSlovenkosSkUserInfo(keys, tokenString)
+		if err != nil {
+			res.WriteHeader(401)
+			return
+		}
 
-		info := UserInfo{user.Token, user.Id}
+		id := slovenskoSkUser.Uri
+
+		user := manager.GetUser(id)
+		if user == nil {
+			name := slovenskoSkUser.Name
+			user = manager.Create(id, name)
+		}
+
+		manager.CreateToken(user)
+
+		info := userInfo(user)
 		res.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(res).Encode(info)
 	}
 }
 
-func HandleLogout(manager UserManager) func(res http.ResponseWriter, req *http.Request) {
-	return func(res http.ResponseWriter, req *http.Request) {
-		token := req.Header.Get("Authorization")
-		if err := manager.Remove(token); err != nil {
+func HandleLogout(manager UserManager) func(res http.ResponseWriter, req *http.Request, user *user.User) {
+	return func(res http.ResponseWriter, req *http.Request, user *user.User) {
+		if err := manager.RemoveToken(user); err != nil {
 			res.WriteHeader(401)
 			return
 		}
@@ -44,15 +63,46 @@ func HandleLogout(manager UserManager) func(res http.ResponseWriter, req *http.R
 	}
 }
 
-func HandleMe(manager UserManager) func(res http.ResponseWriter, req *http.Request) {
-	return func(res http.ResponseWriter, req *http.Request) {
-		token := req.Header.Get("Authorization")
-		if user := manager.GetUser(token); user != nil {
-			info := UserInfo{user.Token, user.Id}
-			res.Header().Set("Content-Type", "application/json")
-			json.NewEncoder(res).Encode(info)
-		} else {
-			res.WriteHeader(401)
+func HandleMe(res http.ResponseWriter, req *http.Request, user *user.User) {
+	info := userInfo(user)
+	res.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(res).Encode(info)
+}
+
+func HandleUpdateUser(manager UserManager) func(res http.ResponseWriter, req *http.Request, user *user.User) {
+	return func(res http.ResponseWriter, req *http.Request, usr *user.User) {
+		body, err := ioutil.ReadAll(io.LimitReader(req.Body, 1048576))
+		if err != nil {
+			panic(err)
 		}
+		if err := req.Body.Close(); err != nil {
+			panic(err)
+		}
+
+		updates := &user.User{}
+
+		if err := json.Unmarshal(body, &updates); err != nil {
+			panic(err)
+		}
+
+		manager.UpdateUser(usr, updates)
+
+		info := userInfo(usr)
+		res.Header().Set("Content-Type", "application/json")
+		json.NewEncoder(res).Encode(info)
+	}
+}
+
+func HandleAuthProxy(proxy *httputil.ReverseProxy) func(res http.ResponseWriter, req *http.Request, user *user.User) {
+	return func(res http.ResponseWriter, req *http.Request, user *user.User) {
+		req.Host = req.URL.Host
+		proxy.ServeHTTP(res, req)
+	}
+}
+
+func HandleOpenProxy(proxy *httputil.ReverseProxy) func(res http.ResponseWriter, req *http.Request) {
+	return func(res http.ResponseWriter, req *http.Request) {
+		req.Host = req.URL.Host
+		proxy.ServeHTTP(res, req)
 	}
 }

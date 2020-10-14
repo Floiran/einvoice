@@ -3,29 +3,49 @@ import {connect} from 'react-redux'
 import {compose, withHandlers} from 'recompose'
 import {Navbar} from 'react-bootstrap'
 import {NavLink, withRouter} from 'react-router-dom'
-import lodash from 'lodash'
-import {login, logout} from '../actions/users'
+import {LOGGING, LOGGING_FAILED, login, logout} from '../actions/users'
 
-const TopBar = ({isLogged, login, logout, userId}) => (
+const TopBar = ({isLogged, login, logout, user, loggingStatus}) => (
   <Navbar bg="primary" variant="dark">
     <NavLink to="/">
       <Navbar.Brand>E-invoice</Navbar.Brand>
     </NavLink>
-    <NavLink to="/invoices">
+    <NavLink className="nav-link" to="/invoices">
       <Navbar.Text>All invoices</Navbar.Text>
     </NavLink>
+    {
+      isLogged &&
+      <NavLink className="nav-link" to="/create-invoice">
+        <Navbar.Text>Create invoice</Navbar.Text>
+      </NavLink>
+    }
+    {
+      isLogged &&
+      <NavLink className="nav-link" to="/account">
+        <Navbar.Text>Account settings</Navbar.Text>
+      </NavLink>
+    }
     <Navbar.Collapse className="justify-content-end">
+      { loggingStatus === LOGGING_FAILED &&
+      <p>Logging failed</p>
+      }
       {isLogged ?
         <React.Fragment>
           <NavLink to="/account">
             <Navbar.Text>
-              User id: {userId}
+              User name: {user.name}
             </Navbar.Text>
           </NavLink>
           <button className="btn btn-danger" onClick={logout}>Logout</button>
         </React.Fragment>
         :
-        <button className="btn btn-success" onClick={login}>Login</button>
+        <button className="btn btn-success" onClick={login}>
+          { loggingStatus === LOGGING ?
+            "Logging in..."
+            :
+            "Login"
+          }
+        </button>
       }
     </Navbar.Collapse>
   </Navbar>
@@ -35,8 +55,9 @@ export default withRouter(
   compose(
     connect(
       (state) => ({
+        loggingStatus: state.loggingStatus,
         isLogged: !!state.user,
-        userId: lodash.get(state, ['user', 'id'])
+        user: state.user
       }),
       {login, logout}
     ),

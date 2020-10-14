@@ -28,7 +28,7 @@ export const getInvoices = () => (
 
 export const getInvoiceDetail = (id) => (
   async (dispatch, getState, {api}) => {
-    const invoiceDetail = await api.getInvoiceDetail(getState().user, id)
+    const invoiceDetail = await api.getInvoiceDetail(id)
     dispatch(setCurrentInvoice(invoiceDetail))
   }
 )

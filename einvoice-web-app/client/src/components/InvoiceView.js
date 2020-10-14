@@ -26,11 +26,6 @@ export default compose(
   }),
   {getInvoiceDetail, setCurrentInvoice}
   ),
-  branch(
-    ({user}) => !user,
-    // TODO: this should be visible for everyone
-    renderNothing,
-  ),
   lifecycle({
     componentDidMount() {
       this.props.getInvoiceDetail(this.props.match.params.id)

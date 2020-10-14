@@ -12,7 +12,7 @@
     state: present
 
 - name: Deploy cloud run web-app
-  command: gcloud run deploy web-app --project '{{ project_id }}' --image gcr.io/{{ project_id }}/web-app:latest --platform managed --region {{ location }} --allow-unauthenticated --set-env-vars AUTH_SERVER_URL='{{ authproxy_url }}' --set-env-vars CLIENT_BUILD_DIR=../client/build/
+  command: gcloud run deploy web-app --project '{{ project_id }}' --image gcr.io/{{ project_id }}/web-app:latest --platform managed --region {{ location }} --allow-unauthenticated --set-env-vars AUTH_SERVER_URL='{{ authproxy_url }}' --set-env-vars CLIENT_BUILD_DIR=../client/build/ --set-env-vars SLOVENSKO_SK_LOGIN_URL=https://upvs.dev.filipsladek.com/login?callback=https://web-app.dev.filipsladek.com/login-callback
 
 - name: Deploy cloud get service web-app
   shell: gcloud run services describe web-app --project '{{ project_id }}' --platform managed --region '{{ location }}' --format 'value(status.url)'
