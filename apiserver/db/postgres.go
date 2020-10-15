@@ -15,22 +15,12 @@ func NewDBConnector() DBConnector {
 }
 
 func (connector *dbConnector) Connect() {
-    if Config.Db.InstanceConnectionName != "" {
-        connector.db = pg.Connect(&pg.Options{
-            Addr:     "/cloudsql/" + Config.Db.InstanceConnectionName + "/.s.PGSQL.5432",
-            Network:  "unix",
-            User:     Config.Db.User,
-            Password: Config.Db.Password,
-            Database: Config.Db.Name,
-        })
-	} else {
-        connector.db = pg.Connect(&pg.Options{
-            Addr:     Config.Db.Host + ":" + Config.Db.Port,
-            User:     Config.Db.User,
-            Password: Config.Db.Password,
-            Database: Config.Db.Name,
-        })
-	}
+	connector.db = pg.Connect(&pg.Options{
+		Addr:     Config.Db.Host + ":" + Config.Db.Port,
+		User:     Config.Db.User,
+		Password: Config.Db.Password,
+		Database: Config.Db.Name,
+	})
 }
 
 func (connector *dbConnector) Close() {

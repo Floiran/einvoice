@@ -12,7 +12,6 @@ type dbConfiguration struct {
 	Name     string
 	User     string
 	Password string
-	InstanceConnectionName string
 }
 
 type configuration struct {
@@ -29,12 +28,11 @@ var Config = configuration{}
 
 func InitConfig() {
 	Config.Db = dbConfiguration{
-		Host:     os.Getenv("DB_HOST"),
-		Port:     os.Getenv("DB_PORT"),
+		Host:     environment.RequireVar("DB_HOST"),
+		Port:     environment.RequireVar("DB_PORT"),
 		Name:     environment.RequireVar("DB_NAME"),
 		User:     environment.RequireVar("DB_USER"),
 		Password: environment.RequireVar("DB_PASSWORD"),
-		InstanceConnectionName: os.Getenv("DB_INSTANCE_CONNECTION_NAME"),
 	}
 
 	Config.Port = environment.ParseInt("PORT")

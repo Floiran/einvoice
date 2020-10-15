@@ -21,7 +21,7 @@
     state: present
 
 - name: Deploy cloud run apiserver
-  command: gcloud run deploy apiserver --project '{{ project_id }}' --image gcr.io/{{ project_id }}/apiserver:latest --platform managed --region '{{ location }}' --allow-unauthenticated --add-cloudsql-instances '{{ sql_instance_res.connectionName }}' --set-env-vars DB_INSTANCE_CONNECTION_NAME='{{ sql_instance_res.connectionName }}' --set-env-vars SLOW_STORAGE_TYPE=gcs --set-env-vars GCS_BUCKET='{{ storage_instance_name }}' --set-env-vars D16B_XSD_PATH=xml/d16b/xsd --set-env-vars UBL21_XSD_PATH=xml/ubl21/xsd --set-env-vars DB_USER='{{ sql_instance.db_user }}' --set-env-vars DB_PASSWORD='{{ sql_instance.db_password }}' --set-env-vars DB_NAME='{{ sql_instance.db_name }}'
+  command: gcloud run deploy apiserver --project '{{ project_id }}' --image gcr.io/{{ project_id }}/apiserver:latest --platform managed --region '{{ location }}' --allow-unauthenticated --vpc-connector sql-connector --add-cloudsql-instances '{{ sql_instance_res.connectionName }}' --set-env-vars SLOW_STORAGE_TYPE=gcs --set-env-vars GCS_BUCKET='{{ storage_instance_name }}' --set-env-vars D16B_XSD_PATH=xml/d16b/xsd --set-env-vars UBL21_XSD_PATH=xml/ubl21/xsd --set-env-vars DB_USER='{{ sql_instance.db_user }}' --set-env-vars DB_HOST={{sql_instance_res.ipAddresses[0].ipAddress}} --set-env-vars DB_PORT=5432 --set-env-vars DB_PASSWORD='{{ sql_instance.db_password }}' --set-env-vars DB_NAME='{{ sql_instance.db_name }}'
 
 - name: Deploy cloud get service apiserver
   shell: gcloud run services describe apiserver --project '{{ project_id }}' --platform managed --region '{{ location }}' --format 'value(status.url)'
