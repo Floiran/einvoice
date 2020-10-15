@@ -49,7 +49,7 @@ export default withRouter(
         const urlParams = new URLSearchParams(this.props.location.search)
 
         if(urlParams.has('token')) {
-          if (await loginWithSlovenskoSkToken(urlParams.get('token'))) {
+          if (await this.props.loginWithSlovenskoSkToken(urlParams.get('token'))) {
             this.props.history.push('/account')
           }
         }
