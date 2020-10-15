@@ -10,9 +10,9 @@ export default class Api {
   }
 
   getApiUrl = async () => {
-    let conf = await this.standardRequest({route: '/api/urls'})
-    this.baseUrl = conf.apiServerUrl
-    this.slovenskoSkLoginUrl = conf.slovenskoSkLoginUrl
+    const urls = await this.standardRequest({route: '/api/urls'})
+    this.baseUrl = urls.apiServerUrl
+    return urls.slovenskoSkLoginUrl
   }
 
   getUserInfo = async (user) => {
@@ -33,10 +33,6 @@ export default class Api {
         Authorization: user.token
       }
     })
-  }
-
-  login = () => {
-    window.location.href = this.slovenskoSkLoginUrl
   }
 
   loginWithSlovenskoSkToken = async (token) => {
@@ -71,21 +67,17 @@ export default class Api {
     })
   }
 
-  createInvoice = async (user, format, invoice) => {
-    // TODO: make it nicer
-    const contentType = format === 'json' ? 'json' : 'xml'
-
-    return await this.apiRequest({
+  createInvoice = async (user, format, invoice) =>
+    await this.apiRequest({
       method: 'POST',
       route: `/api/invoice/${format}`,
       data: invoice,
       headers: {
-        'Content-Type': `application/${contentType}`,
+        'Content-Type': 'application/xml',
         'Authorization': user.token,
       },
-      jsonBody: format === 'json',
+      jsonBody: false,
     })
-  }
 
   apiRequest = (params) =>
     this.standardRequest({

@@ -1,23 +1,14 @@
-const setUser = (user) => ({
-  type: 'SET USER',
-  path: ['user'],
-  payload: user,
-  reducer: (state, user) => user,
-})
+import {loadingWrapper, setData} from './common'
 
 export const LOGGING = "logging"
 export const LOGGING_FAILED = "failed"
 export const LOGGED_IN = "loggedIn"
 export const LOGGED_OUT = "loggedOut"
 
-export const setLoggingStatus = (status) => ({
-  type: 'SET LOGGING STATUS',
-  path: ['loggingStatus'],
-  payload: status,
-  reducer: (state, status) => status,
-})
+export const setLoggingStatus = setData(['loggingStatus'])
+const setUser = setData(['user'])
 
-export const getMyInfo = (location, history) => (
+export const getMyInfo = () => (
   async (dispatch, getState, {api}) => {
     let userString = localStorage.getItem('user')
     let user
@@ -34,32 +25,15 @@ export const getMyInfo = (location, history) => (
         dispatch(setUser(userData))
         localStorage.setItem('user', JSON.stringify(userData))
       } catch (error) {
-        if (error.statusCode === 401) {
-          dispatch(setUser(null))
-        }
+        dispatch(setUser({unauthorized: true}))
       }
-    }
-
-    let urlParams = new URLSearchParams(location.search)
-
-    if(urlParams.has('token')) {
-      await dispatch(loginWithSlovenskoSkToken(history, urlParams.get('token')))
+    } else {
+      dispatch(setUser({unauthorized: true}))
     }
   }
 )
 
-export const login = (history) => (
-  async (dispatch, getState, {api}) => {
-    try {
-      dispatch(setLoggingStatus(LOGGING))
-      await api.login(history)
-    } catch (error) {
-      dispatch(setLoggingStatus(LOGGING_FAILED))
-    }
-  }
-)
-
-export const updateUser = (data) => (
+export const updateUser = (data) => loadingWrapper(
   async (dispatch, getState, {api}) => {
     let userData = await api.updateUser(getState().user, data)
     dispatch(setUser(userData))
@@ -67,15 +41,15 @@ export const updateUser = (data) => (
   }
 )
 
-export const loginWithSlovenskoSkToken = (history, token) => (
+export const loginWithSlovenskoSkToken = (token) => (
   async (dispatch, getState, {api}) => {
     try {
       dispatch(setLoggingStatus(LOGGING))
       let userData = await api.loginWithSlovenskoSkToken(token)
-      history.push("/account")
       dispatch(setUser(userData))
       localStorage.setItem('user', JSON.stringify(userData))
       dispatch(setLoggingStatus(LOGGED_IN))
+      return true
     } catch (error) {
       dispatch(setLoggingStatus(LOGGING_FAILED))
       if (error.statusCode === 401) {

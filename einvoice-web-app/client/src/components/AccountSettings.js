@@ -1,7 +1,5 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import {branch, compose, renderNothing} from 'recompose'
-import {withRouter} from 'react-router-dom'
 import {updateUser} from "../actions/users";
 import {set} from 'object-path-immutable'
 
@@ -64,7 +62,7 @@ class AccountSettings extends React.Component {
   render() {
     return (
       <div className="container">
-        <h2>Settings</h2>
+        <h2 style={{textAlign: 'center'}}>Settings</h2>
         <EditableField
           name={"email"}
           label={<p className="col-1">Email:</p>}
@@ -91,18 +89,9 @@ class AccountSettings extends React.Component {
   }
 }
 
-export default withRouter(
-  compose(
-    connect(
-      (state) => ({
-        user: state.user
-      }),
-      {updateUser}
-    ),
-    branch(
-      ({user}) => !user,
-      // TODO: unauthorized component
-      renderNothing,
-    ),
-  )(AccountSettings)
-)
+export default connect(
+  (state) => ({
+    user: state.user
+  }),
+  {updateUser}
+)(AccountSettings)

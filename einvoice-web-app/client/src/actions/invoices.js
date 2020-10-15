@@ -1,42 +1,56 @@
-const setInvoices = (invoices) => ({
-  type: 'SET INVOICES',
-  path: ['invoices'],
-  payload: invoices,
-  reducer: (state, invoices) => invoices,
-})
+import swal from 'sweetalert'
+import {setData, loadingWrapper} from './common'
 
-export const setCurrentInvoice = (invoice) => ({
-  type: 'SET CURRENT INVOICE',
-  path: ['currentInvoice'],
-  payload: invoice,
-  reducer: (state, invoice) => invoice,
-})
+const setInvoices = setData(['invoices'])
+export const setCurrentInvoice = setData(['currentInvoice'])
+export const setUblInputValue = setData(['createInvoiceScreen', 'ublInput'])
+export const setD16bInputValue = setData(['createInvoiceScreen', 'd16bInput'])
+export const setGeneratedXmlInputValue = setData(['createInvoiceScreen', 'formGeneratedInput'])
 
-export const addInvoice = (invoice) => ({
+const addInvoice = (invoice) => ({
   type: 'ADD INVOICE',
   path: ['invoices'],
   payload: invoice,
   reducer: (state, invoice) => [...state, invoice],
 })
 
-export const getInvoices = () => (
+export const updateInvoiceFormProperty = (property, data) => ({
+  type: `UPDATE INVOICE FORM PROPERTY ${property}`,
+  path: ['createInvoiceScreen', 'form', property],
+  payload: data,
+  reducer: (state, value) => value,
+})
+
+export const getInvoices = () => loadingWrapper(
   async (dispatch, getState, {api}) => {
     const invoices = await api.getInvoices(getState().user)
     dispatch(setInvoices(invoices))
   }
 )
 
-export const getInvoiceDetail = (id) => (
+export const getInvoiceDetail = (id) => loadingWrapper(
   async (dispatch, getState, {api}) => {
     const invoiceDetail = await api.getInvoiceDetail(id)
     dispatch(setCurrentInvoice(invoiceDetail))
   }
 )
 
-export const createInvoice = (format, data) => (
+export const createInvoice = (format, data) => loadingWrapper(
   async (dispatch, getState, {api}) => {
-    const invoice = await api.createInvoice(getState().user, format, data)
-    dispatch(addInvoice(invoice))
-    return invoice.id
+    try {
+      const invoice = await api.createInvoice(getState().user, format, data)
+      dispatch(addInvoice(invoice))
+      await swal({
+        title: 'Invoice was created',
+        icon: 'success',
+      })
+      return invoice.id
+    } catch(error) {
+      await swal({
+        title: 'Invoice could not be created',
+        text: error.message,
+        icon: 'error',
+      })
+    }
   }
 )

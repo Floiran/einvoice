@@ -1,14 +1,19 @@
-const setApiInitialized = () => ({
-  type: 'SET API INITIALIZED',
-  path: ['apiInitialized'],
-  payload: null,
-  reducer: (state) => true,
-})
+import swal from 'sweetalert'
+import {setData} from './common'
 
-// This should not be necessary in future as API url can be send in initial HTML
+// This should not be necessary in future as API urls can be send in initial HTML
 export const initializeApi = () => (
   async (dispatch, getState, {api}) => {
-    await api.getApiUrl()
-    dispatch(setApiInitialized())
+    try {
+      const slovenskoSkUrl = await api.getApiUrl()
+      dispatch(setData(['slovenskoSkUrl'])(slovenskoSkUrl))
+      dispatch(setData(['apiInitialized'])(true))
+    } catch(error) {
+      await swal({
+        title: 'API urls could not be loaded',
+        text: error.message,
+        icon: 'error',
+      })
+    }
   }
 )

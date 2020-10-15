@@ -1,6 +1,6 @@
 import React from 'react'
 import {connect} from 'react-redux'
-import {branch, compose, lifecycle, renderNothing} from 'recompose'
+import {compose, lifecycle} from 'recompose'
 import {NavLink} from 'react-router-dom'
 import {getInvoices} from '../actions/invoices'
 
@@ -23,7 +23,7 @@ const InvoiceList = ({invoices})  => {
   }
 
   return (
-    <div className="container">
+    <div className="container" style={{textAlign: 'center'}}>
       <h2>All invoices</h2>
       <table className="table table-striped table-borderless table-hover">
         <thead>

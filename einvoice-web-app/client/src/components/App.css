@@ -9,10 +9,6 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
 }
 
-.App {
-  text-align: center;
-}
-
 .row {
   margin-bottom: 20px;
 }
@@ -28,4 +24,8 @@ p {
 
 .link {
   color: #3e52ff;
+}
+
+.selected button {
+  background-color: darkblue;
 }
