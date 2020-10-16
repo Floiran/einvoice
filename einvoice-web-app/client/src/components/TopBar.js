@@ -3,23 +3,26 @@ import {connect} from 'react-redux'
 import {compose, withHandlers} from 'recompose'
 import {Navbar} from 'react-bootstrap'
 import {NavLink, withRouter} from 'react-router-dom'
+import {withTranslation} from 'react-i18next'
 import {LOGGING, LOGGING_FAILED, logout} from '../actions/users'
 
-const TopBar = ({isLogged, slovenskoSkUrl, logout, user, loggingStatus}) => (
+const TopBar = ({i18n, isLogged, loggingStatus, logout, slovenskoSkUrl, t, user}) => (
   <Navbar bg="primary" variant="dark">
     <NavLink to="/">
-      <Navbar.Brand>E-invoice</Navbar.Brand>
+      <Navbar.Brand>{t('title')}</Navbar.Brand>
     </NavLink>
+    <button onClick={() => i18n.changeLanguage('sk')}>sk</button>
+    <button onClick={() => i18n.changeLanguage('en')}>en</button>
     <NavLink className="nav-link" to="/invoices">
-      <Navbar.Text>All invoices</Navbar.Text>
+      <Navbar.Text>{t('tabs.allInvoices')}</Navbar.Text>
     </NavLink>
     {
       isLogged && <React.Fragment>
         <NavLink className="nav-link" to="/create-invoice">
-          <Navbar.Text>Create invoice</Navbar.Text>
+          <Navbar.Text>{t('tabs.createInvoice')}</Navbar.Text>
         </NavLink>
         <NavLink className="nav-link" to="/account">
-          <Navbar.Text>Account settings</Navbar.Text>
+          <Navbar.Text>{t('tabs.accountSettings')}</Navbar.Text>
         </NavLink>
       </React.Fragment>
     }
@@ -30,19 +33,17 @@ const TopBar = ({isLogged, slovenskoSkUrl, logout, user, loggingStatus}) => (
       {isLogged ?
         <React.Fragment>
           <NavLink to="/account">
-            <Navbar.Text>
-              User name: {user.name}
-            </Navbar.Text>
+            <Navbar.Text>{user.name}</Navbar.Text>
           </NavLink>
-          <button className="btn btn-danger" onClick={logout}>Logout</button>
+          <button className="btn btn-danger" onClick={logout}>{t('logout')}</button>
         </React.Fragment>
         :
         <a href={slovenskoSkUrl}>
           <button className="btn btn-success">
             { loggingStatus === LOGGING ?
-              "Logging in..."
+              t('logging')
               :
-              "Login"
+              t('login')
             }
           </button>
         </a>
@@ -67,6 +68,7 @@ export default withRouter(
         await logout()
         history.push('/')
       },
-    })
+    }),
+    withTranslation('TopBar'),
   )(TopBar)
 )

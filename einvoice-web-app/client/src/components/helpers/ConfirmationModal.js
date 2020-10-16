@@ -1,25 +1,28 @@
 import React from 'react'
 import {Modal, Button} from 'react-bootstrap'
+import {withTranslation} from 'react-i18next'
 
-const _ConfirmationModal = ({title, text, confirm, cancel}) => (
-  <div className="static-modal Modal" style={{cursor: 'default'}}>
-    <Modal.Dialog>
-      <Modal.Header style={{display: 'flex'}}>
-        <Modal.Title style={{margin: 'auto'}}>{title}</Modal.Title>
-      </Modal.Header>
+const ConfirmationModal = withTranslation('common')(
+  ({cancel, confirm, t, text, title}) => (
+    <div className="static-modal Modal" style={{cursor: 'default'}}>
+      <Modal.Dialog>
+        <Modal.Header style={{display: 'flex'}}>
+          <Modal.Title style={{margin: 'auto'}}>{title}</Modal.Title>
+        </Modal.Header>
 
-      <Modal.Body>{text}</Modal.Body>
+        <Modal.Body>{text}</Modal.Body>
 
-      <Modal.Footer>
-        <Button onClick={cancel}>Cancel</Button>
-        <Button variant="primary" onClick={confirm}>Confirm</Button>
-      </Modal.Footer>
-    </Modal.Dialog>
-  </div>
+        <Modal.Footer>
+          <Button onClick={cancel}>{t('cancel')}</Button>
+          <Button variant="primary" onClick={confirm}>{t('confirm')}</Button>
+        </Modal.Footer>
+      </Modal.Dialog>
+    </div>
+  )
 )
 
 
-export default class ConfirmationModal extends React.Component {
+export default class extends React.Component {
   state = {
     open: false,
     callback: null,
@@ -43,7 +46,7 @@ export default class ConfirmationModal extends React.Component {
     <React.Fragment>
       {this.props.children(this.show)}
       {this.state.open && (
-        <_ConfirmationModal
+        <ConfirmationModal
           title={this.props.title}
           text={this.props.text}
           confirm={this.confirm}

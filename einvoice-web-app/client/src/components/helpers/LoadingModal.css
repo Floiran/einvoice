@@ -10,6 +10,7 @@
   border-top: 16px solid #007bff; /* Blue */
   border-radius: 50%;
   animation: spin 2s linear infinite;
+  margin: auto;
 }
 
 @keyframes spin {

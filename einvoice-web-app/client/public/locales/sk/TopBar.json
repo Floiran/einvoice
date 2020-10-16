@@ -1,0 +1,11 @@
+{
+  "title": "E-faktúra",
+  "tabs": {
+    "allInvoices": "Všetky faktúry",
+    "createInvoice": "Vytvoriť faktúru",
+    "accountSettings": "Nastavenia účtu"
+  },
+  "logout": "Odhlásiť",
+  "login": "Prihlásiť",
+  "logging": "Prihlasujem..."
+}

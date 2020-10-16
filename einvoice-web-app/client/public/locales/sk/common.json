@@ -1,0 +1,15 @@
+{
+  "close": "Zavrieť",
+  "invoice": "Faktúra",
+  "sender": "Odosielateľ",
+  "receiver": "Prijímateľ",
+  "price": "Cena",
+  "format": "Formát",
+  "cancel": "Zrušiť",
+  "save": "Uložiť",
+  "edit": "Upraviť",
+  "email": "E-mail",
+  "serviceAccountKey": "Kľúč služobného účtu",
+  "confirm": "Potvrdiť",
+  "submit": "Odovzdaj"
+}

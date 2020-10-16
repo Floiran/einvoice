@@ -1,9 +1,12 @@
 import React from 'react'
+import {withTranslation} from 'react-i18next'
 
-export default () => (
-  <div>
-    <h1>401</h1>
-    <h2>Unauthorized access</h2>
-    <div>You have no permission to view this page</div>
-  </div>
+export default withTranslation('helpers')(
+    ({t}) => (
+    <div>
+      <h1>401</h1>
+      <h2>{t('auth.title')}</h2>
+      <div>{t('auth.description')}</div>
+    </div>
+  )
 )

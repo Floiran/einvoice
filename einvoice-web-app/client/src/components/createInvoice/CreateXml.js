@@ -1,5 +1,6 @@
 import React from 'react'
 import {connect} from 'react-redux'
+import {withTranslation} from 'react-i18next'
 import ConfirmationButton from '../helpers/ConfirmationButton'
 import {createInvoice, setUblInputValue, setD16bInputValue, setGeneratedXmlInputValue} from '../../actions/invoices'
 
@@ -17,7 +18,7 @@ class CreateXml extends React.Component {
 
   render = () => (
     <div>
-      <p className="row justify-content-center">Format: {this.props.format}</p>
+      <p className="row justify-content-center">{this.props.t('format')}: {this.props.format}</p>
       <div>
         <div className="row justify-content-center">
           <textarea
@@ -33,10 +34,10 @@ class CreateXml extends React.Component {
           <ConfirmationButton
             className="btn btn-primary"
             onClick={this.submitXmlInvoice}
-            confirmationTitle="Create invoice"
-            confirmationText="Do you really want to create this invoice?"
+            confirmationTitle={this.props.t('TopBar:tabs.createInvoice')}
+            confirmationText={this.props.t('invoices:confirmationQuestion')}
           >
-            Submit
+            {this.props.t('submit')}
           </ConfirmationButton>
         </div>
       </div>
@@ -44,13 +45,15 @@ class CreateXml extends React.Component {
   )
 }
 
+const TranslatedCreateXml = withTranslation(['common', 'TopBar', 'invoices'])(CreateXml)
+
 export const CreateUbl = connect(
   (state) => ({
     xmlInputValue: state.createInvoiceScreen.ublInput,
     format: 'ubl',
   }),
   {createInvoice, setXmlInputValue: setUblInputValue}
-)(CreateXml)
+)(TranslatedCreateXml)
 
 export const CreateD16b = connect(
   (state) => ({
@@ -58,7 +61,7 @@ export const CreateD16b = connect(
     format: 'd16b',
   }),
   {createInvoice, setXmlInputValue: setD16bInputValue}
-)(CreateXml)
+)(TranslatedCreateXml)
 
 export const CreateGenerated = connect(
   (state) => ({
@@ -66,4 +69,4 @@ export const CreateGenerated = connect(
     format: 'ubl',
   }),
   {createInvoice, setXmlInputValue: setGeneratedXmlInputValue}
-)(CreateXml)
+)(TranslatedCreateXml)

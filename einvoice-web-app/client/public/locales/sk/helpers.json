@@ -1,0 +1,9 @@
+{
+  "auth": {
+    "title": "Nepovolený prístup",
+    "description": "Nemáte povolenie na prezeranie tejto stránky"
+  },
+  "loading": {
+    "title": "Procesujem žiadosť"
+  }
+}

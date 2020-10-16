@@ -1,0 +1,9 @@
+{
+  "auth": {
+    "title": "Unauthorized access",
+    "description": "You have no permission to view this page"
+  },
+  "loading": {
+    "title": "Processing request"
+  }
+}

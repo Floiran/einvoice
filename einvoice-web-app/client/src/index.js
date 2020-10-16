@@ -3,6 +3,7 @@ import {render} from 'react-dom'
 import Root from './Root'
 import configureStore from './configureStore'
 import * as serviceWorker from './serviceWorker'
+import './i18n'
 
 const store = configureStore()
 

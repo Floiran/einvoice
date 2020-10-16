@@ -2,9 +2,10 @@ import React from 'react'
 import {connect} from 'react-redux'
 import {compose, lifecycle} from 'recompose'
 import {NavLink} from 'react-router-dom'
+import {withTranslation} from 'react-i18next'
 import {getInvoices} from '../actions/invoices'
 
-const InvoiceList = ({invoices})  => {
+const InvoiceList = ({invoices, t})  => {
   let rows = []
   if(invoices) {
     rows = invoices.map((invoice, i) => {
@@ -16,7 +17,7 @@ const InvoiceList = ({invoices})  => {
         <td><p>{invoice.price}</p></td>
         <td><p>{invoice.format}</p></td>
         <td><p>
-          <NavLink to={`/invoices/${invoice.id}`}>view</NavLink>
+          <NavLink to={`/invoices/${invoice.id}`}>detail</NavLink>
         </p></td>
       </tr>
     })
@@ -24,16 +25,16 @@ const InvoiceList = ({invoices})  => {
 
   return (
     <div className="container" style={{textAlign: 'center'}}>
-      <h2>All invoices</h2>
+      <h2>{t('TopBar:tabs.allInvoices')}</h2>
       <table className="table table-striped table-borderless table-hover">
         <thead>
         <tr>
           <th>#</th>
           <th>ID</th>
-          <th>Sender</th>
-          <th>Receiver</th>
-          <th>Price</th>
-          <th>Format</th>
+          <th>{t('sender')}</th>
+          <th>{t('receiver')}</th>
+          <th>{t('price')}</th>
+          <th>{t('format')}</th>
           <th />
         </tr>
         </thead>
@@ -58,4 +59,5 @@ export default compose(
       this.props.getInvoices()
     },
   }),
+  withTranslation(['common', 'TopBar']),
 )(InvoiceList)
