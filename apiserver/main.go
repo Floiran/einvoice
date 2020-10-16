@@ -22,13 +22,11 @@ import (
 func handleRequests(manager manager.Manager, validator xml.Validator) {
 	router := mux.NewRouter()
 
-	// TODO: update URLs to follow REST conventions
-	router.PathPrefix("/api/invoices").Methods("GET").HandlerFunc(apiHandlers.GetAllInvoicesHandler(manager))
-	router.PathPrefix("/api/invoice/full/{id}").Methods("GET").HandlerFunc(apiHandlers.GetFullInvoiceHandler(manager))
-	router.PathPrefix("/api/invoice/meta/{id}").Methods("GET").HandlerFunc(apiHandlers.GetInvoiceMetaHandler(manager))
-	router.PathPrefix("/api/invoice/json").Methods("POST").HandlerFunc(apiHandlers.CreateInvoiceJsonHandler(manager))
-	router.PathPrefix("/api/invoice/ubl").Methods("POST").HandlerFunc(apiHandlers.CreateInvoiceXmlUblHandler(manager, validator))
-	router.PathPrefix("/api/invoice/d16b").Methods("POST").HandlerFunc(apiHandlers.CreateInvoiceXmlD16bHandler(manager, validator))
+	router.Path("/api/invoices").Methods("GET").HandlerFunc(apiHandlers.GetAllInvoicesHandler(manager))
+	router.Path("/api/invoices/{id}").Methods("GET").HandlerFunc(apiHandlers.GetFullInvoiceHandler(manager))
+	// TODO: unify to single endpoint POST /api/invoices
+	router.Path("/api/invoice/ubl").Methods("POST").HandlerFunc(apiHandlers.CreateInvoiceXmlUblHandler(manager, validator))
+	router.Path("/api/invoice/d16b").Methods("POST").HandlerFunc(apiHandlers.CreateInvoiceXmlD16bHandler(manager, validator))
 
 	srv := &http.Server{
 		Handler:      handlers.LoggingHandler(os.Stdout, router),

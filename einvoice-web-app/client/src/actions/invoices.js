@@ -23,7 +23,7 @@ export const updateInvoiceFormProperty = (property, data) => ({
 
 export const getInvoices = () => loadingWrapper(
   async (dispatch, getState, {api}) => {
-    const invoices = await api.getInvoices(getState().user)
+    const invoices = await api.getInvoices()
     dispatch(setInvoices(invoices))
   }
 )

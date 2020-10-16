@@ -13,7 +13,6 @@ type Manager interface {
 	Create(invoice *invoice.Invoice) (*invoice.Meta, error)
 	CreateUBL(value string) (*invoice.Meta, error)
 	CreateD16B(value string) (*invoice.Meta, error)
-	CreateJSON(value string) (*invoice.Meta, error)
 
 	GetFull(id string, format string) (string, error)
 	GetMeta(id string) (*invoice.Meta, error)
@@ -53,31 +52,7 @@ func fileNameFromMeta(meta *invoice.Meta) string {
 }
 
 func fileName(id, format string) string {
-	extension := "json"
-	if format != invoice.JsonFormat {
-		extension = "xml"
-	}
-
-	return "invoice-" + id + "." + extension
-}
-
-func (manager *managerImpl) CreateJSON(value string) (*invoice.Meta, error) {
-	var inv = new(invoice.Invoice)
-
-	if err := json.Unmarshal([]byte(value), &inv); err != nil {
-		return nil, err
-	}
-
-	meta := inv.GetMeta()
-
-	if err := manager.db.CreateInvoice(meta); err != nil {
-		return nil, err
-	}
-
-	if err := manager.storage.SaveObject(fileNameFromMeta(meta), value); err != nil {
-		return nil, err
-	}
-	return meta, nil
+	return "invoice-" + id + ".xml"
 }
 
 func (manager *managerImpl) CreateUBL(value string) (*invoice.Meta, error) {

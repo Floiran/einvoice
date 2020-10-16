@@ -33,14 +33,14 @@ func main() {
 
 	router.PathPrefix("/login").HandlerFunc(auth.HandleLogin(userManager, keys))
 	router.PathPrefix("/logout").HandlerFunc(authenticator.WithUser(auth.HandleLogout(userManager)))
-	router.PathPrefix("/me").Methods("GET").HandlerFunc(authenticator.WithUser(auth.HandleMe))
-	router.PathPrefix("/me").Methods("PUT").HandlerFunc(authenticator.WithUser(auth.HandleUpdateUser(userManager)))
+	// TODO: once user table is moved to postgres change url to /users/:id
+	// Check if current user has access to user:id data
+	router.PathPrefix("/users/me").Methods("GET").HandlerFunc(authenticator.WithUser(auth.HandleMe))
+	router.PathPrefix("/users/me").Methods("PUT").HandlerFunc(authenticator.WithUser(auth.HandleUpdateUser(userManager)))
 
 	proxy := httputil.NewSingleHostReverseProxy(apiserver)
 
 	router.PathPrefix("/api/invoices").Methods("GET").HandlerFunc(auth.HandleOpenProxy(proxy))
-	router.PathPrefix("/api/invoice/full/").Methods("GET").HandlerFunc(auth.HandleOpenProxy(proxy))
-	router.PathPrefix("/api/invoice/meta/").Methods("GET").HandlerFunc(auth.HandleOpenProxy(proxy))
 
 	router.PathPrefix("/").HandlerFunc(authenticator.WithUser(auth.HandleAuthProxy(proxy)))
 

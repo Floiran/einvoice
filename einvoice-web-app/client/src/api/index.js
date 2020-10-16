@@ -17,7 +17,7 @@ export default class Api {
 
   getUserInfo = async (user) => {
     return await this.apiRequest({
-      route: '/me',
+      route: '/users/me',
       headers: {
         Authorization: user.token
       }
@@ -27,8 +27,8 @@ export default class Api {
   updateUser = async (user, data) => {
     return await this.apiRequest({
       method: "PUT",
-      route: '/me',
-      data: data,
+      route: '/users/me',
+      data,
       headers: {
         Authorization: user.token
       }
@@ -54,7 +54,7 @@ export default class Api {
     })
   }
 
-  getInvoices = async (user) => {
+  getInvoices = async () => {
     return await this.apiRequest({
       route: '/api/invoices'
     })
@@ -62,7 +62,7 @@ export default class Api {
 
   getInvoiceDetail = async (id) => {
     return await this.apiRequest({
-      route: `/api/invoice/full/${id}`,
+      route: `/api/invoices/${id}`,
       jsonResponse: false,
     })
   }
