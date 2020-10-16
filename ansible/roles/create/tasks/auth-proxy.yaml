@@ -20,6 +20,17 @@
   shell: gcloud run services describe authproxy --project '{{ project_id }}' --platform managed --region '{{ location }}' --format 'value(status.url)'
   register: authproxy_output
 
+- name: Domain mapping authproxy
+  command: gcloud beta run domain-mappings create --project '{{ project_id }}' --service authproxy --domain authproxy.dev.filipsladek.com --platform managed --region '{{ location }}'
+  ignore_errors: yes
+
+- name: Domain mapping authproxy
+  command: gcloud beta run domain-mappings describe --project '{{ project_id }}' --domain authproxy.dev.filipsladek.com --platform managed --region '{{ location }}'
+  register: authproxy_domain_mapping_output
+
+- debug:
+    msg: authproxy_domain_mapping_output={{ authproxy_domain_mapping_output }}
+
 - set_fact: authproxy_url="{{ authproxy_output.stdout }}"
 
 - debug:
