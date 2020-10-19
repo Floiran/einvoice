@@ -12,9 +12,16 @@
   register: redis
 
 - name: Enable vpc connectors
-  command: gcloud services enable --project {{project_id}} vpcaccess.googleapis.com
+  command: >
+    gcloud services enable vpcaccess.googleapis.com
+      --project {{project_id}}
 
 - name: Create redis connector
-  command: gcloud compute networks vpc-access connectors create redis-connector --network default --project {{project_id}} --region {{ location }} --range 10.8.0.0/28
+  command: >
+    gcloud compute networks vpc-access connectors create redis-connector
+      --network default  
+      --project {{project_id}}  
+      --region {{ location }}  
+      --range 10.8.0.0/28
   ignore_errors: yes
 

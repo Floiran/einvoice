@@ -12,7 +12,11 @@
   register: sql_instance_res_tmp
 
 - name: Enable private ip
-  command: gcloud --project={{ project_id }} beta sql instances patch {{sql_instance_res_tmp.name}} --network=default --no-assign-ip
+  command: >
+    gcloud beta sql instances patch {{sql_instance_res_tmp.name}}
+      --project={{ project_id }}
+      --network=default  
+      --no-assign-ip
 
 - name: Get sql instance info
   gcp_sql_instance:
@@ -46,8 +50,15 @@
     state: present
 
 - name: Enable vpc connectors
-  command: gcloud services enable --project {{project_id}} vpcaccess.googleapis.com
+  command: >
+    gcloud services enable vpcaccess.googleapis.com
+      --project {{project_id}}
 
 - name: Create sql connector
-  command: gcloud compute networks vpc-access connectors create sql-connector --network default --project {{project_id}} --region {{ location }} --range 10.10.0.0/28
+  command: >
+    gcloud compute networks vpc-access connectors create sql-connector
+      --network default  
+      --project {{project_id}}  
+      --region {{ location }}  
+      --range 10.10.0.0/28
   ignore_errors: yes
