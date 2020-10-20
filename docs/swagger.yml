@@ -1,5 +1,3 @@
-# This is just placeholder, up-to-date swagger.yml can be found on
-# https://github.com/filipsladek/slovensko-sk-api/blob/master/swagger.yml
 openapi: "3.0.0"
 info:
   version: 1.0.0
@@ -39,7 +37,7 @@ paths:
         401:
           description: Unauthorized
 
-  /me:
+  /users/me:
     get:
       tags:
         - Users
@@ -83,18 +81,56 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Invoices'
-  /api/invoice/full/{invoice_id}:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - Invoices
+      summary: Create invoice
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/CreateInvoiceRequest'
+      responses:
+        201:
+          description: Invoice created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+  /api/invoices/{invoice_id}:
     get:
       tags:
         - Invoices
-      summary: Get invoice
+      summary: Get invoice meta data
       parameters:
         - name: invoice_id
           in: path
           description: Invoice ID
           required: true
           schema:
-            type: integer
+            type: string
+          example: 1
+      responses:
+        200:
+          description: Successfull response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Invoice'
+  /api/invoices/{invoice_id}/full:
+    get:
+      tags:
+        - Invoices
+      summary: Get invoice content
+      parameters:
+        - name: invoice_id
+          in: path
+          description: Invoice ID
+          required: true
+          schema:
+            type: string
           example: 1
       responses:
         200:
@@ -106,85 +142,27 @@ paths:
             application/xml:
               schema:
                 $ref: '#/components/schemas/Invoice'
-  /api/invoice/meta/{invoice_id}:
+  /api/attachments/{attachment_id}:
     get:
       tags:
-        - Invoices
-      summary: Get invoice meta data
+        - Attachment
+      summary: Get attachment file
       parameters:
-        - name: invoice_id
+        - name: attachment_id
           in: path
-          description: Invoice ID
+          description: Attachment ID
           required: true
           schema:
-            type: integer
+            type: string
           example: 1
       responses:
         200:
-          description: Successfull response
+          description: Attachment file
           content:
-            application/json:
+            application/*:
               schema:
-                $ref: '#/components/schemas/Invoice'
-  /api/invoice/json:
-    post:
-      security:
-        - bearerAuth: []
-      tags:
-        - Invoices
-      summary: Create JSON invoice
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateInvoiceRequest'
-      responses:
-        201:
-          description: Invoice created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Invoice'
-  /api/invoice/ubl:
-    post:
-      security:
-        - bearerAuth: []
-      tags:
-        - Invoices
-      summary: Create UBL invoice
-      requestBody:
-        description: Invoice in UBL format
-        content:
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/CreateInvoiceRequest'
-      responses:
-        201:
-          description: Invoice created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Invoice'
-  /api/invoice/d16b:
-    post:
-      security:
-        - bearerAuth: []
-      tags:
-        - Invoices
-      summary: Create D16B invoice
-      requestBody:
-        description: Invoice in D16B format
-        content:
-          application/xml:
-            schema:
-              $ref: '#/components/schemas/CreateInvoiceRequest'
-      responses:
-        201:
-          description: Invoice created
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Invoice'
+                type: string
+                format: binary
 components:
   securitySchemes:
     bearerAuth:
@@ -226,21 +204,36 @@ components:
         format:
           type: string
           enum:
-            - json
             - ubl2.1
             - d16b
         price:
           type: integer
           example: 100
+        attachments:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+              name:
+                type: string
     CreateInvoiceRequest:
       type: object
       properties:
-        sender:
+        format:
           type: string
-          example: SubjectA
-        receiver:
+          enum:
+            - ubl2.1
+            - d16b
+        data:
           type: string
-          example: SubjectB
-        price:
-          type: integer
-          example: 100
+        attachment1:
+          type: string
+          format: binary
+        attachment2:
+          type: string
+          format: binary
+        attachment...:
+          type: string
+          format: binary

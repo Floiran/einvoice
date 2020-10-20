@@ -5,8 +5,8 @@ import {setData} from './common'
 export const initializeApi = () => (
   async (dispatch, getState, {api}) => {
     try {
-      const slovenskoSkUrl = await api.getApiUrl()
-      dispatch(setData(['slovenskoSkUrl'])(slovenskoSkUrl))
+      const urls = await api.getApiUrl()
+      dispatch(setData(['urls'])(urls))
       dispatch(setData(['apiInitialized'])(true))
     } catch(error) {
       await swal({

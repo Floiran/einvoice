@@ -6,7 +6,7 @@ import {NavLink, withRouter} from 'react-router-dom'
 import {withTranslation} from 'react-i18next'
 import {LOGGING, LOGGING_FAILED, logout} from '../actions/users'
 
-const TopBar = ({i18n, isLogged, loggingStatus, logout, slovenskoSkUrl, t, user}) => (
+const TopBar = ({i18n, isLogged, loggingStatus, logout, slovenskoSkLoginUrl, t, user}) => (
   <Navbar bg="primary" variant="dark">
     <NavLink to="/">
       <Navbar.Brand>{t('title')}</Navbar.Brand>
@@ -38,7 +38,7 @@ const TopBar = ({i18n, isLogged, loggingStatus, logout, slovenskoSkUrl, t, user}
           <button className="btn btn-danger" onClick={logout}>{t('logout')}</button>
         </React.Fragment>
         :
-        <a href={slovenskoSkUrl}>
+        <a href={slovenskoSkLoginUrl}>
           <button className="btn btn-success">
             { loggingStatus === LOGGING ?
               t('logging')
@@ -59,7 +59,7 @@ export default withRouter(
         loggingStatus: state.loggingStatus,
         isLogged: state.user && !state.user.unauthorized,
         user: state.user,
-        slovenskoSkUrl: state.slovenskoSkUrl,
+        slovenskoSkLoginUrl: state.urls.slovenskoSkLoginUrl,
       }),
       {logout}
     ),

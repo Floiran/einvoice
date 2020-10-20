@@ -3,5 +3,6 @@
   "generated": "Vygenerovaná",
   "invoiceForm": "Formulár na faktúru",
   "generateInvoice": "Vygeneruj faktúru",
-  "confirmationQuestion": "Naozaj chcete odovzdať túto faktúru?"
+  "confirmationQuestion": "Naozaj chcete odovzdať túto faktúru?",
+  "attachments": "Prílohy"
 }

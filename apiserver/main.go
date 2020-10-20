@@ -19,14 +19,14 @@ import (
 	"github.com/slovak-egov/einvoice/apiserver/xml"
 )
 
-func handleRequests(manager manager.Manager, validator xml.Validator) {
+func handleRequests(manager manager.Manager) {
 	router := mux.NewRouter()
 
 	router.Path("/api/invoices").Methods("GET").HandlerFunc(apiHandlers.GetAllInvoicesHandler(manager))
-	router.Path("/api/invoices/{id}").Methods("GET").HandlerFunc(apiHandlers.GetFullInvoiceHandler(manager))
-	// TODO: unify to single endpoint POST /api/invoices
-	router.Path("/api/invoice/ubl").Methods("POST").HandlerFunc(apiHandlers.CreateInvoiceXmlUblHandler(manager, validator))
-	router.Path("/api/invoice/d16b").Methods("POST").HandlerFunc(apiHandlers.CreateInvoiceXmlD16bHandler(manager, validator))
+	router.Path("/api/invoices").Methods("POST").HandlerFunc(apiHandlers.CreateInvoiceHandler(manager))
+	router.Path("/api/invoices/{id}").Methods("GET").HandlerFunc(apiHandlers.GetInvoiceMetaHandler(manager))
+	router.Path("/api/invoices/{id}/full").Methods("GET").HandlerFunc(apiHandlers.GetFullInvoiceHandler(manager))
+	router.Path("/api/attachments/{id}").Methods("GET").HandlerFunc(apiHandlers.GetAttachmentHandler(manager))
 
 	srv := &http.Server{
 		Handler:      handlers.LoggingHandler(os.Stdout, router),
@@ -49,12 +49,14 @@ func main() {
 	db.Connect()
 	defer db.Close()
 
+	db.InitDB()
+
 	validator := xml.NewValidator(
 		Config.D16bXsdPath,
 		Config.Ubl21XsdPath,
 	)
 
-	manager := manager.NewManager(db, storage)
+	manager := manager.NewManager(db, storage, validator)
 
-	handleRequests(manager, validator)
+	handleRequests(manager)
 }

@@ -1,9 +1,10 @@
 import React from 'react'
-import {Route, NavLink} from 'react-router-dom'
+import {NavLink, Route} from 'react-router-dom'
 import {Button} from 'react-bootstrap'
 import InvoiceForm from './InvoiceForm'
-import {CreateUbl, CreateD16b, CreateGenerated} from './CreateXml'
+import {CreateD16b, CreateGenerated, CreateUbl} from './CreateXml'
 import {withTranslation} from 'react-i18next'
+import Attachments from "./Attachments";
 
 export default withTranslation(['invoices', 'TopBar'])(
   ({t}) => (
@@ -22,11 +23,15 @@ export default withTranslation(['invoices', 'TopBar'])(
         <NavLink to="/create-invoice/d16b" activeClassName="selected">
           <Button variant="primary" size="lg">D16B</Button>
         </NavLink>
+        <NavLink to="/create-invoice/attachments" activeClassName="selected">
+          <Button variant="primary" size="lg">{t('attachments')}</Button>
+        </NavLink>
       </div>
       <Route exact path="/create-invoice/form" component={InvoiceForm} />
       <Route exact path="/create-invoice/generated" component={CreateGenerated} />
       <Route exact path="/create-invoice/ubl" component={CreateUbl} />
       <Route exact path="/create-invoice/d16b" component={CreateD16b} />
+      <Route exact path="/create-invoice/attachments" component={Attachments} />
     </div>
   )
 )

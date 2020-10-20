@@ -2,7 +2,13 @@ import React from 'react'
 import {connect} from 'react-redux'
 import {withTranslation} from 'react-i18next'
 import ConfirmationButton from '../helpers/ConfirmationButton'
-import {createInvoice, setUblInputValue, setD16bInputValue, setGeneratedXmlInputValue} from '../../actions/invoices'
+import {
+  clearAttachments,
+  createInvoice,
+  setD16bInputValue,
+  setGeneratedXmlInputValue,
+  setUblInputValue
+} from '../../actions/invoices'
 
 class CreateXml extends React.Component {
   updateXmlInputValue = (event) => {
@@ -10,7 +16,13 @@ class CreateXml extends React.Component {
   }
 
   submitXmlInvoice = async () => {
-    const newInvoiceId = await this.props.createInvoice(this.props.format, this.props.xmlInputValue)
+    const formData  = new FormData();
+    formData.append("format", this.props.format)
+    formData.append("data", this.props.xmlInputValue)
+    this.props.attachments.forEach((a, i) => formData.append(`attachment${i}`, a, a.name))
+
+    const newInvoiceId = await this.props.createInvoice(formData)
+    await this.props.clearAttachments()
     if (newInvoiceId) {
       this.props.history.push(`/invoices/${newInvoiceId}`)
     }
@@ -50,23 +62,26 @@ const TranslatedCreateXml = withTranslation(['common', 'TopBar', 'invoices'])(Cr
 export const CreateUbl = connect(
   (state) => ({
     xmlInputValue: state.createInvoiceScreen.ublInput,
-    format: 'ubl',
+    format: 'ubl2.1',
+    attachments: state.createInvoiceScreen.attachments,
   }),
-  {createInvoice, setXmlInputValue: setUblInputValue}
+  {createInvoice, setXmlInputValue: setUblInputValue, clearAttachments}
 )(TranslatedCreateXml)
 
 export const CreateD16b = connect(
   (state) => ({
     xmlInputValue: state.createInvoiceScreen.d16bInput,
     format: 'd16b',
+    attachments: state.createInvoiceScreen.attachments,
   }),
-  {createInvoice, setXmlInputValue: setD16bInputValue}
+  {createInvoice, setXmlInputValue: setD16bInputValue, clearAttachments}
 )(TranslatedCreateXml)
 
 export const CreateGenerated = connect(
   (state) => ({
     xmlInputValue: state.createInvoiceScreen.formGeneratedInput,
-    format: 'ubl',
+    format: 'ubl2.1',
+    attachments: state.createInvoiceScreen.attachments,
   }),
-  {createInvoice, setXmlInputValue: setGeneratedXmlInputValue}
+  {createInvoice, setXmlInputValue: setGeneratedXmlInputValue, clearAttachments}
 )(TranslatedCreateXml)

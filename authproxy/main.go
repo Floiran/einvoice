@@ -41,6 +41,7 @@ func main() {
 	proxy := httputil.NewSingleHostReverseProxy(apiserver)
 
 	router.PathPrefix("/api/invoices").Methods("GET").HandlerFunc(auth.HandleOpenProxy(proxy))
+	router.PathPrefix("/api/attachments").Methods("GET").HandlerFunc(auth.HandleOpenProxy(proxy))
 
 	router.PathPrefix("/").HandlerFunc(authenticator.WithUser(auth.HandleAuthProxy(proxy)))
 

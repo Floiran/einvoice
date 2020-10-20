@@ -6,6 +6,7 @@ export const setCurrentInvoice = setData(['currentInvoice'])
 export const setUblInputValue = setData(['createInvoiceScreen', 'ublInput'])
 export const setD16bInputValue = setData(['createInvoiceScreen', 'd16bInput'])
 export const setGeneratedXmlInputValue = setData(['createInvoiceScreen', 'formGeneratedInput'])
+export const setCurrentInvoiceMeta = setData(['currentInvoiceMeta'])
 
 const addInvoice = (invoice) => ({
   type: 'ADD INVOICE',
@@ -35,10 +36,17 @@ export const getInvoiceDetail = (id) => loadingWrapper(
   }
 )
 
-export const createInvoice = (format, data) => loadingWrapper(
+export const getInvoiceMeta = (id) => loadingWrapper(
+  async (dispatch, getState, {api}) => {
+    const meta = await api.getInvoiceMeta(id)
+    dispatch(setCurrentInvoiceMeta(meta))
+  }
+)
+
+export const createInvoice = (data) => loadingWrapper(
   async (dispatch, getState, {api}) => {
     try {
-      const invoice = await api.createInvoice(getState().user, format, data)
+      const invoice = await api.createInvoice(getState().user, data)
       dispatch(addInvoice(invoice))
       await swal({
         title: 'Invoice was created',
@@ -54,3 +62,23 @@ export const createInvoice = (format, data) => loadingWrapper(
     }
   }
 )
+
+export const addAttachment = (attachment) => ({
+  type: 'ADD ATTACHMENT',
+  path: ['createInvoiceScreen', 'attachments'],
+  payload: attachment,
+  reducer: (state, attachment) => [...state, attachment],
+})
+
+export const removeAttachment = (attachment) => ({
+  type: 'REMOVE ATTACHMENT',
+  path: ['createInvoiceScreen', 'attachments'],
+  payload: attachment,
+  reducer: (state, attachment) => state.filter(a => a !== attachment),
+})
+
+export const clearAttachments = () => ({
+  type: 'CLEAR ATTACHMENTS',
+  path: ['createInvoiceScreen', 'attachments'],
+  reducer: (state, attachment) => [],
+})

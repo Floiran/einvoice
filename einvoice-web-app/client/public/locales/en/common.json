@@ -11,5 +11,8 @@
   "email": "E-mail",
   "serviceAccountKey": "Service account key",
   "confirm": "Confirm",
-  "submit": "Submit"
+  "submit": "Submit",
+  "remove": "Remove",
+  "add": "Add",
+  "name": "Name"
 }

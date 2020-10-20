@@ -11,5 +11,8 @@
   "email": "E-mail",
   "serviceAccountKey": "Kľúč služobného účtu",
   "confirm": "Potvrdiť",
-  "submit": "Odovzdaj"
+  "submit": "Odovzdaj",
+  "remove": "Odstrániť",
+  "add": "Pridať",
+  "name": "Meno"
 }

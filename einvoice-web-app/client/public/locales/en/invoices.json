@@ -3,5 +3,6 @@
   "generated": "Generated",
   "invoiceForm": "Invoice form",
   "generateInvoice": "Generate invoice",
-  "confirmationQuestion": "Do you really want to create this invoice?"
+  "confirmationQuestion": "Do you really want to create this invoice?",
+  "attachments": "Attachments"
 }

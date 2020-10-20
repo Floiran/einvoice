@@ -16,6 +16,7 @@ export const getInitialState = () => ({
       receiver: '',
       price: '',
     },
+    attachments: [],
   },
   // TODO: be smarter and create cache
   currentInvoice: null,

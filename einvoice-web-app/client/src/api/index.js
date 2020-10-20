@@ -12,7 +12,7 @@ export default class Api {
   getApiUrl = async () => {
     const urls = await this.standardRequest({route: '/api/urls'})
     this.baseUrl = urls.apiServerUrl
-    return urls.slovenskoSkLoginUrl
+    return urls
   }
 
   getUserInfo = async (user) => {
@@ -62,18 +62,23 @@ export default class Api {
 
   getInvoiceDetail = async (id) => {
     return await this.apiRequest({
-      route: `/api/invoices/${id}`,
+      route: `/api/invoices/${id}/full`,
       jsonResponse: false,
     })
   }
 
-  createInvoice = async (user, format, invoice) =>
+  getInvoiceMeta = async (id) => {
+    return await this.apiRequest({
+      route: `/api/invoices/${id}`,
+    })
+  }
+
+  createInvoice = async (user, formData) =>
     await this.apiRequest({
       method: 'POST',
-      route: `/api/invoice/${format}`,
-      data: invoice,
+      route: `/api/invoices`,
+      data: formData,
       headers: {
-        'Content-Type': 'application/xml',
         'Authorization': user.token,
       },
       jsonBody: false,
@@ -87,12 +92,16 @@ export default class Api {
 
   //TODO: ideally all request & response bodies are jsons
   async standardRequest({method, data, route, jsonResponse = true, jsonBody = true, ...opts}) {
+    let contentType = {}
+    if(jsonBody) {
+      contentType = {'Content-Type':  'application/json'}
+    }
     const response = await fetch(route, {
       method,
       body: jsonBody ? JSON.stringify(data) : data,
       ...opts,
       headers: {
-        'Content-Type': 'application/json',
+        ...contentType,
         ...opts.headers,
       },
     })
