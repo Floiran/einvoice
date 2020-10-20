@@ -9,6 +9,7 @@ import {
   setGeneratedXmlInputValue,
   setUblInputValue
 } from '../../actions/invoices'
+import {invoiceFormats} from '../../utils/constants'
 
 class CreateXml extends React.Component {
   updateXmlInputValue = (event) => {
@@ -62,7 +63,7 @@ const TranslatedCreateXml = withTranslation(['common', 'TopBar', 'invoices'])(Cr
 export const CreateUbl = connect(
   (state) => ({
     xmlInputValue: state.createInvoiceScreen.ublInput,
-    format: 'ubl2.1',
+    format: invoiceFormats.UBL,
     attachments: state.createInvoiceScreen.attachments,
   }),
   {createInvoice, setXmlInputValue: setUblInputValue, clearAttachments}
@@ -71,7 +72,7 @@ export const CreateUbl = connect(
 export const CreateD16b = connect(
   (state) => ({
     xmlInputValue: state.createInvoiceScreen.d16bInput,
-    format: 'd16b',
+    format: invoiceFormats.D16B,
     attachments: state.createInvoiceScreen.attachments,
   }),
   {createInvoice, setXmlInputValue: setD16bInputValue, clearAttachments}
@@ -80,7 +81,7 @@ export const CreateD16b = connect(
 export const CreateGenerated = connect(
   (state) => ({
     xmlInputValue: state.createInvoiceScreen.formGeneratedInput,
-    format: 'ubl2.1',
+    format: invoiceFormats.UBL,
     attachments: state.createInvoiceScreen.attachments,
   }),
   {createInvoice, setXmlInputValue: setGeneratedXmlInputValue, clearAttachments}

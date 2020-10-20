@@ -14,5 +14,7 @@
   "submit": "Submit",
   "remove": "Remove",
   "add": "Add",
-  "name": "Name"
+  "name": "Name",
+  "filters": "Filters",
+  "search": "Search"
 }

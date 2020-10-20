@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"github.com/gorilla/mux"
 	"github.com/slovak-egov/einvoice/apiserver/attachment"
+	"github.com/slovak-egov/einvoice/apiserver/invoice"
 	"github.com/slovak-egov/einvoice/apiserver/manager"
 	"io/ioutil"
 	"net/http"
@@ -41,6 +42,7 @@ func GetFullInvoiceHandler(manager manager.Manager) func(w http.ResponseWriter, 
 		}
 
 		inv, err := manager.GetFull(id)
+
 		if err != nil {
 			w.WriteHeader(404)
 			return
@@ -80,8 +82,12 @@ func GetAttachmentHandler(manager manager.Manager) func(w http.ResponseWriter, r
 
 func GetAllInvoicesHandler(manager manager.Manager) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
+		formats := r.URL.Query()["format"]
+		if len(formats) == 0 {
+			formats = []string{invoice.UblFormat, invoice.D16bFormat}
+		}
 
-		invoices, err := manager.GetAllInvoiceMeta()
+		invoices, err := manager.GetAllInvoiceMeta(formats)
 		if err != nil {
 			w.WriteHeader(500)
 			return

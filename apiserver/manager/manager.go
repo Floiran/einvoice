@@ -17,7 +17,7 @@ type Manager interface {
 
 	GetFull(id int) (string, error)
 	GetMeta(id int) (*invoice.Meta, error)
-	GetAllInvoiceMeta() ([]invoice.Meta, error)
+	GetAllInvoiceMeta(formats []string) ([]invoice.Meta, error)
 
 	GetAttachmentFile(id int) (string, error)
 	GetAttachmentMeta(id int) (*attachment.Meta, error)
@@ -124,6 +124,6 @@ func (m *managerImpl) GetFull(id int) (string, error) {
 	return invoiceStr, nil
 }
 
-func (m *managerImpl) GetAllInvoiceMeta() ([]invoice.Meta, error) {
-	return m.db.GetAllInvoice()
+func (m *managerImpl) GetAllInvoiceMeta(formats []string) ([]invoice.Meta, error) {
+	return m.db.GetAllInvoice(formats)
 }

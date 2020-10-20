@@ -1,10 +1,11 @@
 import {forwardReducerTo} from './utils/helpers'
+import {invoiceFormats} from './utils/constants'
 import {defaultUbl} from './data/defaultUbl'
 import defaultD16b from './data/defaultD16b'
 
-export const getInitialState = () => ({
+const getInitialState = () => ({
   user: null,
-  invoices: [],
+  invoices: {},
   serviceAccounts: [],
   isLoading: false,
   createInvoiceScreen: {
@@ -18,8 +19,14 @@ export const getInitialState = () => ({
     },
     attachments: [],
   },
-  // TODO: be smarter and create cache
-  currentInvoice: null,
+  invoicesScreen: {
+    filters: {
+      formats: {
+        [invoiceFormats.UBL]: true,
+        [invoiceFormats.D16B]: true,
+      }
+    }
+  },
   // TODO: get rid of this
   apiInitialized: false,
 })

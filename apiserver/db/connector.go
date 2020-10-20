@@ -9,7 +9,7 @@ type DBConnector interface {
 	Connect()
 	Close()
 	InitDB() error
-	GetAllInvoice() ([]invoice.Meta, error)
+	GetAllInvoice(formats []string) ([]invoice.Meta, error)
 	GetInvoiceMeta(id int) (*invoice.Meta, error)
 	CreateInvoice(invoice *invoice.Meta) error
 	CreateAttachment(invoiceId int, name string) (*attachment.Meta, error)

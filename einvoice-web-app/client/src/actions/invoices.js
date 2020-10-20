@@ -1,18 +1,30 @@
 import swal from 'sweetalert'
 import {setData, loadingWrapper} from './common'
 
-const setInvoices = setData(['invoices'])
-export const setCurrentInvoice = setData(['currentInvoice'])
 export const setUblInputValue = setData(['createInvoiceScreen', 'ublInput'])
 export const setD16bInputValue = setData(['createInvoiceScreen', 'd16bInput'])
 export const setGeneratedXmlInputValue = setData(['createInvoiceScreen', 'formGeneratedInput'])
-export const setCurrentInvoiceMeta = setData(['currentInvoiceMeta'])
 
-const addInvoice = (invoice) => ({
-  type: 'ADD INVOICE',
+const setInvoiceIds = setData(['invoicesScreen', 'ids'])
+
+const setInvoice = (id, data) => ({
+  type: 'SET INVOICES',
+  path: ['invoices', id],
+  payload: data,
+  reducer: (state, data) => ({
+    ...state,
+    ...data,
+  })
+})
+
+const setInvoices = (data) => ({
+  type: 'SET INVOICES',
   path: ['invoices'],
-  payload: invoice,
-  reducer: (state, invoice) => [...state, invoice],
+  payload: data,
+  reducer: (state, data) => ({
+    ...state,
+    ...data,
+  })
 })
 
 export const updateInvoiceFormProperty = (property, data) => ({
@@ -22,24 +34,46 @@ export const updateInvoiceFormProperty = (property, data) => ({
   reducer: (state, value) => value,
 })
 
+export const toggleFormatFilter = (format) => ({
+  type: 'TOGGLE FORMAT FILTER',
+  path: ['invoicesScreen', 'filters', 'formats', format],
+  payload: null,
+  reducer: (state) => !state,
+})
+
 export const getInvoices = () => loadingWrapper(
   async (dispatch, getState, {api}) => {
-    const invoices = await api.getInvoices()
-    dispatch(setInvoices(invoices))
+    const filters = getState().invoicesScreen.filters
+    const formats = Object.keys(filters.formats).filter((k) => filters.formats[k])
+
+    const invoices = await api.getInvoices(formats)
+    dispatch(setInvoices(
+      invoices.reduce((acc, val) => ({
+        ...acc,
+        [val.id]: val,
+      }), {})
+    ))
+
+    dispatch(setInvoiceIds(
+      invoices.reduce((acc, val) => ([
+        ...acc,
+        val.id,
+      ]), []))
+    )
   }
 )
 
 export const getInvoiceDetail = (id) => loadingWrapper(
   async (dispatch, getState, {api}) => {
     const invoiceDetail = await api.getInvoiceDetail(id)
-    dispatch(setCurrentInvoice(invoiceDetail))
+    dispatch(setInvoice(id, {data: invoiceDetail}))
   }
 )
 
 export const getInvoiceMeta = (id) => loadingWrapper(
   async (dispatch, getState, {api}) => {
     const meta = await api.getInvoiceMeta(id)
-    dispatch(setCurrentInvoiceMeta(meta))
+    dispatch(setInvoice(id, meta))
   }
 )
 
@@ -47,7 +81,10 @@ export const createInvoice = (data) => loadingWrapper(
   async (dispatch, getState, {api}) => {
     try {
       const invoice = await api.createInvoice(getState().user, data)
-      dispatch(addInvoice(invoice))
+      dispatch(setInvoices({
+        [invoice.id]: invoice
+      }))
+
       await swal({
         title: 'Invoice was created',
         icon: 'success',

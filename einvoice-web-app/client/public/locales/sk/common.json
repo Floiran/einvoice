@@ -14,5 +14,7 @@
   "submit": "Odovzdaj",
   "remove": "Odstrániť",
   "add": "Pridať",
-  "name": "Meno"
+  "name": "Meno",
+  "filters": "Filtre",
+  "search": "Hľadaj"
 }

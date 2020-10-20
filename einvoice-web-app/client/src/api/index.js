@@ -15,17 +15,16 @@ export default class Api {
     return urls
   }
 
-  getUserInfo = async (user) => {
-    return await this.apiRequest({
+  getUserInfo = async (user) =>
+    await this.apiRequest({
       route: '/users/me',
       headers: {
         Authorization: user.token
       }
     })
-  }
 
-  updateUser = async (user, data) => {
-    return await this.apiRequest({
+  updateUser = async (user, data) =>
+    await this.apiRequest({
       method: "PUT",
       route: '/users/me',
       data,
@@ -33,18 +32,16 @@ export default class Api {
         Authorization: user.token
       }
     })
-  }
 
-  loginWithSlovenskoSkToken = async (token) => {
-    return await this.apiRequest({
+  loginWithSlovenskoSkToken = async (token) =>
+    await this.apiRequest({
       route: '/login',
       headers: {
         Authorization: token
       }
     })
-  }
 
-  logout = async (user) => {
+  logout = async (user) =>
     await this.apiRequest({
       route: '/logout',
       headers: {
@@ -52,20 +49,19 @@ export default class Api {
       },
       jsonResponse: false
     })
-  }
 
-  getInvoices = async () => {
+  getInvoices = async (formats) => {
+    const queryParams = formats.map((f) => ['format', f])
     return await this.apiRequest({
-      route: '/api/invoices'
+      route: `/api/invoices?${new URLSearchParams(queryParams)}`
     })
   }
 
-  getInvoiceDetail = async (id) => {
-    return await this.apiRequest({
+  getInvoiceDetail = async (id) =>
+    await this.apiRequest({
       route: `/api/invoices/${id}/full`,
       jsonResponse: false,
     })
-  }
 
   getInvoiceMeta = async (id) => {
     return await this.apiRequest({

@@ -49,10 +49,10 @@ func (connector *dbConnector) Close() {
 	connector.db.Close()
 }
 
-// todo: optimize
-func (connector *dbConnector) GetAllInvoice() ([]invoice.Meta, error) {
+// TODO: optimize performance
+func (connector *dbConnector) GetAllInvoice(formats []string) ([]invoice.Meta, error) {
 	var invoices []invoice.Meta
-	err := connector.db.Model(&invoices).Select()
+	err := connector.db.Model(&invoices).Where("format IN (?)", pg.In(formats)).Select()
 	if err != nil {
 		return nil, err
 	}

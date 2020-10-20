@@ -1,38 +1,39 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import {NavLink} from 'react-router-dom'
-import {compose, lifecycle, withHandlers} from 'recompose'
-import {getInvoiceDetail, getInvoiceMeta, setCurrentInvoice, setCurrentInvoiceMeta} from '../actions/invoices'
+import {branch, compose, lifecycle, renderNothing} from 'recompose'
+import {Button} from 'react-bootstrap'
 import {withTranslation} from 'react-i18next'
+import {get} from 'lodash'
+import {getInvoiceDetail, getInvoiceMeta} from '../actions/invoices'
 
-const InvoiceView = ({invoice, match: {params: {id}}, resetCurrentInvoice, meta, apiServerUrl, t}) => (
+const InvoiceView = ({attachments, invoice, match: {params: {id}}, apiServerUrl, t}) => (
   <div>
     <h2 style={{textAlign: 'center'}}>{t('invoice')} {id}</h2>
-    <div className='row justify-content-center'>
+    <div className="row justify-content-center">
       <NavLink to="/invoices">
-        <button className='btn btn-primary' onClick={resetCurrentInvoice}>{t('close')}</button>
+        <Button variant="primary">{t('close')}</Button>
       </NavLink>
     </div>
     <div style={{borderStyle: 'solid'}}>
       {invoice}
     </div>
-    {
-      meta && meta.attachments.map(a =>
-        <p><a className={'row'} href={`${apiServerUrl}/api/attachments/${a.id}`}>{a.name}</a></p>
-      )
-    }
+    {attachments.map((a, index) =>
+      <p key={index} >
+        <a className="row" href={`${apiServerUrl}/api/attachments/${a.id}`}>{a.name}</a>
+      </p>
+    )}
   </div>
 )
 
 export default compose(
   connect(
-    (state) => ({
-      invoice: state.currentInvoice,
-      meta: state.currentInvoiceMeta,
-      user: state.user,
+    (state, {match: {params: {id}}}) => ({
+      invoice: get(state, ['invoices', id, 'data']),
+      attachments: get(state, ['invoices', id, 'attachments']),
       apiServerUrl: state.urls.apiServerUrl,
     }),
-    {getInvoiceDetail, setCurrentInvoice, getInvoiceMeta, setCurrentInvoiceMeta}
+    {getInvoiceDetail, getInvoiceMeta}
   ),
   lifecycle({
     componentDidMount() {
@@ -40,11 +41,9 @@ export default compose(
       this.props.getInvoiceMeta(this.props.match.params.id)
     },
   }),
-  withHandlers({
-    resetCurrentInvoice: ({setCurrentInvoice, setCurrentInvoiceMeta}) => () => {
-      setCurrentInvoice(null)
-      setCurrentInvoiceMeta(null)
-    },
-  }),
-  withTranslation(['common']),
+  branch(
+    ({invoice, attachments}) => !invoice || !attachments,
+    renderNothing,
+  ),
+  withTranslation('common'),
 )(InvoiceView)
