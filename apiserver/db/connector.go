@@ -8,7 +8,6 @@ import (
 type DBConnector interface {
 	Connect()
 	Close()
-	InitDB() error
 	GetAllInvoice(formats []string) ([]invoice.Meta, error)
 	GetInvoiceMeta(id int) (*invoice.Meta, error)
 	CreateInvoice(invoice *invoice.Meta) error

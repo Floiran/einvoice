@@ -25,9 +25,15 @@ You can view it on this [website](https://generator.swagger.io/?url=https://raw.
 ## Development
 
 * Ensure `postgres` and `redis-server` services are running.
-* Initialize DB (TODO: replace by migrations)
 
-    `./db.sh --drop --create --setup`
+* Initialize DB
+
+    Set proper env variables and run:
+
+```shell script
+go run ./migrations init
+go run ./migrations up
+ ```
 
 * Export proper env variables for every service in `${server-name}/.env`.
 You can initialize it by `cp .env-template .env` and update for your use.

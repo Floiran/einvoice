@@ -1,12 +1,10 @@
 package db
 
 import (
-	"fmt"
 	"github.com/go-pg/pg/v10"
 	"github.com/slovak-egov/einvoice/apiserver/attachment"
 	. "github.com/slovak-egov/einvoice/apiserver/config"
 	"github.com/slovak-egov/einvoice/apiserver/invoice"
-	"io/ioutil"
 )
 
 type dbConnector struct {
@@ -24,25 +22,6 @@ func (connector *dbConnector) Connect() {
 		Password: Config.Db.Password,
 		Database: Config.Db.Name,
 	})
-}
-
-// todo: proper setup of DB migration https://github.com/filipsladek/einvoice/issues/60
-func (connector *dbConnector) InitDB() error {
-
-	query, err := ioutil.ReadFile("sql/setup.sql")
-	if err != nil {
-		return err
-	}
-
-	_, err = connector.db.Exec(string(query))
-	if err != nil {
-		fmt.Println(err)
-		return err
-	}
-
-	fmt.Println("init")
-
-	return nil
 }
 
 func (connector *dbConnector) Close() {

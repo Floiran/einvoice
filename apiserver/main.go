@@ -49,8 +49,6 @@ func main() {
 	db.Connect()
 	defer db.Close()
 
-	db.InitDB()
-
 	validator := xml.NewValidator(
 		Config.D16bXsdPath,
 		Config.Ubl21XsdPath,
