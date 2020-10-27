@@ -1,0 +1,59 @@
+# https://help.github.com/en/articles/workflow-syntax-for-github-actions
+name: CI
+on:
+  push:
+    branches-ignore: [master]
+    # Remove the line above to run when pushing to master
+
+jobs:
+  lint:
+    name: Lint Code Base
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Lint Code Base
+        uses: docker://github/super-linter:v3
+        env:
+          VALIDATE_ALL_CODEBASE: false
+          VALIDATE_GO: false
+          VALIDATE_JAVASCRIPT_STANDARD: false
+          DEFAULT_BRANCH: master
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: github_actions
+    env:
+      DB_HOST: localhost
+      DB_PORT: 5432
+      DB_USER: postgres
+      DB_PASSWORD: postgres
+      DB_NAME: github_actions
+      D16B_XSD_PATH: /home/runner/work/einvoice/einvoice/xml/d16b/xsd
+      UBL21_XSD_PATH: /home/runner/work/einvoice/einvoice/xml/ubl21/xsd
+      SLOW_STORAGE_TYPE: local
+      LOCAL_STORAGE_BASE_PATH: /home/runner/work/einvoice/einvoice/storage
+      PORT: 8081
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Download dependencies
+        run: go get -v -t -d ./...
+      - name: Run migrations
+        run: |
+          go run ./migrations init
+          go run ./migrations up
+      - name: Create local storage
+        run: mkdir storage
+      - name: Run tests
+        run: go test -v ./...

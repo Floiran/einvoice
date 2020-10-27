@@ -20,7 +20,7 @@ const InvoiceView = ({attachments, invoice, match: {params: {id}}, apiServerUrl,
     </div>
     {attachments.map((a, index) =>
       <p key={index} >
-        <a className="row" href={`${apiServerUrl}/api/attachments/${a.id}`}>{a.name}</a>
+        <a className="row" href={`${apiServerUrl}/attachments/${a.id}`}>{a.name}</a>
       </p>
     )}
   </div>

@@ -15,7 +15,7 @@
   command: >
     gcloud beta sql instances patch {{sql_instance_res_tmp.name}}
       --project={{ project_id }}
-      --network=default  
+      --network=default
       --no-assign-ip
 
 - name: Get sql instance info
@@ -57,8 +57,8 @@
 - name: Create sql connector
   command: >
     gcloud compute networks vpc-access connectors create sql-connector
-      --network default  
-      --project {{project_id}}  
-      --region {{ location }}  
+      --network default
+      --project {{project_id}}
+      --region {{ location }}
       --range 10.10.0.0/28
   ignore_errors: yes

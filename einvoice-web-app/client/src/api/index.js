@@ -53,26 +53,26 @@ export default class Api {
   getInvoices = async (formats) => {
     const queryParams = formats.map((f) => ['format', f])
     return await this.apiRequest({
-      route: `/api/invoices?${new URLSearchParams(queryParams)}`
+      route: `/invoices?${new URLSearchParams(queryParams)}`
     })
   }
 
   getInvoiceDetail = async (id) =>
     await this.apiRequest({
-      route: `/api/invoices/${id}/full`,
+      route: `/invoices/${id}/detail`,
       jsonResponse: false,
     })
 
   getInvoiceMeta = async (id) => {
     return await this.apiRequest({
-      route: `/api/invoices/${id}`,
+      route: `/invoices/${id}`,
     })
   }
 
   createInvoice = async (user, formData) =>
     await this.apiRequest({
       method: 'POST',
-      route: `/api/invoices`,
+      route: `/invoices`,
       data: formData,
       headers: {
         'Authorization': user.token,

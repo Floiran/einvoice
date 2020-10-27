@@ -2,8 +2,11 @@ package xml
 
 import (
 	"fmt"
+
 	"github.com/lestrrat-go/libxml2"
 	"github.com/lestrrat-go/libxml2/xsd"
+
+	"github.com/slovak-egov/einvoice/apiserver/config"
 )
 
 type Validator interface {
@@ -24,14 +27,14 @@ type validator struct {
 	ubl21Schema *xsd.Schema
 }
 
-func NewValidator(d16bXsdPath, ubl21Path string) Validator {
-	d16bXsdMainFile := d16bXsdPath + "/data/standard/CrossIndustryInvoice_100pD16B.xsd"
+func NewValidator(appConfig config.Configuration) Validator {
+	d16bXsdMainFile := appConfig.D16bXsdPath + "/data/standard/CrossIndustryInvoice_100pD16B.xsd"
 	d16bSchema, err := xsd.ParseFromFile(d16bXsdMainFile)
 	if err != nil {
 		panic(err)
 	}
 
-	ubl21MainFile := ubl21Path + "/maindoc/UBL-Invoice-2.1.xsd"
+	ubl21MainFile := appConfig.Ubl21XsdPath + "/maindoc/UBL-Invoice-2.1.xsd"
 	ubl21Schema, err := xsd.ParseFromFile(ubl21MainFile)
 	if err != nil {
 		panic(err)

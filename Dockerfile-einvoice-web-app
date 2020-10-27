@@ -1,4 +1,4 @@
-FROM node:12-alpine AS ui_builder
+FROM node:14-alpine AS ui_builder
 
 COPY einvoice-web-app/client /client
 
@@ -6,7 +6,7 @@ WORKDIR /client
 RUN npm install
 RUN npm run build
 
-FROM golang:1.13-alpine AS server_builder
+FROM golang:1.15-alpine AS server_builder
 
 RUN apk add --no-cache git
 
@@ -27,8 +27,8 @@ RUN CGO_ENABLED=0 go test -v ./einvoice-web-app/server
 RUN go build -o /out/server ./einvoice-web-app/server
 
 # Start fresh from a smaller image
-FROM alpine:3.9
-RUN apk add ca-certificates
+FROM alpine:3.12
+RUN apk add --no-cache ca-certificates
 
 COPY --from=server_builder /out/server /server/server
 COPY --from=ui_builder /client/build /client/build

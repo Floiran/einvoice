@@ -1,19 +1,45 @@
 package storage
 
 import (
-	"cloud.google.com/go/storage"
 	"context"
 	"fmt"
-	. "github.com/slovak-egov/einvoice/apiserver/config"
 	"io/ioutil"
+
+	"cloud.google.com/go/storage"
+
+	"github.com/slovak-egov/einvoice/apiserver/config"
 )
 
-type GSC struct {
+type Gcs struct {
 	bkt *storage.BucketHandle
 	ctx context.Context
 }
 
-func (storage *GSC) SaveObject(path, value string) error {
+func (storage *Gcs) invoiceFilename(id int) string {
+	return fmt.Sprintf("invoice-%d", id)
+}
+
+func (storage *Gcs) GetInvoice(id int) (string, error) {
+	return storage.readObject(storage.invoiceFilename(id))
+}
+
+func (storage *Gcs) SaveInvoice(id int, value string) error {
+	return storage.saveObject(storage.invoiceFilename(id), value)
+}
+
+func (storage *Gcs) attachmentFilename(id int) string {
+	return fmt.Sprintf("attachment-%d", id)
+}
+
+func (storage *Gcs) GetAttachment(id int) (string, error) {
+	return storage.readObject(storage.attachmentFilename(id))
+}
+
+func (storage *Gcs) SaveAttachment(id int, value string) error {
+	return storage.saveObject(storage.attachmentFilename(id), value)
+}
+
+func (storage *Gcs) saveObject(path, value string) error {
 	obj := storage.bkt.Object(path)
 	w := obj.NewWriter(storage.ctx)
 
@@ -28,23 +54,23 @@ func (storage *GSC) SaveObject(path, value string) error {
 	return nil
 }
 
-func (storage *GSC) ReadObject(path string) (string, error) {
+func (storage *Gcs) readObject(path string) (string, error) {
 	obj := storage.bkt.Object(path)
 	r, err := obj.NewReader(storage.ctx)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 	defer r.Close()
 
 	res, err := ioutil.ReadAll(r)
 	if err != nil {
-		return "", nil
+		return "", err
 	}
 
-	return string(res), err
+	return string(res), nil
 }
 
-func NewGSC() *GSC {
+func NewGcs(appConfig config.Configuration) *Gcs {
 	ctx := context.Background()
 	client, err := storage.NewClient(ctx)
 
@@ -52,8 +78,8 @@ func NewGSC() *GSC {
 		panic(err)
 	}
 
-	bktName := Config.GcsBucket
+	bktName := appConfig.GcsBucket
 	bkt := client.Bucket(bktName)
 
-	return &GSC{bkt, ctx}
+	return &Gcs{bkt, ctx}
 }

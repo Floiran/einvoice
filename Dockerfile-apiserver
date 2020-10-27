@@ -1,4 +1,4 @@
-FROM golang:1.13-alpine AS build_base
+FROM golang:1.15-alpine AS build_base
 
 RUN apk add --no-cache git
 RUN apk update && apk add --no-cache g++ gcc libxml2 libxslt-dev
@@ -20,7 +20,7 @@ COPY . .
 RUN go build -o /tmp/out/apiserver ./apiserver
 
 # Start fresh from a smaller image
-FROM alpine:3.9
+FROM alpine:3.12
 RUN apk add --no-cache ca-certificates
 RUN apk update && apk add --no-cache libxml2 libxslt-dev
 

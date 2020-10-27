@@ -19,9 +19,9 @@
 - name: Create redis connector
   command: >
     gcloud compute networks vpc-access connectors create redis-connector
-      --network default  
-      --project {{project_id}}  
-      --region {{ location }}  
+      --network default
+      --project {{project_id}}
+      --region {{ location }}
       --range 10.8.0.0/28
   ignore_errors: yes
 

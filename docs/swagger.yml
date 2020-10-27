@@ -69,7 +69,7 @@ paths:
         401:
           description: Unauthorized
 
-  /api/invoices:
+  /invoices:
     get:
       tags:
         - Invoices
@@ -99,7 +99,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Invoice'
-  /api/invoices/{invoice_id}:
+        400:
+          description: Invalid request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /invoices/{invoice_id}:
     get:
       tags:
         - Invoices
@@ -119,7 +125,13 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Invoice'
-  /api/invoices/{invoice_id}/full:
+        404:
+          description: Invoice not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /invoices/{invoice_id}/full:
     get:
       tags:
         - Invoices
@@ -136,13 +148,16 @@ paths:
         200:
           description: Successful response
           content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Invoice'
             application/xml:
               schema:
                 $ref: '#/components/schemas/Invoice'
-  /api/attachments/{attachment_id}:
+        404:
+          description: Invoice not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /attachments/{attachment_id}:
     get:
       tags:
         - Attachment
@@ -163,6 +178,12 @@ paths:
               schema:
                 type: string
                 format: binary
+        404:
+          description: Attachment not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
 components:
   securitySchemes:
     bearerAuth:
@@ -209,15 +230,6 @@ components:
         price:
           type: integer
           example: 100
-        attachments:
-          type: array
-          items:
-            type: object
-            properties:
-              id:
-                type: string
-              name:
-                type: string
     CreateInvoiceRequest:
       type: object
       properties:
@@ -237,3 +249,8 @@ components:
         attachment...:
           type: string
           format: binary
+    ErrorResponse:
+      type: object
+      properties:
+        error:
+          type: string

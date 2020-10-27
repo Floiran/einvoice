@@ -1,21 +1,22 @@
 package config
 
 import (
-	"github.com/slovak-egov/einvoice/environment"
 	"log"
 	"os"
+
+	"github.com/slovak-egov/einvoice/environment"
 )
 
-type dbConfiguration struct {
+type DbConfiguration struct {
 	Host     string
-	Port     string
+	Port     int
 	Name     string
 	User     string
 	Password string
 }
 
-type configuration struct {
-	Db                   dbConfiguration
+type Configuration struct {
+	Db                   DbConfiguration
 	Port                 int
 	D16bXsdPath          string
 	Ubl21XsdPath         string
@@ -24,31 +25,35 @@ type configuration struct {
 	GcsBucket            string
 }
 
-var Config = configuration{}
-
-func InitConfig() {
-	Config.Db = dbConfiguration{
+func (config *Configuration) initDb() {
+	config.Db = DbConfiguration{
 		Host:     environment.RequireVar("DB_HOST"),
-		Port:     environment.RequireVar("DB_PORT"),
+		Port:     environment.ParseInt("DB_PORT"),
 		Name:     environment.RequireVar("DB_NAME"),
 		User:     environment.RequireVar("DB_USER"),
 		Password: environment.RequireVar("DB_PASSWORD"),
 	}
+}
 
-	Config.Port = environment.ParseInt("PORT")
+func Init() Configuration {
+	config := Configuration{}
+	config.initDb()
 
-	Config.D16bXsdPath = environment.RequireVar("D16B_XSD_PATH")
-	Config.Ubl21XsdPath = environment.RequireVar("UBL21_XSD_PATH")
+	config.Port = environment.ParseInt("PORT")
 
-	Config.SlowStorageType = os.Getenv("SLOW_STORAGE_TYPE")
-	switch Config.SlowStorageType {
+	config.D16bXsdPath = environment.RequireVar("D16B_XSD_PATH")
+	config.Ubl21XsdPath = environment.RequireVar("UBL21_XSD_PATH")
+
+	config.SlowStorageType = os.Getenv("SLOW_STORAGE_TYPE")
+	switch config.SlowStorageType {
 	case "local":
-		Config.LocalStorageBasePath = environment.RequireVar("LOCAL_STORAGE_BASE_PATH")
+		config.LocalStorageBasePath = environment.RequireVar("LOCAL_STORAGE_BASE_PATH")
 	case "gcs":
-		Config.GcsBucket = environment.RequireVar("GCS_BUCKET")
+		config.GcsBucket = environment.RequireVar("GCS_BUCKET")
 	default:
-		log.Fatal("Unknown SLOW_STORAGE_TYPE:", Config.SlowStorageType)
+		log.Fatal("Unknown SLOW_STORAGE_TYPE:", config.SlowStorageType)
 	}
 
 	log.Println("Config loaded")
+	return config
 }
