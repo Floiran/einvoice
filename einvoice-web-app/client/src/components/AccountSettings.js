@@ -17,9 +17,9 @@ const EditableField = withTranslation('common')(
         }
       </div>
       <div className="row justify-content-center">
-        {!change && <button className='btn btn-primary col-1' onClick={() => toggleChange(name)}>{t('edit')}</button>}
-        {change && <button className='btn btn-primary col-1' onClick={() => save(name)}>{t('save')}</button>}
-        {change && <button className='btn btn-primary col-1' onClick={() => toggleChange(name)}>{t('cancel')}</button>}
+        {!change && <button className="btn btn-primary col-1" onClick={() => toggleChange(name)}>{t('edit')}</button>}
+        {change && <button className="btn btn-primary col-1" onClick={() => save(name)}>{t('save')}</button>}
+        {change && <button className="btn btn-primary col-1" onClick={() => toggleChange(name)}>{t('cancel')}</button>}
       </div>
     </div>
   )
@@ -32,20 +32,20 @@ class AccountSettings extends React.Component {
     this.state = {
       email: {
         input: this.props.user.email,
-        change: false
+        change: false,
       },
       serviceAccountKey: {
         input: this.props.user.serviceAccountKey,
-        change: false
+        change: false,
       },
     }
   }
 
   toggleChange = (field) => {
-    this.setState( oldState => {
-      let state = {...oldState}
+    this.setState((oldState) => {
+      const state = {...oldState}
       state[field].change = !state[field].change
-      if(!state[field].change) state[field].input = this.props.user[field]
+      if (!state[field].change) state[field].input = this.props.user[field]
       return state
     })
   }
@@ -53,14 +53,14 @@ class AccountSettings extends React.Component {
   handleInputChange = (event) => {
     const target = event.target
     const name = target.name
-    this.setState( state => set(state, [name, 'input'], target.value))
+    this.setState((state) => set(state, [name, 'input'], target.value))
   }
 
   submit = async (field) => {
-    await this.props.updateUser( {
-      [field]: this.state[field].input
+    await this.props.updateUser({
+      [field]: this.state[field].input,
     })
-    this.setState( state => set(state, [field, 'change'], false))
+    this.setState((state) => set(state, [field, 'change'], false))
   }
 
   render = () => (
@@ -70,8 +70,9 @@ class AccountSettings extends React.Component {
         name="email"
         label={<p className="col-1">{this.props.t('common:email')}:</p>}
         valueField={<p className="col-3">{this.props.user.email}</p>}
-        inputField={<input className="col-5" type="text" name="email" value={this.state.email.input}
-                           onChange={this.handleInputChange}/>}
+        inputField={
+          <input className="col-5" type="text" name="email" value={this.state.email.input} onChange={this.handleInputChange} />
+        }
         toggleChange={this.toggleChange}
         save={this.submit}
         {...this.state.email}
@@ -79,10 +80,12 @@ class AccountSettings extends React.Component {
       <EditableField
         name="serviceAccountKey"
         label={<p className="col-2">{this.props.t('common:serviceAccountKey')}:</p>}
-        valueField={<textarea readOnly className="col-7" name="serviceAccountKey" value={this.props.user.serviceAccountKey}
-                              rows="15"/>}
-        inputField={<textarea className="col-7" name="serviceAccountKey" value={this.state.serviceAccountKey.input}
-                              onChange={this.handleInputChange}  rows="15"/>}
+        valueField={
+          <textarea readOnly className="col-7" name="serviceAccountKey" value={this.props.user.serviceAccountKey} rows="15" />
+        }
+        inputField={
+          <textarea className="col-7" name="serviceAccountKey" value={this.state.serviceAccountKey.input} onChange={this.handleInputChange} rows="15" />
+        }
         toggleChange={this.toggleChange}
         save={this.submit}
         {...this.state.serviceAccountKey}
@@ -94,7 +97,7 @@ class AccountSettings extends React.Component {
 export default compose(
   connect(
     (state) => ({
-      user: state.user
+      user: state.user,
     }),
     {updateUser},
   ),

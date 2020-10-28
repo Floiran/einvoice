@@ -53,7 +53,7 @@ const Filters = ({formats, getInvoices, searchEnabled, t, toggleFormatFilter}) =
 export default compose(
   connect(
     (state) => {
-      const filters =  state.invoicesScreen.filters
+      const filters = state.invoicesScreen.filters
       return {
         formats: filters.formats,
         searchEnabled: Object.values(filters.formats).reduce((acc, v) => acc || v, false),

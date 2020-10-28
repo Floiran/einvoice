@@ -8,7 +8,7 @@ export const initializeApi = () => (
       const urls = await api.getApiUrl()
       dispatch(setData(['urls'])(urls))
       dispatch(setData(['apiInitialized'])(true))
-    } catch(error) {
+    } catch (error) {
       await swal({
         title: 'API urls could not be loaded',
         text: error.message,

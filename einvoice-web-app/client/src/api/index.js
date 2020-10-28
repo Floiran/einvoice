@@ -19,41 +19,41 @@ export default class Api {
     await this.apiRequest({
       route: '/users/me',
       headers: {
-        Authorization: user.token
-      }
+        Authorization: user.token,
+      },
     })
 
   updateUser = async (user, data) =>
     await this.apiRequest({
-      method: "PUT",
+      method: 'PUT',
       route: '/users/me',
       data,
       headers: {
-        Authorization: user.token
-      }
+        Authorization: user.token,
+      },
     })
 
   loginWithSlovenskoSkToken = async (token) =>
     await this.apiRequest({
       route: '/login',
       headers: {
-        Authorization: token
-      }
+        Authorization: token,
+      },
     })
 
   logout = async (user) =>
     await this.apiRequest({
       route: '/logout',
       headers: {
-        Authorization: user.token
+        Authorization: user.token,
       },
-      jsonResponse: false
+      jsonResponse: false,
     })
 
   getInvoices = async (formats) => {
     const queryParams = formats.map((f) => ['format', f])
     return await this.apiRequest({
-      route: `/invoices?${new URLSearchParams(queryParams)}`
+      route: `/invoices?${new URLSearchParams(queryParams)}`,
     })
   }
 
@@ -72,10 +72,10 @@ export default class Api {
   createInvoice = async (user, formData) =>
     await this.apiRequest({
       method: 'POST',
-      route: `/invoices`,
+      route: '/invoices',
       data: formData,
       headers: {
-        'Authorization': user.token,
+        Authorization: user.token,
       },
       jsonBody: false,
     })
@@ -89,8 +89,8 @@ export default class Api {
   //TODO: ideally all request & response bodies are jsons
   async standardRequest({method, data, route, jsonResponse = true, jsonBody = true, ...opts}) {
     let contentType = {}
-    if(jsonBody) {
-      contentType = {'Content-Type':  'application/json'}
+    if (jsonBody) {
+      contentType = {'Content-Type': 'application/json'}
     }
     const response = await fetch(route, {
       method,

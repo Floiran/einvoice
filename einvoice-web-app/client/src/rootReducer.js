@@ -24,8 +24,8 @@ const getInitialState = () => ({
       formats: {
         [invoiceFormats.UBL]: true,
         [invoiceFormats.D16B]: true,
-      }
-    }
+      },
+    },
   },
   // TODO: get rid of this
   apiInitialized: false,

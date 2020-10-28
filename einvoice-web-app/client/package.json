@@ -30,10 +30,9 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
-  },
-  "eslintConfig": {
-    "extends": "react-app"
+    "eject": "react-scripts eject",
+    "eslint": "eslint --max-warnings 0 --ext .js src",
+    "eslint-fix": "eslint --fix --ext .js src"
   },
   "browserslist": {
     "production": [
@@ -47,5 +46,8 @@
       "last 1 safari version"
     ]
   },
-  "proxy": "http://localhost:8080/"
+  "proxy": "http://localhost:8080/",
+  "devDependencies": {
+    "eslint-config-vacuumlabs": "^1.9.0"
+  }
 }

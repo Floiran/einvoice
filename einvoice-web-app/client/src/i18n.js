@@ -25,7 +25,7 @@ i18n
       loadPath: '/locales/{{lng}}/{{ns}}.json',
     },
     // TODO: Load namespaces lazily
-    ns: ['common', 'helpers', 'invoices', 'LandingPage', 'TopBar']
+    ns: ['common', 'helpers', 'invoices', 'LandingPage', 'TopBar'],
   })
 
 export default i18n

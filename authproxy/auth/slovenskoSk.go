@@ -24,6 +24,9 @@ func GetSlovenkosSkUserInfo(keys *Keys, oboToken string) (*SlovenskoSkUser, erro
 
 		return keys.OboTokenPublic, nil
 	})
+	if err != nil {
+		return nil, err
+	}
 
 	if !token.Valid {
 		return nil, errors.New("Invalid token")
@@ -50,11 +53,20 @@ func GetSlovenkosSkUserInfo(keys *Keys, oboToken string) (*SlovenskoSkUser, erro
 
 	client := &http.Client{}
 	slovenskoSkReq, err := http.NewRequest("GET", config.Config.SlovenskoSk.Url+"/api/upvs/user/info", nil)
+	if err != nil {
+		return nil, err
+	}
 	slovenskoSkReq.Header.Add("Authorization", "Bearer "+slovenskoSkTokenString)
 	slovenskoSkRes, err := client.Do(slovenskoSkReq)
+	if err != nil {
+		return nil, err
+	}
 
 	defer slovenskoSkRes.Body.Close()
 	body, err := ioutil.ReadAll(slovenskoSkRes.Body)
+	if err != nil {
+		return nil, err
+	}
 
 	user := &SlovenskoSkUser{}
 	if err = json.Unmarshal(body, user); err != nil {

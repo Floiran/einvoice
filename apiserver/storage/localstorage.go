@@ -28,11 +28,11 @@ func (storage *LocalStorage) attachmentFilename(id int) string {
 }
 
 func (storage *LocalStorage) GetAttachment(id int) (string, error) {
-	return storage.readObject(storage.invoiceFilename(id))
+	return storage.readObject(storage.attachmentFilename(id))
 }
 
 func (storage *LocalStorage) SaveAttachment(id int, value string) error {
-	return storage.saveObject(storage.invoiceFilename(id), value)
+	return storage.saveObject(storage.attachmentFilename(id), value)
 }
 
 func (storage *LocalStorage) saveObject(path, value string) error {

@@ -43,7 +43,7 @@ func (storage *Gcs) saveObject(path, value string) error {
 	obj := storage.bkt.Object(path)
 	w := obj.NewWriter(storage.ctx)
 
-	if _, err := fmt.Fprintf(w, value); err != nil {
+	if _, err := fmt.Fprint(w, value); err != nil {
 		return err
 	}
 

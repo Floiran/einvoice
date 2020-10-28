@@ -53,7 +53,7 @@ export default compose(
     generateXml: ({fields, history, setGeneratedXmlInputValue}) => () => {
       setGeneratedXmlInputValue(ublCreator(fields))
       history.push('/create-invoice/generated')
-    }
+    },
   }),
   withTranslation(['common', 'invoices']),
 )(InvoiceForm)

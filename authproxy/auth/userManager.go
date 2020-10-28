@@ -48,7 +48,6 @@ func (userManager userManager) UpdateUser(user, updates *user.User) {
 		user.ServiceAccountKey = updates.ServiceAccountKey
 	}
 	userManager.db.SaveUser(user)
-	return
 }
 
 func (userManager userManager) CreateToken(user *user.User) error {

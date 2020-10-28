@@ -7,7 +7,7 @@ import {
   createInvoice,
   setD16bInputValue,
   setGeneratedXmlInputValue,
-  setUblInputValue
+  setUblInputValue,
 } from '../../actions/invoices'
 import {invoiceFormats} from '../../utils/constants'
 
@@ -17,9 +17,9 @@ class CreateXml extends React.Component {
   }
 
   submitXmlInvoice = async () => {
-    const formData  = new FormData();
-    formData.append("format", this.props.format)
-    formData.append("data", this.props.xmlInputValue)
+    const formData = new FormData()
+    formData.append('format', this.props.format)
+    formData.append('data', this.props.xmlInputValue)
     this.props.attachments.forEach((a, i) => formData.append(`attachment${i}`, a, a.name))
 
     const newInvoiceId = await this.props.createInvoice(formData)

@@ -4,7 +4,7 @@ import {Button} from 'react-bootstrap'
 import InvoiceForm from './InvoiceForm'
 import {CreateD16b, CreateGenerated, CreateUbl} from './CreateXml'
 import {withTranslation} from 'react-i18next'
-import Attachments from "./Attachments";
+import Attachments from './Attachments'
 
 export default withTranslation(['invoices', 'TopBar'])(
   ({t}) => (

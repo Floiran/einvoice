@@ -12,13 +12,15 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
-
+      - name: Download eslint config
+        run: cd einvoice-web-app/client && npm i eslint-config-vacuumlabs
       - name: Lint Code Base
         uses: docker://github/super-linter:v3
         env:
           VALIDATE_ALL_CODEBASE: false
           VALIDATE_GO: false
           VALIDATE_JAVASCRIPT_STANDARD: false
+          JAVASCRIPT_ES_CONFIG_FILE: ../../../github/workspace/einvoice-web-app/client/.eslintrc
           DEFAULT_BRANCH: master
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   tests:

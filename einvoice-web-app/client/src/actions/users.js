@@ -1,16 +1,16 @@
 import {loadingWrapper, setData} from './common'
 
-export const LOGGING = "logging"
-export const LOGGING_FAILED = "failed"
-export const LOGGED_IN = "loggedIn"
-export const LOGGED_OUT = "loggedOut"
+export const LOGGING = 'logging'
+export const LOGGING_FAILED = 'failed'
+export const LOGGED_IN = 'loggedIn'
+export const LOGGED_OUT = 'loggedOut'
 
 export const setLoggingStatus = setData(['loggingStatus'])
 const setUser = setData(['user'])
 
 export const getMyInfo = () => (
   async (dispatch, getState, {api}) => {
-    let userString = localStorage.getItem('user')
+    const userString = localStorage.getItem('user')
     let user
 
     try {
@@ -21,7 +21,7 @@ export const getMyInfo = () => (
 
     if (user) {
       try {
-        let userData = await api.getUserInfo(user)
+        const userData = await api.getUserInfo(user)
         dispatch(setUser(userData))
         localStorage.setItem('user', JSON.stringify(userData))
       } catch (error) {
@@ -35,7 +35,7 @@ export const getMyInfo = () => (
 
 export const updateUser = (data) => loadingWrapper(
   async (dispatch, getState, {api}) => {
-    let userData = await api.updateUser(getState().user, data)
+    const userData = await api.updateUser(getState().user, data)
     dispatch(setUser(userData))
     localStorage.setItem('user', JSON.stringify(userData))
   }
@@ -45,7 +45,7 @@ export const loginWithSlovenskoSkToken = (token) => (
   async (dispatch, getState, {api}) => {
     try {
       dispatch(setLoggingStatus(LOGGING))
-      let userData = await api.loginWithSlovenskoSkToken(token)
+      const userData = await api.loginWithSlovenskoSkToken(token)
       dispatch(setUser(userData))
       localStorage.setItem('user', JSON.stringify(userData))
       dispatch(setLoggingStatus(LOGGED_IN))
@@ -55,6 +55,7 @@ export const loginWithSlovenskoSkToken = (token) => (
       if (error.statusCode === 401) {
         dispatch(setUser(null))
       }
+      return false
     }
   }
 )

@@ -109,7 +109,7 @@ func (a *App) createInvoice(w http.ResponseWriter, r *http.Request) {
 
 func parseAttachments(r *http.Request) ([]*manager.Attachment, error) {
 	var ats []*manager.Attachment
-	for k, _ := range r.MultipartForm.File {
+	for k := range r.MultipartForm.File {
 		if strings.HasPrefix(k, "attachment") {
 			file, handler, err := r.FormFile(k)
 			if err != nil {

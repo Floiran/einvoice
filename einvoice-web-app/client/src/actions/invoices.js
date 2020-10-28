@@ -14,7 +14,7 @@ const setInvoice = (id, data) => ({
   reducer: (state, data) => ({
     ...state,
     ...data,
-  })
+  }),
 })
 
 const setInvoices = (data) => ({
@@ -24,7 +24,7 @@ const setInvoices = (data) => ({
   reducer: (state, data) => ({
     ...state,
     ...data,
-  })
+  }),
 })
 
 export const updateInvoiceFormProperty = (property, data) => ({
@@ -82,7 +82,7 @@ export const createInvoice = (data) => loadingWrapper(
     try {
       const invoice = await api.createInvoice(getState().user, data)
       dispatch(setInvoices({
-        [invoice.id]: invoice
+        [invoice.id]: invoice,
       }))
 
       await swal({
@@ -90,12 +90,13 @@ export const createInvoice = (data) => loadingWrapper(
         icon: 'success',
       })
       return invoice.id
-    } catch(error) {
+    } catch (error) {
       await swal({
         title: 'Invoice could not be created',
         text: error.message,
         icon: 'error',
       })
+      return null
     }
   }
 )
@@ -111,7 +112,7 @@ export const removeAttachment = (attachment) => ({
   type: 'REMOVE ATTACHMENT',
   path: ['createInvoiceScreen', 'attachments'],
   payload: attachment,
-  reducer: (state, attachment) => state.filter(a => a !== attachment),
+  reducer: (state, attachment) => state.filter((a) => a !== attachment),
 })
 
 export const clearAttachments = () => ({

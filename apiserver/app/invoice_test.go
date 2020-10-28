@@ -114,7 +114,7 @@ func TestCreateInvoice(t *testing.T) {
 	response = executeRequest(req)
 
 	checkResponseCode(t, http.StatusOK, response.Code)
-	if bytes.Compare(invoice, response.Body.Bytes()) != 0 {
+	if !bytes.Equal(invoice, response.Body.Bytes()) {
 		t.Errorf("Response was incorrect. We expected %s", invoice)
 	}
 }
