@@ -29,7 +29,7 @@
       --set-env-vars SLOVENSKO_SK_URL=https://upvs.dev.filipsladek.com
 
 - name: Deploy cloud get service authproxy
-  shell: >
+  command: >
     gcloud run services describe authproxy
       --project '{{ project_id }}'  
       --platform managed  

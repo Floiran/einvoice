@@ -16,7 +16,7 @@ type SlovenskoSkUser struct {
 	Uri  string `json:"uri"`
 }
 
-func GetSlovenkosSkUserInfo(keys *Keys, oboToken string) (*SlovenskoSkUser, error) {
+func GetSlovenskoSkUserInfo(keys *Keys, oboToken string) (*SlovenskoSkUser, error) {
 	token, err := jwt.Parse(oboToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
@@ -24,6 +24,10 @@ func GetSlovenkosSkUserInfo(keys *Keys, oboToken string) (*SlovenskoSkUser, erro
 
 		return keys.OboTokenPublic, nil
 	})
+	if err != nil {
+		return nil, err
+	}
+
 	if err != nil {
 		return nil, err
 	}

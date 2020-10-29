@@ -5,6 +5,7 @@ import (
 	"github.com/slovak-egov/einvoice/authproxy/user"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/http/httputil"
 )
@@ -30,8 +31,9 @@ func userInfo(user *user.User) *UserInfo {
 func HandleLogin(manager UserManager, keys *Keys) func(res http.ResponseWriter, req *http.Request) {
 	return func(res http.ResponseWriter, req *http.Request) {
 		tokenString := req.Header.Get("Authorization")
-		slovenskoSkUser, err := GetSlovenkosSkUserInfo(keys, tokenString)
+		slovenskoSkUser, err := GetSlovenskoSkUserInfo(keys, tokenString)
 		if err != nil {
+			log.Print(err.Error())
 			res.WriteHeader(401)
 			return
 		}

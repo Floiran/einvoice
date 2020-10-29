@@ -41,7 +41,7 @@
       --set-env-vars DB_NAME='{{ sql_instance.db_name }}'
 
 - name: Deploy cloud get service apiserver
-  shell: >
+  command: >
     gcloud run services describe apiserver
       --project '{{ project_id }}'
       --platform managed

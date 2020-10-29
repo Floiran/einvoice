@@ -24,7 +24,7 @@
       --set-env-vars SLOVENSKO_SK_LOGIN_URL=https://upvs.dev.filipsladek.com/login?callback=https://web-app.dev.filipsladek.com/login-callback
 
 - name: Deploy cloud get service web-app
-  shell: >
+  command: >
     gcloud run services describe web-app
       --project '{{ project_id }}'
       --platform managed
