@@ -60,14 +60,14 @@ APISERVER_ENV=dev
 
 ## XML
 
-### UBL2.1
+### [UBL2.1](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32017D1870#ntc1-L_2017266EN.01002101-E0001)
 
 [Maindoc](http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd)
 
 From maindoc you need only [this](http://docs.oasis-open.org/ubl/os-UBL-2.1/xsd/maindoc/UBL-Invoice-2.1.xsd)
 part.
 
-### D16B (SCRDM — CII)
+### [D16B (SCRDM — CII)](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32017D1870#ntc2-L_2017266EN.01002101-E0002)
 
 Subset for [CrossIndustryInvoice](https://www.unece.org/fileadmin/DAM/cefact/xml_schemas/D16B_SCRDM__Subset__CII.zip)
 
