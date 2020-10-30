@@ -1,18 +1,13 @@
 package main
 
-import (
-	"github.com/slovak-egov/einvoice/apiserver/app"
-	"github.com/slovak-egov/einvoice/apiserver/config"
-)
+import "github.com/slovak-egov/einvoice/apiserver/app"
 
 func main() {
-	appConfig := config.Init()
-
-	a := app.App{Config: appConfig}
+	a := app.App{}
 
 	a.Initialize()
 
-	a.Run()
+	defer a.Close()
 
-	a.Close()
+	a.Run()
 }

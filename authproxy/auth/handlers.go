@@ -2,12 +2,14 @@ package auth
 
 import (
 	"encoding/json"
-	"github.com/slovak-egov/einvoice/authproxy/user"
 	"io"
 	"io/ioutil"
-	"log"
 	"net/http"
 	"net/http/httputil"
+
+	log "github.com/sirupsen/logrus"
+
+	"github.com/slovak-egov/einvoice/authproxy/user"
 )
 
 type UserInfo struct {
@@ -33,7 +35,7 @@ func HandleLogin(manager UserManager, keys *Keys) func(res http.ResponseWriter, 
 		tokenString := req.Header.Get("Authorization")
 		slovenskoSkUser, err := GetSlovenskoSkUserInfo(keys, tokenString)
 		if err != nil {
-			log.Print(err.Error())
+			log.WithField("error", err).Error("login.slovensko_sk.get_user_info")
 			res.WriteHeader(401)
 			return
 		}

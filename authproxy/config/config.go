@@ -1,8 +1,9 @@
 package config
 
 import (
+	log "github.com/sirupsen/logrus"
+
 	"github.com/slovak-egov/einvoice/environment"
-	"log"
 )
 
 type SlovenskoSkConfiguration struct {
@@ -16,19 +17,40 @@ type configuration struct {
 	RedisUrl     string
 	ApiServerUrl string
 	SlovenskoSk  SlovenskoSkConfiguration
+	LogLevel     log.Level
 }
 
 var Config = configuration{}
 
 func InitConfig() {
-	Config.Port = environment.ParseInt("PORT")
+	authproxyEnv := environment.RequireVar("AUTHPROXY_ENV")
 
-	Config.RedisUrl = environment.RequireVar("REDIS_URL")
-	Config.ApiServerUrl = environment.RequireVar("APISERVER_URL")
+	switch authproxyEnv {
+	case "prod":
+		Config = prodConfig
+	case "dev":
+		Config = devConfig
+	default:
+		log.WithField("environment", authproxyEnv).Fatal("config.environment.unknown")
+	}
 
-	Config.SlovenskoSk.Url = environment.RequireVar("SLOVENSKO_SK_URL")
-	Config.SlovenskoSk.ApiTokenPrivateKey = environment.RequireVar("API_TOKEN_PRIVATE")
-	Config.SlovenskoSk.OboTokenPublicKey = environment.RequireVar("OBO_TOKEN_PUBLIC")
+	log.SetFormatter(&log.JSONFormatter{})
+	var err error
+	logLevel := environment.Getenv("LOG_LEVEL", Config.LogLevel.String())
+	Config.LogLevel, err = log.ParseLevel(logLevel)
+	if err != nil {
+		log.WithField("log_level", logLevel).Fatal("config.log_level.unknown")
+	}
 
-	log.Println("Config loaded")
+	Config.Port = environment.ParseInt("PORT", Config.Port)
+	Config.RedisUrl = environment.Getenv("REDIS_URL", Config.RedisUrl)
+	Config.ApiServerUrl = environment.Getenv("APISERVER_URL", Config.ApiServerUrl)
+
+	Config.SlovenskoSk = SlovenskoSkConfiguration{
+		Url: environment.Getenv("SLOVENSKO_SK_URL", Config.SlovenskoSk.Url),
+		ApiTokenPrivateKey: environment.RequireVar("API_TOKEN_PRIVATE"),
+		OboTokenPublicKey: environment.RequireVar("OBO_TOKEN_PUBLIC"),
+	}
+
+	log.Info("Config loaded")
 }

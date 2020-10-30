@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+
 	"github.com/go-redis/redis/v8"
 	. "github.com/slovak-egov/einvoice/authproxy/config"
 	"github.com/slovak-egov/einvoice/authproxy/user"

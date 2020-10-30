@@ -3,7 +3,7 @@ package auth
 import (
 	"github.com/slovak-egov/einvoice/authproxy/db"
 	"github.com/slovak-egov/einvoice/authproxy/user"
-	"github.com/slovak-egov/einvoice/common"
+	"github.com/slovak-egov/einvoice/random"
 )
 
 type UserManager interface {
@@ -51,7 +51,7 @@ func (userManager userManager) UpdateUser(user, updates *user.User) {
 }
 
 func (userManager userManager) CreateToken(user *user.User) error {
-	user.Token = common.RandomString(50)
+	user.Token = random.String(50)
 	return userManager.db.AddToken(user.Id, user.Token)
 }
 

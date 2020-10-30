@@ -36,16 +36,12 @@ jobs:
           POSTGRES_PASSWORD: postgres
           POSTGRES_DB: github_actions
     env:
-      DB_HOST: localhost
-      DB_PORT: 5432
-      DB_USER: postgres
       DB_PASSWORD: postgres
       DB_NAME: github_actions
       D16B_XSD_PATH: /home/runner/work/einvoice/einvoice/xml/d16b/xsd
       UBL21_XSD_PATH: /home/runner/work/einvoice/einvoice/xml/ubl21/xsd
-      SLOW_STORAGE_TYPE: local
       LOCAL_STORAGE_BASE_PATH: /home/runner/work/einvoice/einvoice/storage
-      PORT: 8081
+      APISERVER_ENV: test
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2

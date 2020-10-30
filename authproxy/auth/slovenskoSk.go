@@ -4,11 +4,13 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/slovak-egov/einvoice/authproxy/config"
-	"github.com/slovak-egov/einvoice/common"
 	"io/ioutil"
 	"net/http"
+
+	"github.com/dgrijalva/jwt-go"
+
+	. "github.com/slovak-egov/einvoice/authproxy/config"
+	"github.com/slovak-egov/einvoice/random"
 )
 
 type SlovenskoSkUser struct {
@@ -43,7 +45,7 @@ func GetSlovenskoSkUserInfo(keys *Keys, oboToken string) (*SlovenskoSkUser, erro
 
 	slovenskoSkToken := jwt.NewWithClaims(jwt.SigningMethodRS256, jwt.MapClaims{
 		"exp": claims["exp"],
-		"jti": common.RandomString(32),
+		"jti": random.String(32),
 		"obo": oboToken,
 	})
 	slovenskoSkToken.Header["alg"] = "RS256"
@@ -56,7 +58,7 @@ func GetSlovenskoSkUserInfo(keys *Keys, oboToken string) (*SlovenskoSkUser, erro
 	}
 
 	client := &http.Client{}
-	slovenskoSkReq, err := http.NewRequest("GET", config.Config.SlovenskoSk.Url+"/api/upvs/user/info", nil)
+	slovenskoSkReq, err := http.NewRequest("GET", Config.SlovenskoSk.Url + "/api/upvs/user/info", nil)
 	if err != nil {
 		return nil, err
 	}

@@ -2,17 +2,16 @@ package app
 
 import (
 	"fmt"
-	"log"
 	"net/http"
-	"os"
 	"time"
 
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
 
 	"github.com/slovak-egov/einvoice/apiserver/config"
 	"github.com/slovak-egov/einvoice/apiserver/manager"
 	"github.com/slovak-egov/einvoice/apiserver/xml"
+	"github.com/slovak-egov/einvoice/logging"
 )
 
 type App struct {
@@ -23,6 +22,7 @@ type App struct {
 }
 
 func (a *App) Initialize() {
+	a.Config = config.Init()
 	a.validator = xml.NewValidator(a.Config)
 	a.manager = manager.Init(a.Config)
 
@@ -38,13 +38,13 @@ func (a *App) Initialize() {
 
 func (a *App) Run() {
 	srv := &http.Server{
-		Handler:      handlers.LoggingHandler(os.Stdout, a.Router),
+		Handler:      logging.Handler{a.Router},
 		Addr:         fmt.Sprintf("%s:%d", "0.0.0.0", a.Config.Port),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
 
-	log.Println("Server running on", srv.Addr)
+	log.WithField("address", srv.Addr).Info("app.server_start")
 
 	log.Fatal(srv.ListenAndServe())
 }

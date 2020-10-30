@@ -6,7 +6,7 @@ import (
 	"github.com/slovak-egov/einvoice/environment"
 )
 
-type configuration struct {
+type Configuration struct {
 	DbHost     string
 	DbPort     int
 	DbName     string
@@ -14,14 +14,16 @@ type configuration struct {
 	DbPassword string
 }
 
-var Config = configuration{}
-
-func InitConfig() {
-	Config.DbHost = environment.RequireVar("DB_HOST")
-	Config.DbPort = environment.ParseInt("DB_PORT")
-	Config.DbName = environment.RequireVar("DB_NAME")
-	Config.DbUser = environment.RequireVar("DB_USER")
-	Config.DbPassword = environment.RequireVar("DB_PASSWORD")
+func Init() Configuration {
+	config := Configuration{
+		DbHost: environment.Getenv("DB_HOST", "localhost"),
+		DbPort: environment.ParseInt("DB_PORT", 5432),
+		DbName: environment.Getenv("DB_NAME", "einvoice"),
+		DbUser: environment.Getenv("DB_USER", "postgres"),
+		DbPassword: environment.RequireVar("DB_PASSWORD"),
+	}
 
 	log.Println("Config loaded")
+
+	return config
 }

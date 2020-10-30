@@ -14,6 +14,5 @@ func respondWithJSON(w http.ResponseWriter, code int, payload interface{}) {
 }
 
 func respondWithError(w http.ResponseWriter, code int, message string) {
-	// TODO add error log if status is 5xx, add debug log for 4xx status
 	respondWithJSON(w, code, map[string]string{"error": message})
 }

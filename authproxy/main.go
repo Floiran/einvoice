@@ -2,17 +2,19 @@ package main
 
 import (
 	"fmt"
-	"github.com/gorilla/handlers"
-	"github.com/gorilla/mux"
-	"github.com/slovak-egov/einvoice/authproxy/auth"
-	. "github.com/slovak-egov/einvoice/authproxy/config"
-	"github.com/slovak-egov/einvoice/authproxy/db"
-	"log"
 	"net/http"
 	"net/http/httputil"
 	"net/url"
-	"os"
 	"time"
+
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
+	log "github.com/sirupsen/logrus"
+
+	"github.com/slovak-egov/einvoice/authproxy/auth"
+	. "github.com/slovak-egov/einvoice/authproxy/config"
+	"github.com/slovak-egov/einvoice/authproxy/db"
+	"github.com/slovak-egov/einvoice/logging"
 )
 
 func main() {
@@ -46,13 +48,13 @@ func main() {
 	router.PathPrefix("/").HandlerFunc(authenticator.WithUser(auth.HandleAuthProxy(proxy)))
 
 	srv := &http.Server{
-		Handler:      handlers.LoggingHandler(os.Stdout, handlers.CORS(corsOptions...)(router)),
+		Handler:      logging.Handler{handlers.CORS(corsOptions...)(router)},
 		Addr:         fmt.Sprintf("%s:%d", "0.0.0.0", Config.Port),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
 
-	log.Println("Server running on", srv.Addr)
+	log.WithField("address", srv.Addr).Info("app.server_start")
 
 	log.Fatal(srv.ListenAndServe())
 }

@@ -36,7 +36,11 @@ go run ./migrations up
  ```
 
 * Export proper env variables for every service in `${server-name}/.env`.
-You can initialize it by `cp .env-template .env` and update for your use.
+
+```text
+APISERVER_ENV=dev
+...
+```
 
 * Run services you need:
 

@@ -8,7 +8,7 @@ import (
 	"github.com/go-pg/migrations/v8"
 	"github.com/go-pg/pg/v10"
 
-	. "github.com/slovak-egov/einvoice/migrations/config"
+	"github.com/slovak-egov/einvoice/migrations/config"
 )
 
 const usageText = `This program runs command on the db. Supported commands are:
@@ -24,16 +24,16 @@ Usage:
 `
 
 func main() {
-	InitConfig()
+	configuration := config.Init()
 
 	flag.Usage = usage
 	flag.Parse()
 
 	db := pg.Connect(&pg.Options{
-		Addr:     fmt.Sprintf("%s:%d", Config.DbHost, Config.DbPort),
-		User:     Config.DbUser,
-		Password: Config.DbPassword,
-		Database: Config.DbName,
+		Addr:     fmt.Sprintf("%s:%d", configuration.DbHost, configuration.DbPort),
+		User:     configuration.DbUser,
+		Password: configuration.DbPassword,
+		Database: configuration.DbName,
 	})
 
 	oldVersion, newVersion, err := migrations.Run(db, flag.Args()...)

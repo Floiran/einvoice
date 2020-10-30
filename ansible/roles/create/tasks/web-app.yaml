@@ -3,7 +3,7 @@
   docker_image:
     build:
       path: ../
-      dockerfile: Dockerfile-einvoice-web-app
+      dockerfile: Dockerfile-web-app
     name: 'gcr.io/{{ project_id }}/web-app'
     tag: latest
     push: yes
@@ -20,8 +20,7 @@
       --region {{ location }}
       --allow-unauthenticated
       --set-env-vars AUTH_SERVER_URL='{{ authproxy_url }}'
-      --set-env-vars CLIENT_BUILD_DIR=../client/build/
-      --set-env-vars SLOVENSKO_SK_LOGIN_URL=https://upvs.dev.filipsladek.com/login?callback=https://web-app.dev.filipsladek.com/login-callback
+      --set-env-vars WEBSERVER_ENV=prod
 
 - name: Deploy cloud get service web-app
   command: >

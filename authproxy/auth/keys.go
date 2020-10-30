@@ -2,9 +2,12 @@ package auth
 
 import (
 	"crypto/rsa"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/slovak-egov/einvoice/authproxy/config"
 	"strings"
+
+	"github.com/dgrijalva/jwt-go"
+	log "github.com/sirupsen/logrus"
+
+	. "github.com/slovak-egov/einvoice/authproxy/config"
 )
 
 type Keys struct {
@@ -14,19 +17,19 @@ type Keys struct {
 
 func NewKeys() *Keys {
 	signBytes := "-----BEGIN RSA PRIVATE KEY-----\n" +
-		strings.ReplaceAll(config.Config.SlovenskoSk.ApiTokenPrivateKey, " ", string(byte(10))) +
+		strings.ReplaceAll(Config.SlovenskoSk.ApiTokenPrivateKey, " ", string(byte(10))) +
 		"\n-----END RSA PRIVATE KEY-----\n"
 	signKey, err := jwt.ParseRSAPrivateKeyFromPEM([]byte(signBytes))
 	if err != nil {
-		panic(err)
+		log.WithField("error", err).Fatal("new_keys.parse_rsa_private_error")
 	}
 
 	verifyBytes := "-----BEGIN RSA PRIVATE KEY-----\n" +
-		strings.ReplaceAll(config.Config.SlovenskoSk.OboTokenPublicKey, " ", string(byte(10))) +
+		strings.ReplaceAll(Config.SlovenskoSk.OboTokenPublicKey, " ", string(byte(10))) +
 		"\n-----END RSA PRIVATE KEY-----\n"
 	verifyKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(verifyBytes))
 	if err != nil {
-		panic(err)
+		log.WithField("error", err).Fatal("new_keys.parse_rsa_public_error")
 	}
 
 	return &Keys{

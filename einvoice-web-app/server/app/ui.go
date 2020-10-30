@@ -1,11 +1,10 @@
-package handlers
+package app
 
 import (
 	"net/http"
 	"os"
 	"path/filepath"
 )
-
 
 type UiHandler struct {
 	StaticPath string

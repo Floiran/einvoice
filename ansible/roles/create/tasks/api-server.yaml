@@ -30,15 +30,12 @@
       --allow-unauthenticated
       --vpc-connector sql-connector
       --add-cloudsql-instances '{{ sql_instance_res.connectionName }}'
-      --set-env-vars SLOW_STORAGE_TYPE=gcs
       --set-env-vars GCS_BUCKET='{{ storage_instance_name }}'
-      --set-env-vars D16B_XSD_PATH=xml/d16b/xsd
-      --set-env-vars UBL21_XSD_PATH=xml/ubl21/xsd
       --set-env-vars DB_USER='{{ sql_instance.db_user }}'
       --set-env-vars DB_HOST={{sql_instance_res.ipAddresses[0].ipAddress}}
-      --set-env-vars DB_PORT=5432
       --set-env-vars DB_PASSWORD='{{ sql_instance.db_password }}'
       --set-env-vars DB_NAME='{{ sql_instance.db_name }}'
+      --set-env-vars APISERVER_ENV=prod
 
 - name: Deploy cloud get service apiserver
   command: >

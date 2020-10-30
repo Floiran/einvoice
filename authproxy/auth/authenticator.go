@@ -3,9 +3,11 @@ package auth
 import (
 	"errors"
 	"fmt"
-	"github.com/dgrijalva/jwt-go"
-	"github.com/slovak-egov/einvoice/authproxy/user"
 	"net/http"
+
+	"github.com/dgrijalva/jwt-go"
+
+	"github.com/slovak-egov/einvoice/authproxy/user"
 )
 
 type Authenticator interface {

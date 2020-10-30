@@ -15,6 +15,7 @@ require (
 	github.com/lestrrat-go/libxml2 v0.0.0-20200828014403-a52d2c78ffc6
 	github.com/lib/pq v1.7.1
 	github.com/pkg/errors v0.9.1 // indirect
+	github.com/sirupsen/logrus v1.7.0
 	golang.org/x/tools v0.0.0-20200820010801-b793a1359eac // indirect
 	gopkg.in/xmlpath.v1 v1.0.0-20140413065638-a146725ea6e7 // indirect
 	launchpad.net/gocheck v0.0.0-20140225173054-000000000087 // indirect
