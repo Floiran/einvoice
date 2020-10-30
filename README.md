@@ -82,3 +82,4 @@ Subset for [CrossIndustryInvoice](https://www.unece.org/fileadmin/DAM/cefact/xml
 * Directive on electronic invoicing in public procurement [2014/55/EU](https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32014L0055)
 * Council Directive on the common system of value added tax [2006/112/EC](https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX:32006L0112)
 * Regulation on electronic identification and trust services for electronic transactions in the internal market [910/2014](https://eur-lex.europa.eu/legal-content/EN/ALL/?uri=CELEX%3A32014R0910)
+* Commission Implementing Decision on the publication of the reference of the European standard on electronic invoicing and the list of its syntaxes pursuant to Directive [2017/1870](https://eur-lex.europa.eu/legal-content/EN/TXT/?uri=CELEX%3A32017D1870)
