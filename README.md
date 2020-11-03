@@ -31,8 +31,8 @@ You can view it on this [website](https://generator.swagger.io/?url=https://raw.
     Set proper env variables and run:
 
 ```shell script
-go run ./migrations init
-go run ./migrations up
+go run ./migrations/${server-name} init
+go run ./migrations/${server-name} up
  ```
 
 * Export proper env variables for every service in `${server-name}/.env`.

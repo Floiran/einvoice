@@ -1,7 +1,8 @@
 ---
-- import_tasks: sql.yaml
+- import_tasks: sql-apiserver.yaml
 - import_tasks: bucket.yaml
 - import_tasks: api-server.yaml
 - import_tasks: redis.yaml
+- import_tasks: sql-authproxy.yaml
 - import_tasks: auth-proxy.yaml
 - import_tasks: web-app.yaml

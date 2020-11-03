@@ -15,7 +15,7 @@ jobs:
       - name: Download eslint config
         run: cd einvoice-web-app/client && npm i eslint-config-vacuumlabs
       - name: Lint Code Base
-        uses: docker://github/super-linter:v3
+        uses: docker://github/super-linter:v3.13.1
         env:
           VALIDATE_ALL_CODEBASE: false
           VALIDATE_GO: false
@@ -49,8 +49,8 @@ jobs:
         run: go get -v -t -d ./...
       - name: Run migrations
         run: |
-          go run ./migrations init
-          go run ./migrations up
+          go run ./migrations/apiserver init
+          go run ./migrations/apiserver up
       - name: Create local storage
         run: mkdir storage
       - name: Run tests

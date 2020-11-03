@@ -1,60 +1,68 @@
 package auth
 
 import (
+	log "github.com/sirupsen/logrus"
+	"github.com/slovak-egov/einvoice/authproxy/cache"
 	"github.com/slovak-egov/einvoice/authproxy/db"
 	"github.com/slovak-egov/einvoice/authproxy/user"
 	"github.com/slovak-egov/einvoice/random"
 )
 
 type UserManager interface {
-	Create(id, name string) *user.User
-	GetUserByToken(token string) *user.User
-	GetUser(id string) *user.User
-	UpdateUser(user, updates *user.User)
+	Create(id, name string) (*user.User, error)
+	GetUserIdByToken(token string) (string, error)
+	GetUser(id string) (*user.User, error)
+	UpdateUser(updates *user.User) error
 
-	CreateToken(user *user.User) error
-	RemoveToken(user *user.User) error
+	CreateToken(user *user.User)
+	RemoveToken(token string) bool
 }
 
 type userManager struct {
-	db db.AuthDB
+	db    db.AuthDb
+	cache cache.Cache
 }
 
-func NewUserManager(db db.AuthDB) UserManager {
-	return userManager{db}
+func NewUserManager(db db.AuthDb, cache cache.Cache) UserManager {
+	return &userManager{db, cache}
 }
 
-func (userManager userManager) Create(id, name string) *user.User {
+func (userManager *userManager) Create(id, name string) (*user.User, error) {
 	usr := &user.User{Id: id, Name: name}
 
-	userManager.db.SaveUser(usr)
-
-	return usr
-}
-
-func (userManager userManager) GetUserByToken(token string) *user.User {
-	return userManager.db.GetUserByToken(token)
-}
-
-func (userManager userManager) GetUser(id string) *user.User {
-	return userManager.db.GetUser(id)
-}
-
-func (userManager userManager) UpdateUser(user, updates *user.User) {
-	if updates.Email != "" {
-		user.Email = updates.Email
+	err := userManager.db.AddUser(usr)
+	if err != nil {
+		log.WithField("error", err.Error()).Error("manager.user.create.failed")
+		return nil, err
 	}
-	if updates.ServiceAccountKey != "" {
-		user.ServiceAccountKey = updates.ServiceAccountKey
-	}
-	userManager.db.SaveUser(user)
+	return usr, nil
 }
 
-func (userManager userManager) CreateToken(user *user.User) error {
+func (userManager *userManager) GetUserIdByToken(token string) (string, error) {
+	id, err := userManager.cache.GetUserId(token)
+	if err != nil {
+		return "", err
+	}
+	return id, nil
+}
+
+func (userManager *userManager) GetUser(id string) (*user.User, error) {
+	usr, err := userManager.db.GetUser(id)
+	if err != nil {
+		return nil, err
+	}
+	return usr, nil
+}
+
+func (userManager *userManager) UpdateUser(updates *user.User) error {
+	return userManager.db.UpdateUser(updates)
+}
+
+func (userManager *userManager) CreateToken(user *user.User) {
 	user.Token = random.String(50)
-	return userManager.db.AddToken(user.Id, user.Token)
+	userManager.cache.SaveToken(user.Token, user.Id)
 }
 
-func (userManager userManager) RemoveToken(user *user.User) error {
-	return userManager.db.RemoveToken(user.Id, user.Token)
+func (userManager *userManager) RemoveToken(token string) bool {
+	return userManager.cache.RemoveToken(token)
 }

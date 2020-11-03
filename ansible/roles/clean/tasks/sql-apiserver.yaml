@@ -1,0 +1,11 @@
+---
+- name: Delete apiserver sql instance
+  gcp_sql_instance:
+    name: '{{ apiserver_sql.instance_name }}'
+    backend_type: '{{ apiserver_sql.backend_type }}'
+    database_version: '{{ apiserver_sql.database_version }}'
+    settings:
+      tier: '{{ apiserver_sql.tier }}'
+    region: '{{ location }}'
+    project: '{{ project_id }}'
+    state: absent

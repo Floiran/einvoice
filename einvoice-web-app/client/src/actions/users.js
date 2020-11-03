@@ -35,7 +35,9 @@ export const getMyInfo = () => (
 
 export const updateUser = (data) => loadingWrapper(
   async (dispatch, getState, {api}) => {
-    const userData = await api.updateUser(getState().user, data)
+    const updateData = await api.updateUser(getState().user, data)
+    // TODO: fixme
+    const userData = {...getState().user, ...updateData}
     dispatch(setUser(userData))
     localStorage.setItem('user', JSON.stringify(userData))
   }

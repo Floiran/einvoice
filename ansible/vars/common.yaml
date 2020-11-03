@@ -1,16 +1,24 @@
 ---
 project_name: einvoice
 location: europe-west1
-sql_instance:
+apiserver_sql:
   backend_type: SECOND_GEN
   database_version: POSTGRES_12
   tier: db-g1-small
   db_user: '{{ project_name }}'
   db_password: 12345
   db_name: '{{ project_name }}'
+  instance_name: "{{ project_name }}-apiserver-{{ sql_db_version }}"
+authproxy_sql:
+  backend_type: SECOND_GEN
+  database_version: POSTGRES_12
+  tier: db-g1-small
+  db_user: '{{ project_name }}'
+  db_password: 12345
+  db_name: '{{ project_name }}'
+  instance_name: "{{ project_name }}-authproxy-{{ sql_db_version }}"
 service_account_file: "{{ lookup('env', 'GCP_SERVICE_ACCOUNT_FILE') }}"
 docker_password: " {{ lookup('file', '{{ service_account_file }}' ) }}"
 storage_instance_name: '{{ project_name }}'
 sql_db_version: 1
-sql_instance_name: "{{ project_name }}-{{ sql_db_version }}"
 redis_instance_name: '{{ project_name }}'

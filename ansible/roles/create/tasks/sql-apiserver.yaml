@@ -1,0 +1,64 @@
+---
+- name: Create apiserver sql instance
+  gcp_sql_instance:
+    name: '{{ apiserver_sql.instance_name }}'
+    backend_type: '{{ apiserver_sql.backend_type }}'
+    database_version: '{{ apiserver_sql.database_version }}'
+    settings:
+      tier: '{{ apiserver_sql.tier }}'
+    region: '{{ location }}'
+    project: '{{ project_id }}'
+    state: present
+  register: sql_apiserver_instance_res_tmp
+
+- name: Enable private ip
+  command: >
+    gcloud beta sql instances patch {{sql_apiserver_instance_res_tmp.name}}
+      --project={{ project_id }}
+      --network=default
+      --no-assign-ip
+
+- name: Get apiserver sql instance info
+  gcp_sql_instance:
+    name: '{{ apiserver_sql.instance_name }}'
+    backend_type: '{{ apiserver_sql.backend_type }}'
+    database_version: '{{ apiserver_sql.database_version }}'
+    settings:
+      tier: '{{ apiserver_sql.tier }}'
+    region: '{{ location }}'
+    project: '{{ project_id }}'
+    state: present
+  register: sql_apiserver_instance_res
+
+- name: Create database
+  ignore_errors: yes
+  gcp_sql_database:
+    name: '{{ apiserver_sql.db_name }}'
+    charset: utf8
+    instance: "{{ sql_apiserver_instance_res.name }}"
+    project: '{{ project_id }}'
+    state: present
+
+- name: Create a user
+  ignore_errors: yes
+  gcp_sql_user:
+    name: '{{ apiserver_sql.db_user }}'
+    host: '{{ sql_apiserver_instance_res.ipAddresses[0].ipAddress }}'
+    password: '{{ apiserver_sql.db_password }}'
+    instance: "{{ sql_apiserver_instance_res }}"
+    project: '{{ project_id }}'
+    state: present
+
+- name: Enable vpc connectors
+  command: >
+    gcloud services enable vpcaccess.googleapis.com
+      --project {{project_id}}
+
+- name: Create apiserver sql connector
+  command: >
+    gcloud compute networks vpc-access connectors create sql-apiserver-connector
+      --network default
+      --project {{project_id}}
+      --region {{ location }}
+      --range 10.10.0.0/28
+  ignore_errors: yes

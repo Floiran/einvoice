@@ -26,9 +26,6 @@ func GetSlovenskoSkUserInfo(keys *Keys, oboToken string) (*SlovenskoSkUser, erro
 
 		return keys.OboTokenPublic, nil
 	})
-	if err != nil {
-		return nil, err
-	}
 
 	if err != nil {
 		return nil, err

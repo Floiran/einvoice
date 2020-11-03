@@ -12,6 +12,7 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/slovak-egov/einvoice/authproxy/auth"
+	"github.com/slovak-egov/einvoice/authproxy/cache"
 	. "github.com/slovak-egov/einvoice/authproxy/config"
 	"github.com/slovak-egov/einvoice/authproxy/db"
 	"github.com/slovak-egov/einvoice/logging"
@@ -25,8 +26,9 @@ func main() {
 		panic(err)
 	}
 
-	authDB := db.NewAuthDB()
-	userManager := auth.NewUserManager(authDB)
+	authDB := db.New()
+	cache := cache.New()
+	userManager := auth.NewUserManager(authDB, cache)
 	authenticator := auth.NewAuthenticator(userManager)
 
 	keys := auth.NewKeys()
@@ -34,10 +36,10 @@ func main() {
 	router := mux.NewRouter()
 
 	router.PathPrefix("/login").HandlerFunc(auth.HandleLogin(userManager, keys))
-	router.PathPrefix("/logout").HandlerFunc(authenticator.WithUser(auth.HandleLogout(userManager)))
+	router.PathPrefix("/logout").HandlerFunc(auth.HandleLogout(userManager))
 	// TODO: once user table is moved to postgres change url to /users/:id
 	// Check if current user has access to user:id data
-	router.PathPrefix("/users/me").Methods("GET").HandlerFunc(authenticator.WithUser(auth.HandleMe))
+	router.PathPrefix("/users/me").Methods("GET").HandlerFunc(authenticator.WithUser(auth.HandleMe(userManager)))
 	router.PathPrefix("/users/me").Methods("PUT").HandlerFunc(authenticator.WithUser(auth.HandleUpdateUser(userManager)))
 
 	proxy := httputil.NewSingleHostReverseProxy(apiserver)

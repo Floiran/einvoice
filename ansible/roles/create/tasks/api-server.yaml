@@ -28,13 +28,13 @@
       --platform managed
       --region '{{ location }}'
       --allow-unauthenticated
-      --vpc-connector sql-connector
-      --add-cloudsql-instances '{{ sql_instance_res.connectionName }}'
+      --vpc-connector sql-apiserver-connector
+      --add-cloudsql-instances '{{ sql_apiserver_instance_res.connectionName }}'
       --set-env-vars GCS_BUCKET='{{ storage_instance_name }}'
-      --set-env-vars DB_USER='{{ sql_instance.db_user }}'
-      --set-env-vars DB_HOST={{sql_instance_res.ipAddresses[0].ipAddress}}
-      --set-env-vars DB_PASSWORD='{{ sql_instance.db_password }}'
-      --set-env-vars DB_NAME='{{ sql_instance.db_name }}'
+      --set-env-vars DB_USER='{{ apiserver_sql.db_user }}'
+      --set-env-vars DB_HOST={{sql_apiserver_instance_res.ipAddresses[0].ipAddress}}
+      --set-env-vars DB_PASSWORD='{{ apiserver_sql.db_password }}'
+      --set-env-vars DB_NAME='{{ apiserver_sql.db_name }}'
       --set-env-vars APISERVER_ENV=prod
 
 - name: Deploy cloud get service apiserver

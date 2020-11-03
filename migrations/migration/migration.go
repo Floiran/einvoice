@@ -1,4 +1,4 @@
-package main
+package migration
 
 import (
 	"flag"
@@ -23,7 +23,7 @@ Usage:
   go run *.go <command> [args]
 `
 
-func main() {
+func Run() {
 	configuration := config.Init()
 
 	flag.Usage = usage

@@ -4,7 +4,16 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/slovak-egov/einvoice/environment"
+	"time"
 )
+
+type DbConfiguration struct {
+	Host     string
+	Port     int
+	Name     string
+	User     string
+	Password string
+}
 
 type SlovenskoSkConfiguration struct {
 	Url                string
@@ -13,14 +22,26 @@ type SlovenskoSkConfiguration struct {
 }
 
 type configuration struct {
-	Port         int
-	RedisUrl     string
-	ApiServerUrl string
-	SlovenskoSk  SlovenskoSkConfiguration
-	LogLevel     log.Level
+	Port            int
+	RedisUrl        string
+	ApiServerUrl    string
+	SlovenskoSk     SlovenskoSkConfiguration
+	Db              DbConfiguration
+	TokenExpiration time.Duration
+	LogLevel        log.Level
 }
 
 var Config = configuration{}
+
+func (c *configuration) initDb() {
+	c.Db = DbConfiguration{
+		Host:     environment.Getenv("DB_HOST", c.Db.Host),
+		Port:     environment.ParseInt("DB_PORT", c.Db.Port),
+		Name:     environment.Getenv("DB_NAME", c.Db.Name),
+		User:     environment.Getenv("DB_USER", c.Db.User),
+		Password: environment.RequireVar("DB_PASSWORD"),
+	}
+}
 
 func InitConfig() {
 	authproxyEnv := environment.RequireVar("AUTHPROXY_ENV")
@@ -47,10 +68,16 @@ func InitConfig() {
 	Config.ApiServerUrl = environment.Getenv("APISERVER_URL", Config.ApiServerUrl)
 
 	Config.SlovenskoSk = SlovenskoSkConfiguration{
-		Url: environment.Getenv("SLOVENSKO_SK_URL", Config.SlovenskoSk.Url),
+		Url:                environment.Getenv("SLOVENSKO_SK_URL", Config.SlovenskoSk.Url),
 		ApiTokenPrivateKey: environment.RequireVar("API_TOKEN_PRIVATE"),
-		OboTokenPublicKey: environment.RequireVar("OBO_TOKEN_PUBLIC"),
+		OboTokenPublicKey:  environment.RequireVar("OBO_TOKEN_PUBLIC"),
 	}
 
-	log.Info("Config loaded")
+	Config.initDb()
+
+	if tokenExpirationSeconds := environment.ParseInt("TOKEN_EXPIRATION_SECONDS", -1); tokenExpirationSeconds != -1 {
+		Config.TokenExpiration = time.Duration(tokenExpirationSeconds) * time.Second
+	}
+
+	log.Info("config.loaded")
 }

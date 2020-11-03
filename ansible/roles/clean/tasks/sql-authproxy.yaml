@@ -1,0 +1,11 @@
+---
+- name: Delete authproxy sql instance
+  gcp_sql_instance:
+    name: '{{ authproxy_sql.instance_name }}'
+    backend_type: '{{ authproxy_sql.backend_type }}'
+    database_version: '{{ authproxy_sql.database_version }}'
+    settings:
+      tier: '{{ authproxy_sql.tier }}'
+    region: '{{ location }}'
+    project: '{{ project_id }}'
+    state: absent
