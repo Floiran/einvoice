@@ -1,4 +1,4 @@
-package auth
+package slovenskoSk
 
 import (
 	"encoding/json"
@@ -9,27 +9,22 @@ import (
 
 	"github.com/dgrijalva/jwt-go"
 
-	. "github.com/slovak-egov/einvoice/authproxy/config"
 	"github.com/slovak-egov/einvoice/random"
 )
 
-type SlovenskoSkUser struct {
+type User struct {
 	Name string `json:"name"`
 	Uri  string `json:"uri"`
 }
 
-func GetSlovenskoSkUserInfo(keys *Keys, oboToken string) (*SlovenskoSkUser, error) {
+func (connector *Connector) GetUser(oboToken string) (*User, error) {
 	token, err := jwt.Parse(oboToken, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodRSA); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", token.Header["alg"])
 		}
 
-		return keys.OboTokenPublic, nil
+		return connector.oboTokenPublic, nil
 	})
-
-	if err != nil {
-		return nil, err
-	}
 
 	if !token.Valid {
 		return nil, errors.New("Invalid token")
@@ -49,13 +44,13 @@ func GetSlovenskoSkUserInfo(keys *Keys, oboToken string) (*SlovenskoSkUser, erro
 	slovenskoSkToken.Header["cty"] = "JWT"
 	delete(slovenskoSkToken.Header, "typ")
 
-	slovenskoSkTokenString, err := slovenskoSkToken.SignedString(keys.ApiTokenPrivate)
+	slovenskoSkTokenString, err := slovenskoSkToken.SignedString(connector.apiTokenPrivate)
 	if err != nil {
 		return nil, err
 	}
 
 	client := &http.Client{}
-	slovenskoSkReq, err := http.NewRequest("GET", Config.SlovenskoSk.Url + "/api/upvs/user/info", nil)
+	slovenskoSkReq, err := http.NewRequest("GET", connector.baseUrl + "/api/upvs/user/info", nil)
 	if err != nil {
 		return nil, err
 	}
@@ -71,7 +66,7 @@ func GetSlovenskoSkUserInfo(keys *Keys, oboToken string) (*SlovenskoSkUser, erro
 		return nil, err
 	}
 
-	user := &SlovenskoSkUser{}
+	user := &User{}
 	if err = json.Unmarshal(body, user); err != nil {
 		return nil, err
 	}

@@ -11,7 +11,7 @@ import (
 	"github.com/slovak-egov/einvoice/apiserver/config"
 	"github.com/slovak-egov/einvoice/apiserver/manager"
 	"github.com/slovak-egov/einvoice/apiserver/xml"
-	"github.com/slovak-egov/einvoice/logging"
+	"github.com/slovak-egov/einvoice/handlers"
 )
 
 type App struct {
@@ -38,7 +38,7 @@ func (a *App) Initialize() {
 
 func (a *App) Run() {
 	srv := &http.Server{
-		Handler:      logging.Handler{a.Router},
+		Handler:      handlers.LoggingHandler{a.Router},
 		Addr:         fmt.Sprintf("%s:%d", "0.0.0.0", a.Config.Port),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,

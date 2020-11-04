@@ -48,7 +48,7 @@ APISERVER_ENV=dev
 ./dev-scripts/start_service.sh ${service-name}
 ```
 
-* Finally run [web-app](einvoice-web-app/README.md)
+* Finally run [web-app](web-app/README.md)
 
 ## Keys
 

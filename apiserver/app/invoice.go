@@ -10,6 +10,7 @@ import (
 
 	"github.com/slovak-egov/einvoice/apiserver/db"
 	"github.com/slovak-egov/einvoice/apiserver/manager"
+	"github.com/slovak-egov/einvoice/handlers"
 )
 
 func (a *App) getInvoices(w http.ResponseWriter, r *http.Request) {
@@ -20,43 +21,43 @@ func (a *App) getInvoices(w http.ResponseWriter, r *http.Request) {
 
 	invoices, err := a.manager.GetInvoices(formats)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Something went wrong")
+		handlers.RespondWithError(w, http.StatusInternalServerError, "Something went wrong")
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, invoices)
+	handlers.RespondWithJSON(w, http.StatusOK, invoices)
 }
 
 func (a *App) getInvoice(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "ID should be integer")
+		handlers.RespondWithError(w, http.StatusBadRequest, "ID should be integer")
 		return
 	}
 
 	invoice, err := a.manager.GetInvoice(id)
 	if err != nil {
 		// TODO: distinguish NotFound and other errors
-		respondWithError(w, http.StatusNotFound, "Invoice was not found")
+		handlers.RespondWithError(w, http.StatusNotFound, "Invoice was not found")
 		return
 	}
 
-	respondWithJSON(w, http.StatusOK, invoice)
+	handlers.RespondWithJSON(w, http.StatusOK, invoice)
 }
 
 func (a *App) getInvoiceDetail(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	id, err := strconv.Atoi(vars["id"])
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "ID should be integer")
+		handlers.RespondWithError(w, http.StatusBadRequest, "ID should be integer")
 		return
 	}
 
 	invoice, err := a.manager.GetInvoiceDetail(id)
 	if err != nil {
 		// TODO: distinguish NotFound and other errors
-		respondWithError(w, http.StatusNotFound, "Invoice was not found")
+		handlers.RespondWithError(w, http.StatusNotFound, "Invoice was not found")
 		return
 	}
 
@@ -69,7 +70,7 @@ func (a *App) createInvoice(w http.ResponseWriter, r *http.Request) {
 	// TODO: return 413 if request is too large
 	err := r.ParseMultipartForm(10 << 20)
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid payload")
+		handlers.RespondWithError(w, http.StatusBadRequest, "Invalid payload")
 		return
 	}
 
@@ -77,7 +78,7 @@ func (a *App) createInvoice(w http.ResponseWriter, r *http.Request) {
 	format := r.PostFormValue("format")
 	ats, err := parseAttachments(r)
 	if err != nil {
-		respondWithError(w, http.StatusBadRequest, "Invalid attachments")
+		handlers.RespondWithError(w, http.StatusBadRequest, "Invalid attachments")
 		return
 	}
 
@@ -85,26 +86,26 @@ func (a *App) createInvoice(w http.ResponseWriter, r *http.Request) {
 	switch format {
 	case db.UblFormat:
 		if err = a.validator.ValidateUBL21([]byte(data)); err != nil {
-			respondWithError(w, http.StatusBadRequest, "Invoice is not valid")
+			handlers.RespondWithError(w, http.StatusBadRequest, "Invoice is not valid")
 			return
 		}
 	case db.D16bFormat:
 		if err = a.validator.ValidateD16B([]byte(data)); err != nil {
-			respondWithError(w, http.StatusBadRequest, "Invoice is not valid")
+			handlers.RespondWithError(w, http.StatusBadRequest, "Invoice is not valid")
 			return
 		}
 	default:
-		respondWithError(w, http.StatusBadRequest, "Invalid format")
+		handlers.RespondWithError(w, http.StatusBadRequest, "Invalid format")
 		return
 	}
 
 	metadata, err := a.manager.CreateInvoice(format, data, ats)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "Something went wrong")
+		handlers.RespondWithError(w, http.StatusInternalServerError, "Something went wrong")
 		return
 	}
 
-	respondWithJSON(w, http.StatusCreated, metadata)
+	handlers.RespondWithJSON(w, http.StatusCreated, metadata)
 }
 
 func parseAttachments(r *http.Request) ([]*manager.Attachment, error) {

@@ -1,7 +1,7 @@
 package cache
 
 type Cache interface {
-	SaveToken(token, userId string)
+	SaveUserToken(token, userId string)
 	GetUserId(token string) (string, error)
-	RemoveToken(token string) bool
+	RemoveUserToken(token string) bool
 }

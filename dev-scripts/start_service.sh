@@ -6,7 +6,7 @@ service=$1
 shift
 
 # Check if valid service name was provided
-if ! [[ "$service" =~ ^(apiserver|authproxy|einvoice-web-app/server|migrations/apiserver|migrations/authproxy)$ ]]; then
+if ! [[ "$service" =~ ^(apiserver|authproxy|web-app/server|migrations/apiserver|migrations/authproxy)$ ]]; then
   echo Service "$service" does not exist.
   exit 1
 fi

@@ -10,20 +10,10 @@ const setUser = setData(['user'])
 
 export const getMyInfo = () => (
   async (dispatch, getState, {api}) => {
-    const userString = localStorage.getItem('user')
-    let user
-
-    try {
-      user = userString && JSON.parse(userString)
-    } catch (error) {
-      localStorage.removeItem('user')
-    }
-
-    if (user) {
+    if (localStorage.getItem('token')) {
       try {
-        const userData = await api.getUserInfo(user)
+        const userData = await api.getUserInfo()
         dispatch(setUser(userData))
-        localStorage.setItem('user', JSON.stringify(userData))
       } catch (error) {
         dispatch(setUser({unauthorized: true}))
       }
@@ -35,11 +25,8 @@ export const getMyInfo = () => (
 
 export const updateUser = (data) => loadingWrapper(
   async (dispatch, getState, {api}) => {
-    const updateData = await api.updateUser(getState().user, data)
-    // TODO: fixme
-    const userData = {...getState().user, ...updateData}
+    const userData = await api.updateUser(data)
     dispatch(setUser(userData))
-    localStorage.setItem('user', JSON.stringify(userData))
   }
 )
 
@@ -49,7 +36,7 @@ export const loginWithSlovenskoSkToken = (token) => (
       dispatch(setLoggingStatus(LOGGING))
       const userData = await api.loginWithSlovenskoSkToken(token)
       dispatch(setUser(userData))
-      localStorage.setItem('user', JSON.stringify(userData))
+      localStorage.setItem('token', userData.token)
       dispatch(setLoggingStatus(LOGGED_IN))
       return true
     } catch (error) {
@@ -57,6 +44,7 @@ export const loginWithSlovenskoSkToken = (token) => (
       if (error.statusCode === 401) {
         dispatch(setUser(null))
       }
+      localStorage.removeItem('token')
       return false
     }
   }
@@ -64,9 +52,9 @@ export const loginWithSlovenskoSkToken = (token) => (
 
 export const logout = () => (
   async (dispatch, getState, {api}) => {
-    await api.logout(getState().user)
+    await api.logout()
     dispatch(setUser(null))
-    localStorage.removeItem('user')
+    localStorage.removeItem('token')
     dispatch(setLoggingStatus(LOGGED_OUT))
   }
 )

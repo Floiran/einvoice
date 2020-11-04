@@ -1,4 +1,4 @@
-package logging
+package handlers
 
 import (
 	"net/http"
@@ -23,11 +23,11 @@ func (r *responseRecorder) WriteHeader(status int) {
 	r.ResponseWriter.WriteHeader(status)
 }
 
-type Handler struct {
+type LoggingHandler struct {
 	Handler   http.Handler
 }
 
-func (h Handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+func (h LoggingHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	// TODO: add requestId to every request to easily pair logs
 	recorder := &responseRecorder{
 		ResponseWriter: w,

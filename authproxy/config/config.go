@@ -1,10 +1,11 @@
 package config
 
 import (
+	"time"
+
 	log "github.com/sirupsen/logrus"
 
 	"github.com/slovak-egov/einvoice/environment"
-	"time"
 )
 
 type DbConfiguration struct {
@@ -21,7 +22,7 @@ type SlovenskoSkConfiguration struct {
 	OboTokenPublicKey  string
 }
 
-type configuration struct {
+type Configuration struct {
 	Port            int
 	RedisUrl        string
 	ApiServerUrl    string
@@ -31,9 +32,7 @@ type configuration struct {
 	LogLevel        log.Level
 }
 
-var Config = configuration{}
-
-func (c *configuration) initDb() {
+func (c *Configuration) initDb() {
 	c.Db = DbConfiguration{
 		Host:     environment.Getenv("DB_HOST", c.Db.Host),
 		Port:     environment.ParseInt("DB_PORT", c.Db.Port),
@@ -43,41 +42,43 @@ func (c *configuration) initDb() {
 	}
 }
 
-func InitConfig() {
+func Init() Configuration{
 	authproxyEnv := environment.RequireVar("AUTHPROXY_ENV")
-
+	var config Configuration
 	switch authproxyEnv {
 	case "prod":
-		Config = prodConfig
+		config = prodConfig
 	case "dev":
-		Config = devConfig
+		config = devConfig
 	default:
 		log.WithField("environment", authproxyEnv).Fatal("config.environment.unknown")
 	}
 
 	log.SetFormatter(&log.JSONFormatter{})
 	var err error
-	logLevel := environment.Getenv("LOG_LEVEL", Config.LogLevel.String())
-	Config.LogLevel, err = log.ParseLevel(logLevel)
+	logLevel := environment.Getenv("LOG_LEVEL", config.LogLevel.String())
+	config.LogLevel, err = log.ParseLevel(logLevel)
 	if err != nil {
 		log.WithField("log_level", logLevel).Fatal("config.log_level.unknown")
 	}
 
-	Config.Port = environment.ParseInt("PORT", Config.Port)
-	Config.RedisUrl = environment.Getenv("REDIS_URL", Config.RedisUrl)
-	Config.ApiServerUrl = environment.Getenv("APISERVER_URL", Config.ApiServerUrl)
+	config.Port = environment.ParseInt("PORT", config.Port)
+	config.RedisUrl = environment.Getenv("REDIS_URL", config.RedisUrl)
+	config.ApiServerUrl = environment.Getenv("APISERVER_URL", config.ApiServerUrl)
 
-	Config.SlovenskoSk = SlovenskoSkConfiguration{
-		Url:                environment.Getenv("SLOVENSKO_SK_URL", Config.SlovenskoSk.Url),
+	config.SlovenskoSk = SlovenskoSkConfiguration{
+		Url:                environment.Getenv("SLOVENSKO_SK_URL", config.SlovenskoSk.Url),
 		ApiTokenPrivateKey: environment.RequireVar("API_TOKEN_PRIVATE"),
 		OboTokenPublicKey:  environment.RequireVar("OBO_TOKEN_PUBLIC"),
 	}
 
-	Config.initDb()
+	config.initDb()
 
 	if tokenExpirationSeconds := environment.ParseInt("TOKEN_EXPIRATION_SECONDS", -1); tokenExpirationSeconds != -1 {
-		Config.TokenExpiration = time.Duration(tokenExpirationSeconds) * time.Second
+		config.TokenExpiration = time.Duration(tokenExpirationSeconds) * time.Second
 	}
 
 	log.Info("config.loaded")
+
+	return config
 }

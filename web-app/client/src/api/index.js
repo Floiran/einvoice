@@ -1,6 +1,5 @@
 import ApiError from './ApiError'
 
-// TODO: user token should be cookie and sent automatically with all requests in future
 export default class Api {
 
   validateResponse = ({status, body}) => {
@@ -15,21 +14,21 @@ export default class Api {
     return urls
   }
 
-  getUserInfo = async (user) =>
+  getUserInfo = async () =>
     await this.apiRequest({
       route: '/users/me',
       headers: {
-        Authorization: user.token,
+        Authorization: localStorage.getItem('token'),
       },
     })
 
-  updateUser = async (user, data) =>
+  updateUser = async (data) =>
     await this.apiRequest({
       method: 'PUT',
       route: '/users/me',
       data,
       headers: {
-        Authorization: user.token,
+        Authorization: localStorage.getItem('token'),
       },
     })
 
@@ -41,11 +40,11 @@ export default class Api {
       },
     })
 
-  logout = async (user) =>
+  logout = async () =>
     await this.apiRequest({
       route: '/logout',
       headers: {
-        Authorization: user.token,
+        Authorization: localStorage.getItem('token'),
       },
       jsonResponse: false,
     })
@@ -69,13 +68,13 @@ export default class Api {
     })
   }
 
-  createInvoice = async (user, formData) =>
+  createInvoice = async (formData) =>
     await this.apiRequest({
       method: 'POST',
       route: '/invoices',
       data: formData,
       headers: {
-        Authorization: user.token,
+        Authorization: localStorage.getItem('token'),
       },
       jsonBody: false,
     })

@@ -4,7 +4,7 @@
 
 Run react app.
 ```shell script
-cd einvoice-web-app/client
+cd web-app/client
 npm install
 npm start
 ```

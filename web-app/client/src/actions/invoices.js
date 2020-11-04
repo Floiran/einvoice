@@ -80,7 +80,7 @@ export const getInvoiceMeta = (id) => loadingWrapper(
 export const createInvoice = (data) => loadingWrapper(
   async (dispatch, getState, {api}) => {
     try {
-      const invoice = await api.createInvoice(getState().user, data)
+      const invoice = await api.createInvoice(data)
       dispatch(setInvoices({
         [invoice.id]: invoice,
       }))

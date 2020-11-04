@@ -1,6 +1,6 @@
 FROM node:14-alpine AS ui_builder
 
-COPY einvoice-web-app/client /client
+COPY web-app/client /client
 
 WORKDIR /client
 RUN npm install --production
@@ -22,9 +22,9 @@ RUN go mod download
 COPY . .
 
 # Unit tests
-RUN CGO_ENABLED=0 go test -v ./einvoice-web-app/server
+RUN CGO_ENABLED=0 go test -v ./web-app/server
 
-RUN go build -o /out/server ./einvoice-web-app/server
+RUN go build -o /out/server ./web-app/server
 
 # Start fresh from a smaller image
 FROM alpine:3.12

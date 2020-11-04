@@ -8,8 +8,8 @@ import (
 	"github.com/gorilla/mux"
 	log "github.com/sirupsen/logrus"
 
-	"github.com/slovak-egov/einvoice/einvoice-web-app/server/config"
-	"github.com/slovak-egov/einvoice/logging"
+	"github.com/slovak-egov/einvoice/handlers"
+	"github.com/slovak-egov/einvoice/web-app/server/config"
 )
 
 type App struct {
@@ -31,7 +31,7 @@ func (a *App) Initialize() {
 
 func (a *App) Run() {
 	srv := &http.Server{
-		Handler:      logging.Handler{a.Router},
+		Handler:      handlers.LoggingHandler{a.Router},
 		Addr:         fmt.Sprintf("%s:%d", "0.0.0.0", a.Config.Port),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,

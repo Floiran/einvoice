@@ -3,40 +3,45 @@ package cache
 import (
 	"context"
 	"errors"
+	"time"
+
 	"github.com/go-redis/redis/v8"
 	log "github.com/sirupsen/logrus"
-	"github.com/slovak-egov/einvoice/authproxy/config"
 )
 
 var ctx = context.Background()
 
 type redisCache struct {
+	userTokenExpiration time.Duration
 	client *redis.Client
 }
 
-func New() Cache {
+func NewRedis(redisUrl string, userTokenExpiration time.Duration) Cache {
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     config.Config.RedisUrl,
+		Addr:     redisUrl,
 		Password: "", // no password set
 		DB:       0,  // use default db
 	})
 
-	ping := rdb.Ping(ctx).Val()
-	if ping == "" {
-		log.WithField("redis_url", config.Config.RedisUrl).Error("app.redis.not_connected")
+	pong := rdb.Ping(ctx).Val()
+	if pong == "" {
+		log.WithField("redis_url", redisUrl).Fatal("app.redis.not_connected")
 	} else {
 		log.Info("app.redis.connected")
 	}
 
-	return &redisCache{rdb}
+	return &redisCache{
+		userTokenExpiration: userTokenExpiration,
+		client: rdb,
+	}
 }
 
 func userIdKey(token string) string {
 	return "token-" + token
 }
 
-func (redis *redisCache) SaveToken(token, userId string) {
-	redis.client.Set(ctx, userIdKey(token), userId, config.Config.TokenExpiration).Val()
+func (redis *redisCache) SaveUserToken(token, userId string) {
+	redis.client.Set(ctx, userIdKey(token), userId, redis.userTokenExpiration).Val()
 }
 
 func (redis *redisCache) GetUserId(token string) (string, error) {
@@ -45,11 +50,10 @@ func (redis *redisCache) GetUserId(token string) (string, error) {
 		log.WithField("token", token).Debug("redis.token.not_found")
 		return "", errors.New("Token not found")
 	}
-	redis.client.Expire(ctx, userIdKey(token), config.Config.TokenExpiration)
+	redis.client.Expire(ctx, userIdKey(token), redis.userTokenExpiration)
 	return id, nil
 }
 
-func (redis *redisCache) RemoveToken(token string) bool {
-	deletedRecordsNumber := redis.client.Del(ctx, userIdKey(token)).Val()
-	return deletedRecordsNumber == 1
+func (redis *redisCache) RemoveUserToken(token string) bool {
+	return redis.client.Del(ctx, userIdKey(token)).Val() == 1
 }
