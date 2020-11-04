@@ -22,10 +22,12 @@ func (a *App) Initialize() {
 
 	a.Router = mux.NewRouter()
 
-	a.Router.HandleFunc("/api/urls", a.ApiUrlHandler).Methods("Get")
-
 	a.Router.PathPrefix("/").Handler(
-		UiHandler{StaticPath: a.Config.ClientBuildDir, IndexPath: "index.html"},
+		UiHandler{
+			StaticPath: a.Config.ClientBuildDir,
+			IndexPath: "index.html",
+			reactAppConfig: a.Config.Urls,
+		},
 	)
 }
 

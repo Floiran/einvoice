@@ -4,7 +4,6 @@ import {defaultUbl} from './data/defaultUbl'
 import defaultD16b from './data/defaultD16b'
 
 const getInitialState = () => ({
-  user: null,
   invoices: {},
   serviceAccounts: [],
   isLoading: false,
@@ -27,8 +26,6 @@ const getInitialState = () => ({
       },
     },
   },
-  // TODO: get rid of this
-  apiInitialized: false,
 })
 
 const rootReducer = (state = getInitialState(), action) => {

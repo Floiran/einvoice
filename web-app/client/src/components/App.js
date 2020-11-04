@@ -2,14 +2,13 @@ import 'bootstrap/dist/css/bootstrap.css'
 import './App.css'
 import React from 'react'
 import {connect} from 'react-redux'
-import {branch, compose, lifecycle, renderComponent} from 'recompose'
+import {compose, lifecycle} from 'recompose'
 import {Redirect, Route, Switch, withRouter} from 'react-router-dom'
 import InvoiceList from './invoiceList'
 import LandingPage from './LandingPage'
 import TopBar from './TopBar'
 import CreateInvoice from './createInvoice'
 import InvoiceView from './InvoiceView'
-import {initializeApi} from '../actions/api'
 import {getMyInfo, loginWithSlovenskoSkToken} from '../actions/users'
 import AccountSettings from './AccountSettings'
 import Auth from './helpers/Auth'
@@ -36,14 +35,12 @@ export default withRouter(
   compose(
     connect(
       (state) => ({
-        apiInitialized: state.apiInitialized,
         isLoading: state.isLoading,
       }),
-      {initializeApi, loginWithSlovenskoSkToken, getMyInfo}
+      {loginWithSlovenskoSkToken, getMyInfo}
     ),
     lifecycle({
       async componentDidMount() {
-        await this.props.initializeApi()
         await this.props.getMyInfo()
 
         const urlParams = new URLSearchParams(this.props.location.search)
@@ -55,9 +52,5 @@ export default withRouter(
         }
       },
     }),
-    branch(
-      ({apiInitialized}) => !apiInitialized,
-      renderComponent(LoadingModal),
-    ),
   )(App)
 )

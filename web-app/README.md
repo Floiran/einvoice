@@ -2,15 +2,15 @@
 
 ## Development
 
-Run react app.
-```shell script
-cd web-app/client
-npm install
-npm start
+Set env vars (either in `client/.env` or using your editor), e.g.
+```text
+REACT_APP_AUTHSERVER_URL=http://localhost:8082
+REACT_APP_SLOVENSKOSK_LOGIN_URL=https://upvs.dev.filipsladek.com/login?callback=http://localhost:3000/login-callback
 ```
 
-Run backend in next tab, rerun after server update.
+Then run hot server.
 ```shell script
-cd server
-go build && ./server
+cd client
+npm install
+npm start
 ```

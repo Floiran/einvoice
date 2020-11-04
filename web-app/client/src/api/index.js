@@ -1,3 +1,4 @@
+import {CONFIG} from '../appSettings'
 import ApiError from './ApiError'
 
 export default class Api {
@@ -6,12 +7,6 @@ export default class Api {
     if (status < 200 || status >= 300) {
       throw new ApiError({statusCode: status, message: body && body.error})
     }
-  }
-
-  getApiUrl = async () => {
-    const urls = await this.standardRequest({route: '/api/urls'})
-    this.baseUrl = urls.apiServerUrl
-    return urls
   }
 
   getUserInfo = async () =>
@@ -82,7 +77,7 @@ export default class Api {
   apiRequest = (params) =>
     this.standardRequest({
       ...params,
-      route: `${this.baseUrl}${params.route}`,
+      route: `${CONFIG.authServerUrl}${params.route}`,
     })
 
   //TODO: ideally all request & response bodies are jsons

@@ -1,14 +1,20 @@
 package app
 
 import (
+	"html/template"
 	"net/http"
 	"os"
 	"path/filepath"
+
+	log "github.com/sirupsen/logrus"
+
+	"github.com/slovak-egov/einvoice/web-app/server/config"
 )
 
 type UiHandler struct {
 	StaticPath string
 	IndexPath  string
+	reactAppConfig config.Urls
 }
 
 // Let client do the routing.
@@ -25,9 +31,14 @@ func (h UiHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	// Check if file exists at the given path
 	_, err = os.Stat(path)
-	if os.IsNotExist(err) {
+	if path == h.StaticPath || os.IsNotExist(err) {
 		// File does not exist, serve index.html
-		http.ServeFile(w, r, filepath.Join(h.StaticPath, h.IndexPath))
+		t, err := template.ParseFiles(filepath.Join(h.StaticPath, h.IndexPath))
+		if err != nil {
+			log.WithField("error", err.Error()).Warn("ui_handler.html_parse.failed")
+		}
+
+		t.Execute(w, h.reactAppConfig)
 	} else if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	} else {

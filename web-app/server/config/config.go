@@ -6,11 +6,15 @@ import (
 	"github.com/slovak-egov/einvoice/environment"
 )
 
+type Urls struct {
+	AuthServer string
+	SlovenskoSkLogin string
+}
+
 type Configuration struct {
 	Port                int
-	AuthServerUrl       string
+	Urls                Urls
 	ClientBuildDir      string
-	SlovenskoSkLoginUrl string
 	LogLevel            log.Level
 }
 
@@ -35,9 +39,11 @@ func Init() Configuration {
 	}
 
 	config.Port = environment.ParseInt("PORT", config.Port)
-	config.AuthServerUrl = environment.Getenv("AUTH_SERVER_URL", config.AuthServerUrl)
 	config.ClientBuildDir = environment.Getenv("CLIENT_BUILD_DIR", config.ClientBuildDir)
-	config.SlovenskoSkLoginUrl = environment.Getenv("SLOVENSKO_SK_LOGIN_URL", config.SlovenskoSkLoginUrl)
+	config.Urls = Urls{
+		AuthServer: environment.Getenv("AUTH_SERVER_URL", config.Urls.AuthServer),
+		SlovenskoSkLogin: environment.Getenv("SLOVENSKO_SK_LOGIN_URL", config.Urls.SlovenskoSkLogin),
+	}
 
 	log.Info("config.loaded")
 	return config

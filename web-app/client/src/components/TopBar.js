@@ -5,8 +5,9 @@ import {Navbar} from 'react-bootstrap'
 import {NavLink, withRouter} from 'react-router-dom'
 import {withTranslation} from 'react-i18next'
 import {LOGGING, LOGGING_FAILED, logout} from '../actions/users'
+import {CONFIG} from '../appSettings'
 
-const TopBar = ({i18n, isLogged, loggingStatus, logout, slovenskoSkLoginUrl, t, user}) => (
+const TopBar = ({i18n, isLogged, loggingStatus, logout, t, user}) => (
   <Navbar bg="primary" variant="dark">
     <NavLink to="/">
       <Navbar.Brand>{t('title')}</Navbar.Brand>
@@ -38,7 +39,7 @@ const TopBar = ({i18n, isLogged, loggingStatus, logout, slovenskoSkLoginUrl, t, 
           <button className="btn btn-danger" onClick={logout}>{t('logout')}</button>
         </React.Fragment>
         :
-        <a href={slovenskoSkLoginUrl}>
+        <a href={CONFIG.slovenskoSkLoginUrl}>
           <button className="btn btn-success">
             { loggingStatus === LOGGING ?
               t('logging')
@@ -59,7 +60,6 @@ export default withRouter(
         loggingStatus: state.loggingStatus,
         isLogged: state.user && !state.user.unauthorized,
         user: state.user,
-        slovenskoSkLoginUrl: state.urls.slovenskoSkLoginUrl,
       }),
       {logout}
     ),
