@@ -13,7 +13,7 @@ export default class Api {
     await this.apiRequest({
       route: '/users/me',
       headers: {
-        Authorization: localStorage.getItem('token'),
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     })
 
@@ -23,7 +23,7 @@ export default class Api {
       route: '/users/me',
       data,
       headers: {
-        Authorization: localStorage.getItem('token'),
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
     })
 
@@ -31,7 +31,7 @@ export default class Api {
     await this.apiRequest({
       route: '/login',
       headers: {
-        Authorization: token,
+        Authorization: `Bearer ${token}`,
       },
     })
 
@@ -39,7 +39,7 @@ export default class Api {
     await this.apiRequest({
       route: '/logout',
       headers: {
-        Authorization: localStorage.getItem('token'),
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
       jsonResponse: false,
     })
@@ -69,7 +69,7 @@ export default class Api {
       route: '/invoices',
       data: formData,
       headers: {
-        Authorization: localStorage.getItem('token'),
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
       },
       jsonBody: false,
     })

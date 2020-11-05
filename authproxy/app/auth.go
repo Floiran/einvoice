@@ -7,7 +7,12 @@ import (
 )
 
 func (a *App) handleLogin(res http.ResponseWriter, req *http.Request) {
-	slovenskoSkUser, err := a.slovenskoSk.GetUser(req.Header.Get("Authorization"))
+	oboToken, err := GetBearerToken(req)
+	if err != nil {
+		handlers.RespondWithError(res, http.StatusUnauthorized, err.Error())
+		return
+	}
+	slovenskoSkUser, err := a.slovenskoSk.GetUser(oboToken)
 	if err != nil {
 		handlers.RespondWithError(res, http.StatusUnauthorized, "Unauthorized")
 		return
@@ -28,17 +33,23 @@ func (a *App) handleLogin(res http.ResponseWriter, req *http.Request) {
 
 	token := a.manager.CreateUserToken(id)
 
-	handlers.RespondWithJSON(res, http.StatusOK, map[string] string{
-		"token": token,
-		"id": id,
-		"email": user.Email,
+	handlers.RespondWithJSON(res, http.StatusOK, map[string]string{
+		"token":             token,
+		"id":                id,
+		"email":             user.Email,
 		"serviceAccountKey": user.ServiceAccountKey,
-		"name": user.Name,
+		"name":              user.Name,
 	})
 }
 
 func (a *App) handleLogout(res http.ResponseWriter, req *http.Request) {
-	err := a.manager.LogoutUser(req.Header.Get("Authorization"))
+	token, err := GetBearerToken(req)
+	if err != nil {
+		handlers.RespondWithError(res, http.StatusUnauthorized, err.Error())
+		return
+	}
+
+	err = a.manager.LogoutUser(token)
 	if err != nil {
 		handlers.RespondWithError(res, http.StatusUnauthorized, "Unauthorized")
 		return

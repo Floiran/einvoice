@@ -9,11 +9,16 @@ import (
 	log "github.com/sirupsen/logrus"
 
 	"github.com/slovak-egov/einvoice/authproxy/db"
+	"github.com/slovak-egov/einvoice/handlers"
 )
 
 func (a *App) authMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(res http.ResponseWriter, req *http.Request) {
-		token := req.Header.Get("Authorization")
+		token, err := GetBearerToken(req)
+		if err != nil {
+			handlers.RespondWithError(res, http.StatusUnauthorized, err.Error())
+			return
+		}
 
 		userId, err := a.manager.GetUserIdByToken(token)
 		if err != nil {
@@ -21,7 +26,7 @@ func (a *App) authMiddleware(next http.Handler) http.Handler {
 		}
 
 		if err != nil {
-			res.WriteHeader(401)
+			handlers.RespondWithError(res, http.StatusUnauthorized, "Invalid token")
 			return
 		}
 
@@ -32,7 +37,6 @@ func (a *App) authMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(res, req)
 	})
 }
-
 
 func (a *App) getUserByServiceAccount(tokenString string) (string, error) {
 	var user *db.User
