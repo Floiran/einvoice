@@ -4,8 +4,19 @@ type User struct {
 	tableName         struct{} `pg:"users"`
 	Id                string   `json:"id"`
 	Name              string   `json:"name"`
-	ServiceAccountKey string   `json:"serviceAccountKey" pg:"service_account_key"`
+	ServiceAccountKey string   `json:"serviceAccountKey"`
 	Email             string   `json:"email"`
+}
+
+type UserUpdate struct {
+	UserId            string
+	ServiceAccountKey *string `json:"serviceAccountKey"`
+	Email             *string `json:"email"`
+}
+
+func (user *UserUpdate) IsEmpty() bool {
+	return user.ServiceAccountKey == nil &&
+		user.Email == nil
 }
 
 func (connector *Connector) GetUser(id string) (*User, error) {
@@ -17,13 +28,14 @@ func (connector *Connector) GetUser(id string) (*User, error) {
 	return user, nil
 }
 
-func (connector *Connector) UpdateUser(user *User) (*User, error) {
-	query := connector.db.Model(user).Where("id = ?", user.Id).Returning("*")
-	if user.ServiceAccountKey != "" {
-		query= query.Set("service_account_key = ?", user.ServiceAccountKey)
+func (connector *Connector) UpdateUser(updatedUserData *UserUpdate) (*User, error) {
+	user := &User{}
+	query := connector.db.Model(user).Where("id = ?", updatedUserData.UserId).Returning("*")
+	if updatedUserData.ServiceAccountKey != nil {
+		query = query.Set("service_account_key = ?", *updatedUserData.ServiceAccountKey)
 	}
-	if user.Email != "" {
-		query = query.Set("email = ?", user.Email)
+	if updatedUserData.Email != nil {
+		query = query.Set("email = ?", *updatedUserData.Email)
 	}
 	_, err := query.Update()
 
@@ -34,4 +46,3 @@ func (connector *Connector) CreateUser(user *User) error {
 	_, err := connector.db.Model(user).Insert(user)
 	return err
 }
-

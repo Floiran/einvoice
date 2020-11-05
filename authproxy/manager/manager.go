@@ -17,7 +17,7 @@ type Manager struct {
 func Init(appConfig config.Configuration) Manager {
 	return Manager{
 		cache: cache.NewRedis(appConfig.RedisUrl, appConfig.TokenExpiration),
-		Db: db.Connect(appConfig.Db),
+		Db:    db.Connect(appConfig.Db),
 	}
 }
 
@@ -37,7 +37,7 @@ func (m *Manager) GetUser(id string) (*db.User, error) {
 	return user, nil
 }
 
-func (m *Manager) UpdateUser(user *db.User) (*db.User, error) {
+func (m *Manager) UpdateUser(user *db.UserUpdate) (*db.User, error) {
 	return m.Db.UpdateUser(user)
 }
 

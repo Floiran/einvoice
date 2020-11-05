@@ -18,9 +18,9 @@ import (
 )
 
 type App struct {
-	router *mux.Router
-	config config.Configuration
-	manager manager.Manager
+	router      *mux.Router
+	config      config.Configuration
+	manager     manager.Manager
 	slovenskoSk slovenskoSk.Connector
 }
 
@@ -44,7 +44,7 @@ func (a *App) Initialize() {
 	// TODO: Change url to /users/:id
 	// Check if current user has access to user:id data
 	authRouter.HandleFunc("/users/me", a.getUser).Methods("GET")
-	authRouter.HandleFunc("/users/me", a.updateUser).Methods("PUT")
+	authRouter.HandleFunc("/users/me", a.updateUser).Methods("PATCH")
 
 	proxy := httputil.NewSingleHostReverseProxy(apiserver)
 
@@ -74,7 +74,7 @@ func (a *App) Close() {
 var corsOptions = []muxHandlers.CORSOption{
 	muxHandlers.AllowedHeaders([]string{"Content-Type", "Origin", "Accept", "token", "Authorization"}),
 	muxHandlers.AllowedOrigins([]string{"*"}),
-	muxHandlers.AllowedMethods([]string{"GET", "POST", "OPTIONS", "DELETE", "PUT"}),
+	muxHandlers.AllowedMethods([]string{"GET", "POST", "OPTIONS", "DELETE", "PUT", "PATCH"}),
 }
 
 func handleProxy(proxy *httputil.ReverseProxy) func(res http.ResponseWriter, req *http.Request) {

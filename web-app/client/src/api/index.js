@@ -19,7 +19,7 @@ export default class Api {
 
   updateUser = async (data) =>
     await this.apiRequest({
-      method: 'PUT',
+      method: 'PATCH',
       route: '/users/me',
       data,
       headers: {

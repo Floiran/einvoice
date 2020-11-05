@@ -31,15 +31,20 @@ func (a *App) updateUser(res http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	user := &db.User{}
+	updatedUserData := &db.UserUpdate{}
 
-	if err := json.Unmarshal(body, &user); err != nil {
+	if err := json.Unmarshal(body, &updatedUserData); err != nil {
 		handlers.RespondWithError(res, http.StatusBadRequest, "Invalid payload")
 		return
 	}
-	user.Id = req.Header.Get("User-Id")
+	if updatedUserData.IsEmpty() {
+		handlers.RespondWithError(res, http.StatusBadRequest, "Empty body")
+		return
+	}
 
-	user, err = a.manager.UpdateUser(user)
+	updatedUserData.UserId = req.Header.Get("User-Id")
+
+	user, err := a.manager.UpdateUser(updatedUserData)
 	if err != nil {
 		handlers.RespondWithError(res, http.StatusInternalServerError, "Something went wrong")
 		return
