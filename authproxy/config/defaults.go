@@ -20,7 +20,7 @@ var devConfig = Configuration{
 		User: "postgres",
 	},
 	LogLevel:        logrus.DebugLevel,
-	TokenExpiration: 1 * time.Hour,
+	TokenExpiration: 24 * time.Hour,
 }
 
 var prodConfig = Configuration{

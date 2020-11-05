@@ -6,6 +6,10 @@ import {Route, Switch} from 'react-router-dom'
 import App from './App'
 import LoadingModal from './helpers/LoadingModal'
 import {loginWithSlovenskoSkToken} from '../actions/users'
+import {registerLocale} from 'react-datepicker'
+import sk from 'date-fns/locale/sk'
+// Load slovak translations for time
+registerLocale('sk', sk)
 
 const LoginCallback = compose(
   connect(

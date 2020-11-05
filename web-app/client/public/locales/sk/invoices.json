@@ -4,5 +4,14 @@
   "invoiceForm": "Formulár na faktúru",
   "generateInvoice": "Vygeneruj faktúru",
   "confirmationQuestion": "Naozaj chcete odovzdať túto faktúru?",
-  "attachments": "Prílohy"
+  "attachments": "Prílohy",
+  "issueDate": "Dátum vydania",
+  "dueDate": "Dátum splatnosti",
+  "invoicePeriodStartDate": "Začiatok fakturačného obdobia",
+  "invoicePeriodEndDate": "Koniec fakturačného obdobia",
+  "vat": "DPH",
+  "invoiceId": "Identifikačné číslo faktúry",
+  "sender": "Odosielateľ",
+  "receiver": "Prijímateľ",
+  "price": "Cena"
 }

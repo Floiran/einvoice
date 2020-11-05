@@ -4,5 +4,14 @@
   "invoiceForm": "Invoice form",
   "generateInvoice": "Generate invoice",
   "confirmationQuestion": "Do you really want to create this invoice?",
-  "attachments": "Attachments"
+  "attachments": "Attachments",
+  "issueDate": "Issue date",
+  "dueDate": "Due date",
+  "invoicePeriodStartDate": "Invoice period start date",
+  "invoicePeriodEndDate": "Invoice period end date",
+  "vat": "VAT",
+  "invoiceId": "Invoice ID",
+  "sender": "Sender",
+  "receiver": "Receiver",
+  "price": "Price"
 }

@@ -15,9 +15,9 @@ const Index = ({invoices, invoiceIds, t}) => (
       <thead>
         <tr>
           <th>ID</th>
-          <th>{t('sender')}</th>
-          <th>{t('receiver')}</th>
-          <th>{t('price')}</th>
+          <th>{t('invoices:sender')}</th>
+          <th>{t('invoices:receiver')}</th>
+          <th>{t('invoices:price')}</th>
           <th>{t('format')}</th>
           <th />
         </tr>
@@ -57,5 +57,5 @@ export default compose(
     ({invoiceIds}) => invoiceIds == null,
     renderNothing,
   ),
-  withTranslation(['common', 'TopBar']),
+  withTranslation(['common', 'TopBar', 'invoices']),
 )(Index)

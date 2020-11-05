@@ -1,7 +1,7 @@
 import React from 'react'
 import {NavLink, Route, Switch} from 'react-router-dom'
 import {Button} from 'react-bootstrap'
-import InvoiceForm from './InvoiceForm'
+import InvoiceForm from './invoiceForm'
 import CreateInvoice from './CreateInvoice'
 import {useTranslation} from 'react-i18next'
 

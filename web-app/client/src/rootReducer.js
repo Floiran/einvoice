@@ -25,6 +25,12 @@ const getInitialState = () => ({
       sender: '',
       receiver: '',
       price: '',
+      issueDate: new Date(),
+      dueDate: new Date(),
+      invoicePeriodStartDate: new Date(),
+      invoicePeriodEndDate: new Date(),
+      vat: '',
+      invoiceId: '',
     },
   },
   invoicesScreen: {
