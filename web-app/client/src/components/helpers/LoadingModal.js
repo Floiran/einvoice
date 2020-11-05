@@ -1,10 +1,11 @@
 import './LoadingModal.css'
 import React from 'react'
 import {Modal} from 'react-bootstrap'
-import {withTranslation} from 'react-i18next'
+import {useTranslation} from 'react-i18next'
 
-export default withTranslation('helpers')(
-  ({t}) => (
+export default () => {
+  const {t} = useTranslation('helpers')
+  return (
     <div className="static-modal Modal">
       <Modal.Dialog>
         <Modal.Header style={{display: 'flex', backgroundColor: '#f3f3f3'}}>
@@ -17,4 +18,4 @@ export default withTranslation('helpers')(
       </Modal.Dialog>
     </div>
   )
-)
+}

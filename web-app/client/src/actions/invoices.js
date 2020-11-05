@@ -1,9 +1,7 @@
 import swal from 'sweetalert'
 import {setData, loadingWrapper} from './common'
 
-export const setUblInputValue = setData(['createInvoiceScreen', 'ublInput'])
-export const setD16bInputValue = setData(['createInvoiceScreen', 'd16bInput'])
-export const setGeneratedXmlInputValue = setData(['createInvoiceScreen', 'formGeneratedInput'])
+export const setCreateInvoiceValue = (tab) => setData(['createInvoiceScreen', tab, 'invoice'])
 
 const setInvoiceIds = setData(['invoicesScreen', 'ids'])
 
@@ -27,6 +25,17 @@ const setInvoices = (data) => ({
   }),
 })
 
+const setInvoiceNotFound = (id) => ({
+  type: 'SET INVOICE NOT FOUND',
+  path: ['invoices', id],
+  payload: null,
+  reducer: () => ({
+    notFound: true,
+    data: '',
+    attachments: [],
+  }),
+})
+
 export const updateInvoiceFormProperty = (property, data) => ({
   type: `UPDATE INVOICE FORM PROPERTY ${property}`,
   path: ['createInvoiceScreen', 'form', property],
@@ -46,34 +55,66 @@ export const getInvoices = () => loadingWrapper(
     const filters = getState().invoicesScreen.filters
     const formats = Object.keys(filters.formats).filter((k) => filters.formats[k])
 
-    const invoices = await api.getInvoices(formats)
-    dispatch(setInvoices(
-      invoices.reduce((acc, val) => ({
-        ...acc,
-        [val.id]: val,
-      }), {})
-    ))
+    try {
+      const invoices = await api.getInvoices(formats)
+      dispatch(setInvoices(
+        invoices.reduce((acc, val) => ({
+          ...acc,
+          [val.id]: val,
+        }), {})
+      ))
 
-    dispatch(setInvoiceIds(
-      invoices.reduce((acc, val) => ([
-        ...acc,
-        val.id,
-      ]), []))
-    )
+      dispatch(setInvoiceIds(
+        invoices.reduce((acc, val) => ([
+          ...acc,
+          val.id,
+        ]), []))
+      )
+    } catch (error) {
+      await swal({
+        title: 'Invoices could not be fetched',
+        text: error.message,
+        icon: 'error',
+      })
+    }
   }
 )
 
 export const getInvoiceDetail = (id) => loadingWrapper(
   async (dispatch, getState, {api}) => {
-    const invoiceDetail = await api.getInvoiceDetail(id)
-    dispatch(setInvoice(id, {data: invoiceDetail}))
+    try {
+      const invoiceDetail = await api.getInvoiceDetail(id)
+      dispatch(setInvoice(id, {data: invoiceDetail}))
+    } catch (error) {
+      if (error.statusCode === 404) {
+        dispatch(setInvoiceNotFound(id))
+      } else {
+        await swal({
+          title: `Invoice ${id} could not be fetched`,
+          text: error.message,
+          icon: 'error',
+        })
+      }
+    }
   }
 )
 
 export const getInvoiceMeta = (id) => loadingWrapper(
   async (dispatch, getState, {api}) => {
-    const meta = await api.getInvoiceMeta(id)
-    dispatch(setInvoice(id, meta))
+    try {
+      const meta = await api.getInvoiceMeta(id)
+      dispatch(setInvoice(id, meta))
+    } catch (error) {
+      if (error.statusCode === 404) {
+        dispatch(setInvoiceNotFound(id))
+      } else {
+        await swal({
+          title: `Invoice ${id} could not be fetched`,
+          text: error.message,
+          icon: 'error',
+        })
+      }
+    }
   }
 )
 
@@ -101,22 +142,22 @@ export const createInvoice = (data) => loadingWrapper(
   }
 )
 
-export const addAttachment = (attachment) => ({
+export const addAttachment = (tab, attachment) => ({
   type: 'ADD ATTACHMENT',
-  path: ['createInvoiceScreen', 'attachments'],
+  path: ['createInvoiceScreen', tab, 'attachments'],
   payload: attachment,
   reducer: (state, attachment) => [...state, attachment],
 })
 
-export const removeAttachment = (attachment) => ({
+export const removeAttachment = (tab, attachment) => ({
   type: 'REMOVE ATTACHMENT',
-  path: ['createInvoiceScreen', 'attachments'],
+  path: ['createInvoiceScreen', tab, 'attachments'],
   payload: attachment,
   reducer: (state, attachment) => state.filter((a) => a !== attachment),
 })
 
-export const clearAttachments = () => ({
+export const clearAttachments = (tab) => ({
   type: 'CLEAR ATTACHMENTS',
-  path: ['createInvoiceScreen', 'attachments'],
-  reducer: (state, attachment) => [],
+  path: ['createInvoiceScreen', tab, 'attachments'],
+  reducer: (state) => [],
 })

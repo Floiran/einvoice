@@ -1,10 +1,11 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import {NavLink} from 'react-router-dom'
-import {branch, compose, lifecycle, renderNothing} from 'recompose'
+import {branch, compose, lifecycle, renderComponent, renderNothing} from 'recompose'
 import {Button} from 'react-bootstrap'
 import {withTranslation} from 'react-i18next'
 import {get} from 'lodash'
+import NotFound from './helpers/NotFound'
 import {getInvoiceDetail, getInvoiceMeta} from '../actions/invoices'
 import {CONFIG} from '../appSettings'
 
@@ -20,7 +21,7 @@ const InvoiceView = ({attachments, invoice, match: {params: {id}}, t}) => (
       {invoice}
     </div>
     {attachments.map((a, index) => (
-      <p key={index} >
+      <p key={index}>
         <a className="row" href={`${CONFIG.authServerUrl}/attachments/${a.id}`}>{a.name}</a>
       </p>
     ))}
@@ -32,6 +33,7 @@ export default compose(
     (state, {match: {params: {id}}}) => ({
       invoice: get(state, ['invoices', id, 'data']),
       attachments: get(state, ['invoices', id, 'attachments']),
+      invoiceDoesNotExist: get(state, ['invoices', id, 'notFound']),
     }),
     {getInvoiceDetail, getInvoiceMeta}
   ),
@@ -42,8 +44,12 @@ export default compose(
     },
   }),
   branch(
-    ({invoice, attachments}) => !invoice || !attachments,
+    ({invoice, attachments}) => invoice == null || !attachments,
     renderNothing,
+  ),
+  branch(
+    ({invoiceDoesNotExist}) => invoiceDoesNotExist,
+    renderComponent(NotFound),
   ),
   withTranslation('common'),
 )(InvoiceView)

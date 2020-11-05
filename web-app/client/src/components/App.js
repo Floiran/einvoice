@@ -12,6 +12,7 @@ import {getMyInfo} from '../actions/users'
 import AccountSettings from './AccountSettings'
 import Auth from './helpers/Auth'
 import LoadingModal from './helpers/LoadingModal'
+import NotFound from './helpers/NotFound'
 
 const App = ({isLoading}) => (
   <div>
@@ -23,7 +24,8 @@ const App = ({isLoading}) => (
         <Redirect exact from="/create-invoice" to="/create-invoice/form" />
         <Route path="/create-invoice" component={Auth(CreateInvoice)} />
         <Route exact path="/invoices" component={InvoiceList} />
-        <Route exact path="/invoices/:id" component={InvoiceView} />
+        <Route exact path="/invoices/:id([0-9]+)" component={InvoiceView} />
+        <Route component={NotFound} />
       </Switch>
     </div>
     {isLoading && <LoadingModal />}
@@ -33,7 +35,7 @@ const App = ({isLoading}) => (
 export default compose(
   connect(
     (state) => ({
-      isLoading: state.isLoading,
+      isLoading: state.loadingRequests > 0,
       loggedUser: state.loggedUser,
     }),
     {getMyInfo}

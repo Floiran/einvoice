@@ -5,18 +5,27 @@ import defaultD16b from './data/defaultD16b'
 
 const getInitialState = () => ({
   invoices: {},
-  serviceAccounts: [],
-  isLoading: false,
+  // Count of running requests
+  // If there is at least one running request show Loading Modal
+  loadingRequests: 0,
   createInvoiceScreen: {
-    ublInput: defaultUbl,
-    d16bInput: defaultD16b,
-    formGeneratedInput: '',
+    ubl: {
+      invoice: defaultUbl,
+      attachments: [],
+    },
+    d16b: {
+      invoice: defaultD16b,
+      attachments: [],
+    },
+    generated: {
+      invoice: '',
+      attachments: [],
+    },
     form: {
       sender: '',
       receiver: '',
       price: '',
     },
-    attachments: [],
   },
   invoicesScreen: {
     filters: {

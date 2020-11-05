@@ -4,8 +4,8 @@ type User struct {
 	tableName         struct{} `pg:"users"`
 	Id                string   `json:"id"`
 	Name              string   `json:"name"`
-	ServiceAccountKey string   `json:"serviceAccountKey,omitempty" pg:"service_account_key"`
-	Email             string   `json:"email,omitempty"`
+	ServiceAccountKey string   `json:"serviceAccountKey" pg:"service_account_key"`
+	Email             string   `json:"email"`
 }
 
 func (connector *Connector) GetUser(id string) (*User, error) {

@@ -1,9 +1,10 @@
 import React from 'react'
 import {Modal, Button} from 'react-bootstrap'
-import {withTranslation} from 'react-i18next'
+import {useTranslation} from 'react-i18next'
 
-const ConfirmationModal = withTranslation('common')(
-  ({cancel, confirm, t, text, title}) => (
+const ConfirmationModal = ({cancel, confirm, text, title}) => {
+  const {t} = useTranslation('common')
+  return (
     <div className="static-modal Modal" style={{cursor: 'default'}}>
       <Modal.Dialog>
         <Modal.Header style={{display: 'flex'}}>
@@ -19,7 +20,7 @@ const ConfirmationModal = withTranslation('common')(
       </Modal.Dialog>
     </div>
   )
-)
+}
 
 
 export default class extends React.Component {

@@ -6,7 +6,7 @@ import {NavLink} from 'react-router-dom'
 import {withTranslation} from 'react-i18next'
 import {CONFIG} from '../appSettings'
 import {logout} from '../actions/users'
-import {setLoadingState} from '../actions/common'
+import {updateRunningRequests} from '../actions/common'
 
 const TopBar = ({i18n, isLogged, loggedUser, logout, startLoading, t}) => (
   <Navbar bg="primary" variant="dark">
@@ -25,9 +25,6 @@ const TopBar = ({i18n, isLogged, loggedUser, logout, startLoading, t}) => (
             <Navbar.Text>{t('tabs.createInvoice')}</Navbar.Text>
           </NavLink>
           <NavLink className="nav-link" to="/account">
-            <Navbar.Text>{t('tabs.accountSettings')}</Navbar.Text>
-          </NavLink>
-          <NavLink to="/account">
             <Navbar.Text>{loggedUser.name}</Navbar.Text>
           </NavLink>
           <button className="btn btn-danger" onClick={logout}>{t('logout')}</button>
@@ -49,14 +46,14 @@ export default compose(
       isLogged: state.loggedUser.id != null,
       loggedUser: state.loggedUser,
     }),
-    {logout, setLoadingState}
+    {logout, updateRunningRequests}
   ),
   withHandlers({
     logout: ({history, logout}) => async () => {
       await logout()
       history.push('/')
     },
-    startLoading: ({setLoadingState}) => () => setLoadingState(true)
+    startLoading: ({updateRunningRequests}) => () => updateRunningRequests(1)
   }),
   withTranslation('TopBar'),
 )(TopBar)

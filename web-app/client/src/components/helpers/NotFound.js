@@ -5,9 +5,9 @@ export default () => {
   const {t} = useTranslation('helpers')
   return (
     <div>
-      <h1>401</h1>
-      <h2>{t('auth.title')}</h2>
-      <div>{t('auth.description')}</div>
+      <h1>404</h1>
+      <h2>{t('notfound.title')}</h2>
+      <div>{t('notfound.description')}</div>
     </div>
   )
 }

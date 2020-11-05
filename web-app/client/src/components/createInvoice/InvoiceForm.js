@@ -3,10 +3,10 @@ import {connect} from 'react-redux'
 import {compose, withHandlers} from 'recompose'
 import {Button, Card, Form} from 'react-bootstrap'
 import {withTranslation} from 'react-i18next'
-import {updateInvoiceFormProperty, setGeneratedXmlInputValue} from '../../actions/invoices'
+import {updateInvoiceFormProperty, setCreateInvoiceValue} from '../../actions/invoices'
 import {ublCreator} from '../../data/defaultUbl'
 
-const InvoiceForm = ({fields, generateXml, updateTextField, t}) => (
+const InvoiceForm = ({fields, generateInvoice, updateTextField, t}) => (
   <Card>
     <Card.Header className="bg-primary text-white">{t('invoices:invoiceForm')}</Card.Header>
     <Card.Body>
@@ -32,7 +32,7 @@ const InvoiceForm = ({fields, generateXml, updateTextField, t}) => (
         />
       </Form.Group>
       <div style={{display: 'flex'}}>
-        <Button variant="primary" style={{marginLeft: 'auto'}} onClick={generateXml}>
+        <Button variant="primary" style={{marginLeft: 'auto'}} onClick={generateInvoice}>
           {t('invoices:generateInvoice')}
         </Button>
       </div>
@@ -45,13 +45,13 @@ export default compose(
     (state) => ({
       fields: state.createInvoiceScreen.form,
     }),
-    {setGeneratedXmlInputValue, updateInvoiceFormProperty}
+    {setInvoiceValue: setCreateInvoiceValue('generated'), updateInvoiceFormProperty}
   ),
   withHandlers({
     updateTextField: ({updateInvoiceFormProperty}) => (property) => (e) =>
       updateInvoiceFormProperty(property, e.target.value),
-    generateXml: ({fields, history, setGeneratedXmlInputValue}) => () => {
-      setGeneratedXmlInputValue(ublCreator(fields))
+    generateInvoice: ({fields, history, setInvoiceValue}) => () => {
+      setInvoiceValue(ublCreator(fields))
       history.push('/create-invoice/generated')
     },
   }),

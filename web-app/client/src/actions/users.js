@@ -23,8 +23,16 @@ export const getMyInfo = () => (
 
 export const updateUser = (data) => loadingWrapper(
   async (dispatch, getState, {api}) => {
-    const userData = await api.updateUser(data)
-    dispatch(setUser(userData))
+    try {
+      const userData = await api.updateUser(data)
+      dispatch(setUser(userData))
+    } catch (error) {
+      await swal({
+        title: 'User data could not be updated',
+        text: error.message,
+        icon: 'error',
+      })
+    }
   }
 )
 
