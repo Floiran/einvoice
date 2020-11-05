@@ -1,15 +1,14 @@
-import 'bootstrap/dist/css/bootstrap.css'
 import './App.css'
 import React from 'react'
 import {connect} from 'react-redux'
-import {compose, lifecycle} from 'recompose'
-import {Redirect, Route, Switch, withRouter} from 'react-router-dom'
+import {branch, compose, lifecycle, renderComponent} from 'recompose'
+import {Redirect, Route, Switch} from 'react-router-dom'
 import InvoiceList from './invoiceList'
 import LandingPage from './LandingPage'
 import TopBar from './TopBar'
 import CreateInvoice from './createInvoice'
 import InvoiceView from './InvoiceView'
-import {getMyInfo, loginWithSlovenskoSkToken} from '../actions/users'
+import {getMyInfo} from '../actions/users'
 import AccountSettings from './AccountSettings'
 import Auth from './helpers/Auth'
 import LoadingModal from './helpers/LoadingModal'
@@ -31,26 +30,24 @@ const App = ({isLoading}) => (
   </div>
 )
 
-export default withRouter(
-  compose(
-    connect(
-      (state) => ({
-        isLoading: state.isLoading,
-      }),
-      {loginWithSlovenskoSkToken, getMyInfo}
-    ),
-    lifecycle({
-      async componentDidMount() {
-        await this.props.getMyInfo()
-
-        const urlParams = new URLSearchParams(this.props.location.search)
-
-        if (urlParams.has('token')) {
-          if (await this.props.loginWithSlovenskoSkToken(urlParams.get('token'))) {
-            this.props.history.push('/account')
-          }
-        }
-      },
+export default compose(
+  connect(
+    (state) => ({
+      isLoading: state.isLoading,
+      loggedUser: state.loggedUser,
     }),
-  )(App)
-)
+    {getMyInfo}
+  ),
+  lifecycle({
+    async componentDidMount() {
+      // try to get user only if not already logged
+      if (this.props.loggedUser.id == null) {
+        await this.props.getMyInfo()
+      }
+    },
+  }),
+  branch(
+    ({loggedUser}) => loggedUser.loading,
+    renderComponent(LoadingModal),
+  ),
+)(App)

@@ -1,7 +1,7 @@
 import React from 'react'
 import {Provider} from 'react-redux'
 import {BrowserRouter} from 'react-router-dom'
-import App from './components/App'
+import AppWrapper from './components/AppWrapper'
 import ErrorBoundary from './components/helpers/ErrorBoundary'
 
 const Spinner = () => (
@@ -15,7 +15,7 @@ export default ({store}) => (
     <Provider store={store}>
       <BrowserRouter>
         <React.Suspense fallback={<Spinner />}>
-          <App />
+          <AppWrapper />
         </React.Suspense>
       </BrowserRouter>
     </Provider>

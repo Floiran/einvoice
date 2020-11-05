@@ -26,6 +26,14 @@ const getInitialState = () => ({
       },
     },
   },
+  // loggedUser can be in 3 possible states
+  // 1. {unknown: true} - no user is logged
+  // 2. {loading: true} - we are trying to request user data
+  // 3. {id: 1, ...} - user is logged
+  loggedUser: {
+    // We start with loading user data
+    loading: true,
+  }
 })
 
 const rootReducer = (state = getInitialState(), action) => {

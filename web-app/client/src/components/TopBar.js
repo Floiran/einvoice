@@ -2,12 +2,13 @@ import React from 'react'
 import {connect} from 'react-redux'
 import {compose, withHandlers} from 'recompose'
 import {Navbar} from 'react-bootstrap'
-import {NavLink, withRouter} from 'react-router-dom'
+import {NavLink} from 'react-router-dom'
 import {withTranslation} from 'react-i18next'
-import {LOGGING, LOGGING_FAILED, logout} from '../actions/users'
 import {CONFIG} from '../appSettings'
+import {logout} from '../actions/users'
+import {setLoadingState} from '../actions/common'
 
-const TopBar = ({i18n, isLogged, loggingStatus, logout, t, user}) => (
+const TopBar = ({i18n, isLogged, loggedUser, logout, startLoading, t}) => (
   <Navbar bg="primary" variant="dark">
     <NavLink to="/">
       <Navbar.Brand>{t('title')}</Navbar.Brand>
@@ -17,35 +18,24 @@ const TopBar = ({i18n, isLogged, loggingStatus, logout, t, user}) => (
     <NavLink className="nav-link" to="/invoices">
       <Navbar.Text>{t('tabs.allInvoices')}</Navbar.Text>
     </NavLink>
-    {
-      isLogged && <React.Fragment>
-        <NavLink className="nav-link" to="/create-invoice">
-          <Navbar.Text>{t('tabs.createInvoice')}</Navbar.Text>
-        </NavLink>
-        <NavLink className="nav-link" to="/account">
-          <Navbar.Text>{t('tabs.accountSettings')}</Navbar.Text>
-        </NavLink>
-      </React.Fragment>
-    }
     <Navbar.Collapse className="justify-content-end">
-      { loggingStatus === LOGGING_FAILED &&
-      <p>Logging failed</p>
-      }
       {isLogged ?
         <React.Fragment>
+          <NavLink className="nav-link" to="/create-invoice">
+            <Navbar.Text>{t('tabs.createInvoice')}</Navbar.Text>
+          </NavLink>
+          <NavLink className="nav-link" to="/account">
+            <Navbar.Text>{t('tabs.accountSettings')}</Navbar.Text>
+          </NavLink>
           <NavLink to="/account">
-            <Navbar.Text>{user.name}</Navbar.Text>
+            <Navbar.Text>{loggedUser.name}</Navbar.Text>
           </NavLink>
           <button className="btn btn-danger" onClick={logout}>{t('logout')}</button>
         </React.Fragment>
         :
         <a href={CONFIG.slovenskoSkLoginUrl}>
-          <button className="btn btn-success">
-            { loggingStatus === LOGGING ?
-              t('logging')
-              :
-              t('login')
-            }
+          <button className="btn btn-success" onClick={startLoading}>
+            {t('login')}
           </button>
         </a>
       }
@@ -53,22 +43,20 @@ const TopBar = ({i18n, isLogged, loggingStatus, logout, t, user}) => (
   </Navbar>
 )
 
-export default withRouter(
-  compose(
-    connect(
-      (state) => ({
-        loggingStatus: state.loggingStatus,
-        isLogged: state.user && !state.user.unauthorized,
-        user: state.user,
-      }),
-      {logout}
-    ),
-    withHandlers({
-      logout: ({history, logout}) => async () => {
-        await logout()
-        history.push('/')
-      },
+export default compose(
+  connect(
+    (state) => ({
+      isLogged: state.loggedUser.id != null,
+      loggedUser: state.loggedUser,
     }),
-    withTranslation('TopBar'),
-  )(TopBar)
-)
+    {logout, setLoadingState}
+  ),
+  withHandlers({
+    logout: ({history, logout}) => async () => {
+      await logout()
+      history.push('/')
+    },
+    startLoading: ({setLoadingState}) => () => setLoadingState(true)
+  }),
+  withTranslation('TopBar'),
+)(TopBar)

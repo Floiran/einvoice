@@ -5,7 +5,7 @@ export const setData = (path) => (data) => ({
   reducer: (_, data) => data,
 })
 
-const setLoadingState = setData(['isLoading'])
+export const setLoadingState = setData(['isLoading'])
 
 export const loadingWrapper = (action) => (
   async (dispatch) => {

@@ -31,11 +31,11 @@ class AccountSettings extends React.Component {
 
     this.state = {
       email: {
-        input: this.props.user.email,
+        input: this.props.loggedUser.email,
         change: false,
       },
       serviceAccountKey: {
-        input: this.props.user.serviceAccountKey,
+        input: this.props.loggedUser.serviceAccountKey,
         change: false,
       },
     }
@@ -45,7 +45,7 @@ class AccountSettings extends React.Component {
     this.setState((oldState) => {
       const state = {...oldState}
       state[field].change = !state[field].change
-      if (!state[field].change) state[field].input = this.props.user[field]
+      if (!state[field].change) state[field].input = this.props.loggedUser[field]
       return state
     })
   }
@@ -69,7 +69,7 @@ class AccountSettings extends React.Component {
       <EditableField
         name="email"
         label={<p className="col-1">{this.props.t('common:email')}:</p>}
-        valueField={<p className="col-3">{this.props.user.email}</p>}
+        valueField={<p className="col-3">{this.props.loggedUser.email}</p>}
         inputField={
           <input className="col-5" type="text" name="email" value={this.state.email.input} onChange={this.handleInputChange} />
         }
@@ -81,10 +81,22 @@ class AccountSettings extends React.Component {
         name="serviceAccountKey"
         label={<p className="col-2">{this.props.t('common:serviceAccountKey')}:</p>}
         valueField={
-          <textarea readOnly className="col-7" name="serviceAccountKey" value={this.props.user.serviceAccountKey} rows="15" />
+          <textarea
+            readOnly
+            className="col-7"
+            name="serviceAccountKey"
+            value={this.props.loggedUser.serviceAccountKey}
+            rows="15"
+          />
         }
         inputField={
-          <textarea className="col-7" name="serviceAccountKey" value={this.state.serviceAccountKey.input} onChange={this.handleInputChange} rows="15" />
+          <textarea
+            className="col-7"
+            name="serviceAccountKey"
+            value={this.state.serviceAccountKey.input}
+            onChange={this.handleInputChange}
+            rows="15"
+          />
         }
         toggleChange={this.toggleChange}
         save={this.submit}
@@ -97,7 +109,7 @@ class AccountSettings extends React.Component {
 export default compose(
   connect(
     (state) => ({
-      user: state.user,
+      loggedUser: state.loggedUser,
     }),
     {updateUser},
   ),
