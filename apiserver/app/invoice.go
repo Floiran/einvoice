@@ -19,7 +19,7 @@ func (a *App) getInvoices(w http.ResponseWriter, r *http.Request) {
 		formats = []string{db.UblFormat, db.D16bFormat}
 	}
 
-	invoices, err := a.manager.GetInvoices(formats)
+	invoices, err := a.Manager.GetInvoices(formats)
 	if err != nil {
 		handlers.RespondWithError(w, http.StatusInternalServerError, "Something went wrong")
 		return
@@ -36,7 +36,7 @@ func (a *App) getInvoice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	invoice, err := a.manager.GetInvoice(id)
+	invoice, err := a.Manager.GetInvoice(id)
 	if err != nil {
 		// TODO: distinguish NotFound and other errors
 		handlers.RespondWithError(w, http.StatusNotFound, "Invoice was not found")
@@ -54,7 +54,7 @@ func (a *App) getInvoiceDetail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	invoice, err := a.manager.GetInvoiceDetail(id)
+	invoice, err := a.Manager.GetInvoiceDetail(id)
 	if err != nil {
 		// TODO: distinguish NotFound and other errors
 		handlers.RespondWithError(w, http.StatusNotFound, "Invoice was not found")
@@ -99,7 +99,7 @@ func (a *App) createInvoice(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	metadata, err := a.manager.CreateInvoice(format, data, ats)
+	metadata, err := a.Manager.CreateInvoice(format, data, ats)
 	if err != nil {
 		handlers.RespondWithError(w, http.StatusInternalServerError, "Something went wrong")
 		return

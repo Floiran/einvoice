@@ -15,16 +15,16 @@ import (
 )
 
 type App struct {
-	Router *mux.Router
-	Config config.Configuration
-	manager manager.Manager
+	Router    *mux.Router
+	Config    config.Configuration
+	Manager   manager.Manager
 	validator xml.Validator
 }
 
 func (a *App) Initialize() {
 	a.Config = config.Init()
 	a.validator = xml.NewValidator(a.Config)
-	a.manager = manager.Init(a.Config)
+	a.Manager = manager.Init(a.Config)
 
 	a.Router = mux.NewRouter()
 
@@ -51,5 +51,5 @@ func (a *App) Run() {
 
 func (a *App) Close() {
 	// TODO: https://github.com/gorilla/mux#graceful-shutdown
-	a.manager.Db.Close()
+	a.Manager.Db.Close()
 }

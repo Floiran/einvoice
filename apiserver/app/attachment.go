@@ -17,7 +17,7 @@ func (a *App) getAttachment(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	attachment, name, err := a.manager.GetAttachment(id)
+	attachment, name, err := a.Manager.GetAttachment(id)
 	if err != nil {
 		handlers.RespondWithError(w, http.StatusNotFound, "Attachment was not found")
 		return

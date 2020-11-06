@@ -1,14 +1,16 @@
-package app
+package app_test
 
 import (
 	"os"
 	"testing"
+
+	"github.com/slovak-egov/einvoice/apiserver/app"
 )
 
-var a App
+var a *app.App
 
 func TestMain(m *testing.M) {
-	a = App{}
+	a = &app.App{}
 
 	a.Initialize()
 

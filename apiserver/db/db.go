@@ -26,9 +26,3 @@ func Connect(dbConfig config.DbConfiguration) Connector {
 func (connector *Connector) Close() {
 	connector.Db.Close()
 }
-
-// Note: Used only in tests
-func (connector *Connector) ClearData() {
-	connector.Db.Model(&Invoice{}).Where("TRUE").Delete()
-	connector.Db.Model(&Attachment{}).Where("TRUE").Delete()
-}

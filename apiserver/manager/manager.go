@@ -7,13 +7,13 @@ import (
 )
 
 type Manager struct {
-	Db        db.Connector
-	storage   storage.Storage
+	Db      db.Connector
+	storage storage.Storage
 }
 
 func Init(appConfig config.Configuration) Manager {
 	return Manager{
-		Db: db.Connect(appConfig.Db),
+		Db:      db.Connect(appConfig.Db),
 		storage: storage.Init(appConfig),
 	}
 }
