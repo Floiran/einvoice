@@ -1,9 +1,8 @@
 package main
 
 import (
-	"log"
-
 	"github.com/go-pg/migrations/v8"
+	log "github.com/sirupsen/logrus"
 )
 
 func init() {

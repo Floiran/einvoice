@@ -2,8 +2,6 @@ package app
 
 import (
 	"encoding/json"
-	"io"
-	"io/ioutil"
 	"net/http"
 
 	"github.com/slovak-egov/einvoice/authproxy/db"
@@ -21,30 +19,17 @@ func (a *App) getUser(res http.ResponseWriter, req *http.Request) {
 }
 
 func (a *App) updateUser(res http.ResponseWriter, req *http.Request) {
-	body, err := ioutil.ReadAll(io.LimitReader(req.Body, 1048576))
-	if err != nil {
-		handlers.RespondWithError(res, http.StatusBadRequest, "Invalid payload")
-		return
-	}
-	if err = req.Body.Close(); err != nil {
-		handlers.RespondWithError(res, http.StatusBadRequest, "Invalid payload")
-		return
-	}
+	var requestBody *db.UserUpdate
 
-	updatedUserData := &db.UserUpdate{}
+	decoder := json.NewDecoder(req.Body)
+	decoder.DisallowUnknownFields()
 
-	if err := json.Unmarshal(body, &updatedUserData); err != nil {
-		handlers.RespondWithError(res, http.StatusBadRequest, "Invalid payload")
-		return
-	}
-	if updatedUserData.IsEmpty() {
-		handlers.RespondWithError(res, http.StatusBadRequest, "Empty body")
+	if err := decoder.Decode(&requestBody); err != nil {
+		handlers.RespondWithError(res, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	updatedUserData.UserId = req.Header.Get("User-Id")
-
-	user, err := a.manager.UpdateUser(updatedUserData)
+	user, err := a.manager.UpdateUser(req.Header.Get("User-Id"), requestBody)
 	if err != nil {
 		handlers.RespondWithError(res, http.StatusInternalServerError, "Something went wrong")
 		return

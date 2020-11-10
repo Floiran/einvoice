@@ -22,23 +22,15 @@ func Init(appConfig config.Configuration) Manager {
 }
 
 func (m *Manager) GetUserIdByToken(token string) (string, error) {
-	id, err := m.Cache.GetUserId(token)
-	if err != nil {
-		return "", err
-	}
-	return id, nil
+	return m.Cache.GetUserId(token)
 }
 
 func (m *Manager) GetUser(id string) (*db.User, error) {
-	user, err := m.Db.GetUser(id)
-	if err != nil {
-		return nil, err
-	}
-	return user, nil
+	return m.Db.GetUser(id)
 }
 
-func (m *Manager) UpdateUser(user *db.UserUpdate) (*db.User, error) {
-	return m.Db.UpdateUser(user)
+func (m *Manager) UpdateUser(id string, user *db.UserUpdate) (*db.User, error) {
+	return m.Db.UpdateUser(id, user)
 }
 
 func (m *Manager) LogoutUser(token string) error {
@@ -51,12 +43,8 @@ func (m *Manager) LogoutUser(token string) error {
 }
 
 func (m *Manager) CreateUser(id, name string) (*db.User, error) {
-	user := &db.User{Id: id, Name: name}
-	err := m.Db.CreateUser(user)
-	if err != nil {
-		return nil, err
-	}
-	return user, nil
+	user := &db.User{Id: id, Name: &name}
+	return m.Db.CreateUser(user)
 }
 
 func (m *Manager) CreateUserToken(userId string) string {

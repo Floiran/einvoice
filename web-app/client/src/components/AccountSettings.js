@@ -1,6 +1,6 @@
 import React, {useState} from 'react'
 import {connect} from 'react-redux'
-import {compose} from 'recompose'
+import {compose, withHandlers} from 'recompose'
 import {Button, Card, Form} from 'react-bootstrap'
 import {useTranslation, withTranslation} from 'react-i18next'
 import {updateUser} from '../actions/users'
@@ -20,7 +20,7 @@ const EditableField = ({actualValue, label, save, ...props}) => {
         }
       </div>
       <Form.Control
-        value={value}
+        value={value || ''}
         readOnly={!isEditing}
         onChange={(e) => setValue(e.target.value)}
         {...props}
@@ -36,7 +36,7 @@ const EditableField = ({actualValue, label, save, ...props}) => {
         <Button
           variant="success"
           size="sm"
-          onClick={() => {save(value); setEditing(false)}}
+          onClick={() => save(value)}
         >
           {t('save')}
         </Button>
@@ -45,7 +45,7 @@ const EditableField = ({actualValue, label, save, ...props}) => {
   )
 }
 
-const AccountSettings = ({loggedUser, t, updateUser}) => {
+const AccountSettings = ({loggedUser, t, updateIntField, updateUser}) => {
   return (
     <Card style={{margin: '15px'}}>
       <Card.Header className="bg-primary text-white text-center" as="h2">{t('tabs.accountSettings')}</Card.Header>
@@ -54,6 +54,16 @@ const AccountSettings = ({loggedUser, t, updateUser}) => {
           actualValue={loggedUser.email}
           label={t('common:email')}
           save={(email) => updateUser({email})}
+        />
+        <EditableField
+          actualValue={loggedUser.taxId}
+          label="DIČ"
+          save={updateIntField('taxId')}
+        />
+        <EditableField
+          actualValue={loggedUser.vatNumber}
+          label="IČ DPH"
+          save={updateIntField('vatNumber')}
         />
         <EditableField
           actualValue={loggedUser.serviceAccountKey}
@@ -74,5 +84,11 @@ export default compose(
     }),
     {updateUser},
   ),
+  withHandlers({
+    updateIntField: ({updateUser}) => (property) => (value) => {
+      if (value === '')updateUser({[property]: null})
+      else updateUser({[property]: parseInt(value)})
+    }
+  }),
   withTranslation(['TopBar', 'common']),
 )(AccountSettings)

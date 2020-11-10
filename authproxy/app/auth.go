@@ -3,6 +3,7 @@ package app
 import (
 	"net/http"
 
+	"github.com/slovak-egov/einvoice/authproxy/db"
 	"github.com/slovak-egov/einvoice/handlers"
 )
 
@@ -33,13 +34,10 @@ func (a *App) handleLogin(res http.ResponseWriter, req *http.Request) {
 
 	token := a.manager.CreateUserToken(id)
 
-	handlers.RespondWithJSON(res, http.StatusOK, map[string]string{
-		"token":             token,
-		"id":                id,
-		"email":             user.Email,
-		"serviceAccountKey": user.ServiceAccountKey,
-		"name":              user.Name,
-	})
+	handlers.RespondWithJSON(res, http.StatusOK, struct{
+		Token string `json:"token"`
+		*db.User
+	}{token, user})
 }
 
 func (a *App) handleLogout(res http.ResponseWriter, req *http.Request) {

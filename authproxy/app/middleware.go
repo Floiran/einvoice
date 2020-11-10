@@ -55,7 +55,7 @@ func (a *App) getUserByServiceAccount(tokenString string) (string, error) {
 			return nil, errors.New("User not found")
 		}
 
-		verifyKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(user.ServiceAccountKey))
+		verifyKey, err := jwt.ParseRSAPublicKeyFromPEM([]byte(*user.ServiceAccountKey))
 		if err != nil {
 			return nil, errors.New("Invalid key")
 		}
