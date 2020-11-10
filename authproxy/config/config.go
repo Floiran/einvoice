@@ -50,6 +50,8 @@ func Init() Configuration{
 		config = prodConfig
 	case "dev":
 		config = devConfig
+	case "test":
+		config = testConfig
 	default:
 		log.WithField("environment", authproxyEnv).Fatal("config.environment.unknown")
 	}
@@ -68,8 +70,8 @@ func Init() Configuration{
 
 	config.SlovenskoSk = SlovenskoSkConfiguration{
 		Url:                environment.Getenv("SLOVENSKO_SK_URL", config.SlovenskoSk.Url),
-		ApiTokenPrivateKey: environment.RequireVar("API_TOKEN_PRIVATE"),
-		OboTokenPublicKey:  environment.RequireVar("OBO_TOKEN_PUBLIC"),
+		ApiTokenPrivateKey: environment.Getenv("API_TOKEN_PRIVATE", config.SlovenskoSk.ApiTokenPrivateKey),
+		OboTokenPublicKey:  environment.Getenv("OBO_TOKEN_PUBLIC", config.SlovenskoSk.OboTokenPublicKey),
 	}
 
 	config.initDb()

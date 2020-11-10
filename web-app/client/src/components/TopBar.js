@@ -1,8 +1,8 @@
 import React from 'react'
 import {connect} from 'react-redux'
 import {compose, withHandlers} from 'recompose'
-import {Navbar} from 'react-bootstrap'
-import {NavLink} from 'react-router-dom'
+import {Dropdown, DropdownButton, Navbar} from 'react-bootstrap'
+import {NavLink, withRouter} from 'react-router-dom'
 import {withTranslation} from 'react-i18next'
 import {CONFIG} from '../appSettings'
 import {logout} from '../actions/users'
@@ -13,8 +13,14 @@ const TopBar = ({i18n, isLogged, loggedUser, logout, startLoading, t}) => (
     <NavLink to="/">
       <Navbar.Brand>{t('title')}</Navbar.Brand>
     </NavLink>
-    <button onClick={() => i18n.changeLanguage('sk')}>sk</button>
-    <button onClick={() => i18n.changeLanguage('en')}>en</button>
+    <DropdownButton size="sm" title={i18n.language.toUpperCase()} variant="secondary">
+      <Dropdown.Item active={i18n.language === 'sk'} onClick={() => i18n.changeLanguage('sk')}>
+        SK
+      </Dropdown.Item>
+      <Dropdown.Item active={i18n.language === 'en'} onClick={() => i18n.changeLanguage('en')}>
+        EN
+      </Dropdown.Item>
+    </DropdownButton>
     <NavLink className="nav-link" to="/invoices">
       <Navbar.Text>{t('tabs.allInvoices')}</Navbar.Text>
     </NavLink>
@@ -40,20 +46,22 @@ const TopBar = ({i18n, isLogged, loggedUser, logout, startLoading, t}) => (
   </Navbar>
 )
 
-export default compose(
-  connect(
-    (state) => ({
-      isLogged: state.loggedUser.id != null,
-      loggedUser: state.loggedUser,
+export default withRouter(
+  compose(
+    connect(
+      (state) => ({
+        isLogged: state.loggedUser.id != null,
+        loggedUser: state.loggedUser,
+      }),
+      {logout, updateRunningRequests}
+    ),
+    withHandlers({
+      logout: ({logout, history}) => async () => {
+        await logout()
+        history.push('/')
+      },
+      startLoading: ({updateRunningRequests}) => () => updateRunningRequests(1)
     }),
-    {logout, updateRunningRequests}
-  ),
-  withHandlers({
-    logout: ({history, logout}) => async () => {
-      await logout()
-      history.push('/')
-    },
-    startLoading: ({updateRunningRequests}) => () => updateRunningRequests(1)
-  }),
-  withTranslation('TopBar'),
-)(TopBar)
+    withTranslation('TopBar'),
+  )(TopBar)
+)

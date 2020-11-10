@@ -5,24 +5,25 @@ import (
 	"net/http/httptest"
 	"testing"
 
-	"github.com/slovak-egov/einvoice/apiserver/app"
 	"github.com/slovak-egov/einvoice/apiserver/db"
 )
 
 func executeRequest(req *http.Request) *httptest.ResponseRecorder {
 	rr := httptest.NewRecorder()
-	a.Router.ServeHTTP(rr, req)
+	a.ServeHTTP(rr, req)
 
 	return rr
 }
 
 func checkResponseCode(t *testing.T, expected, actual int) {
+	t.Helper()
 	if expected != actual {
 		t.Errorf("Expected response code %d. Got %d\n", expected, actual)
 	}
 }
 
 func createTestInvoice(t *testing.T) int {
+	t.Helper()
 	invoice := &db.Invoice{
 		Sender:   "sender",
 		Receiver: "receiver",
@@ -37,7 +38,7 @@ func createTestInvoice(t *testing.T) int {
 	return invoice.Id
 }
 
-func cleanDb(t *testing.T, a *app.App) func() {
+func cleanDb(t *testing.T) func() {
 	return func() {
 		if _, err := a.Manager.Db.Db.Model(&db.Attachment{}).Where("TRUE").Delete(); err != nil {
 			t.Error(err)

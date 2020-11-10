@@ -34,3 +34,22 @@ var prodConfig = Configuration{
 	LogLevel:        logrus.InfoLevel,
 	TokenExpiration: 1 * time.Hour,
 }
+
+var testConfig = Configuration{
+	Port:         8082,
+	RedisUrl:     "localhost:6379",
+	ApiServerUrl: "http://apiserver.com",
+	SlovenskoSk: SlovenskoSkConfiguration{
+		Url: "https://slovenskosk-test.com",
+		ApiTokenPrivateKey: "test",
+		OboTokenPublicKey: "test",
+	},
+	Db: DbConfiguration{
+		Host: "localhost",
+		Port: 5432,
+		Name: "authproxy",
+		User: "postgres",
+	},
+	LogLevel:        logrus.InfoLevel,
+	TokenExpiration: 1 * time.Hour,
+}

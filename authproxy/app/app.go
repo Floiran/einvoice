@@ -24,16 +24,24 @@ type App struct {
 	slovenskoSk slovenskoSk.Connector
 }
 
-func (a *App) Initialize() {
-	a.config = config.Init()
+func NewApp() *App {
+	appConfig := config.Init()
+	a := &App{
+		config:  appConfig,
+		manager: manager.Init(appConfig),
+		slovenskoSk: slovenskoSk.Init(appConfig.SlovenskoSk),
+	}
 
+	a.InitializeRouter()
+
+	return a
+}
+
+func (a *App) InitializeRouter() {
 	apiserver, err := url.Parse(a.config.ApiServerUrl)
 	if err != nil {
 		log.WithField("error", err.Error()).Fatal("app.initialization.apiserver_url.parse")
 	}
-
-	a.manager = manager.Init(a.config)
-	a.slovenskoSk = slovenskoSk.Init(a.config.SlovenskoSk)
 
 	a.router = mux.NewRouter()
 	authRouter := a.router.PathPrefix("/").Subrouter()
@@ -69,6 +77,10 @@ func (a *App) Run() {
 func (a *App) Close() {
 	// TODO: https://github.com/gorilla/mux#graceful-shutdown
 	a.manager.Db.Close()
+}
+
+func (a *App) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	a.router.ServeHTTP(w, req)
 }
 
 var corsOptions = []muxHandlers.CORSOption{

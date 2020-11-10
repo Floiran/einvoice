@@ -9,12 +9,12 @@ import (
 )
 
 type Connector struct {
-	db *pg.DB
+	Db *pg.DB
 }
 
 func Connect(dbConfig config.DbConfiguration) Connector {
 	return Connector{
-		db: pg.Connect(&pg.Options{
+		pg.Connect(&pg.Options{
 			Addr:     fmt.Sprintf("%s:%d", dbConfig.Host, dbConfig.Port),
 			User:     dbConfig.User,
 			Password: dbConfig.Password,
@@ -24,5 +24,5 @@ func Connect(dbConfig config.DbConfiguration) Connector {
 }
 
 func (connector *Connector) Close() {
-	connector.db.Close()
+	connector.Db.Close()
 }

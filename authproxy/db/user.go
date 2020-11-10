@@ -21,7 +21,7 @@ func (user *UserUpdate) IsEmpty() bool {
 
 func (connector *Connector) GetUser(id string) (*User, error) {
 	user := &User{}
-	err := connector.db.Model(user).Where("id = ?", id).Select(user)
+	err := connector.Db.Model(user).Where("id = ?", id).Select(user)
 	if err != nil {
 		return nil, err
 	}
@@ -30,7 +30,7 @@ func (connector *Connector) GetUser(id string) (*User, error) {
 
 func (connector *Connector) UpdateUser(updatedUserData *UserUpdate) (*User, error) {
 	user := &User{}
-	query := connector.db.Model(user).Where("id = ?", updatedUserData.UserId).Returning("*")
+	query := connector.Db.Model(user).Where("id = ?", updatedUserData.UserId).Returning("*")
 	if updatedUserData.ServiceAccountKey != nil {
 		query = query.Set("service_account_key = ?", *updatedUserData.ServiceAccountKey)
 	}
@@ -43,6 +43,6 @@ func (connector *Connector) UpdateUser(updatedUserData *UserUpdate) (*User, erro
 }
 
 func (connector *Connector) CreateUser(user *User) error {
-	_, err := connector.db.Model(user).Insert(user)
+	_, err := connector.Db.Model(user).Insert(user)
 	return err
 }

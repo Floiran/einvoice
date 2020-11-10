@@ -23,7 +23,7 @@ var flagtests = []struct {
 
 func TestGetInvoices(t *testing.T) {
 	// Fill DB
-	t.Cleanup(cleanDb(t, a))
+	t.Cleanup(cleanDb(t))
 	createTestInvoice(t)
 
 	// Run tests
@@ -45,7 +45,7 @@ func TestGetInvoices(t *testing.T) {
 }
 
 func TestGetInvoice(t *testing.T) {
-	t.Cleanup(cleanDb(t, a))
+	t.Cleanup(cleanDb(t))
 	id := createTestInvoice(t)
 
 	req, _ := http.NewRequest("GET", fmt.Sprintf("/invoices/%d", id), nil)
@@ -84,7 +84,7 @@ var createInvoiceTest = []struct {
 func TestCreateInvoice(t *testing.T) {
 	for _, tt := range createInvoiceTest {
 		t.Run(tt.name, func(t *testing.T) {
-			t.Cleanup(cleanDb(t, a))
+			t.Cleanup(cleanDb(t))
 
 			var requestBody bytes.Buffer
 			multipartWriter := multipart.NewWriter(&requestBody)
@@ -114,7 +114,6 @@ func TestCreateInvoice(t *testing.T) {
 			for i, at := range tt.attachments {
 				expectedAttachments = append(expectedAttachments,
 					db.Attachment{
-						InvoiceId: 0,                                 // Default value, missing in response
 						Id:        createdResponse.Attachments[i].Id, // No need to assert this param,
 						Name:      at.fileName,
 						CreatedAt: createdResponse.Attachments[i].CreatedAt, // No need to assert this param,
@@ -130,8 +129,8 @@ func TestCreateInvoice(t *testing.T) {
 				Format:      db.UblFormat,
 				Attachments: expectedAttachments,
 			}
-			bytes1, _ := json.Marshal(expectedResponse)
-			if !bytes.Equal(bytes1, response.Body.Bytes()) {
+			expectedBytes, _ := json.Marshal(expectedResponse)
+			if !bytes.Equal(expectedBytes, response.Body.Bytes()) {
 				t.Errorf("Expected created response was %v. Got %v", expectedResponse, createdResponse)
 			}
 

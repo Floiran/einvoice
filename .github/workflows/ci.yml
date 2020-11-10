@@ -15,7 +15,7 @@ jobs:
       - name: Download eslint config
         run: cd web-app/client && npm i eslint-config-vacuumlabs
       - name: Lint Code Base
-        uses: docker://github/super-linter:v3.13.1
+        uses: docker://github/super-linter:v3
         env:
           VALIDATE_ALL_CODEBASE: false
           VALIDATE_GO: false
@@ -23,8 +23,8 @@ jobs:
           JAVASCRIPT_ES_CONFIG_FILE: ../../../github/workspace/web-app/client/.eslintrc
           DEFAULT_BRANCH: master
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  tests:
-    name: Tests
+  apiserver_tests:
+    name: Apiserver tests
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -46,7 +46,7 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
       - name: Download dependencies
-        run: go get -v -t -d ./...
+        run: cd apiserver && go get -v -t -d ./...
       - name: Run migrations
         run: |
           go run ./migrations/apiserver init
@@ -54,4 +54,45 @@ jobs:
       - name: Create local storage
         run: mkdir storage
       - name: Run tests
-        run: go test -v ./...
+        run: |
+          cd apiserver
+          go test -v ./...
+  authproxy_tests:
+    name: Authproxy tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: github_actions
+      redis:
+        image: redis
+        # Set health checks to wait until redis has started
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 6379:6379
+    env:
+      DB_PASSWORD: postgres
+      DB_NAME: github_actions
+      AUTHPROXY_ENV: test
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      - name: Download dependencies
+        run: cd authproxy && go get -v -t -d ./...
+      - name: Run migrations
+        run: |
+          go run ./migrations/authproxy init
+          go run ./migrations/authproxy up
+      - name: Run tests
+        run: |
+          cd authproxy
+          go test -v ./...

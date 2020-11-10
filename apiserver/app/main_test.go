@@ -10,9 +10,7 @@ import (
 var a *app.App
 
 func TestMain(m *testing.M) {
-	a = &app.App{}
-
-	a.Initialize()
+	a = app.NewApp()
 
 	result := m.Run()
 

@@ -15,31 +15,40 @@ import (
 )
 
 type App struct {
-	Router    *mux.Router
-	Config    config.Configuration
+	router    *mux.Router
+	config    config.Configuration
 	Manager   manager.Manager
 	validator xml.Validator
 }
 
-func (a *App) Initialize() {
-	a.Config = config.Init()
-	a.validator = xml.NewValidator(a.Config)
-	a.Manager = manager.Init(a.Config)
+func NewApp() *App {
+	appConfig := config.Init()
 
-	a.Router = mux.NewRouter()
+	a := &App{
+		config: appConfig,
+		Manager: manager.Init(appConfig),
+		validator: xml.NewValidator(appConfig),
+		router: mux.NewRouter(),
+	}
 
-	a.Router.HandleFunc("/invoices", a.getInvoices).Methods("GET")
-	a.Router.HandleFunc("/invoices", a.createInvoice).Methods("POST")
+	a.InitializeHandlers()
+
+	return a
+}
+
+func (a *App) InitializeHandlers() {
+	a.router.HandleFunc("/invoices", a.getInvoices).Methods("GET")
+	a.router.HandleFunc("/invoices", a.createInvoice).Methods("POST")
 	// Maybe we can merge following 2 endpoints
-	a.Router.HandleFunc("/invoices/{id:[0-9]+}", a.getInvoice).Methods("GET")
-	a.Router.HandleFunc("/invoices/{id:[0-9]+}/detail", a.getInvoiceDetail).Methods("GET")
-	a.Router.HandleFunc("/attachments/{id:[0-9]+}", a.getAttachment).Methods("GET")
+	a.router.HandleFunc("/invoices/{id:[0-9]+}", a.getInvoice).Methods("GET")
+	a.router.HandleFunc("/invoices/{id:[0-9]+}/detail", a.getInvoiceDetail).Methods("GET")
+	a.router.HandleFunc("/attachments/{id:[0-9]+}", a.getAttachment).Methods("GET")
 }
 
 func (a *App) Run() {
 	srv := &http.Server{
-		Handler:      handlers.LoggingHandler{a.Router},
-		Addr:         fmt.Sprintf("%s:%d", "0.0.0.0", a.Config.Port),
+		Handler:      handlers.LoggingHandler{a.router},
+		Addr:         fmt.Sprintf("%s:%d", "0.0.0.0", a.config.Port),
 		WriteTimeout: 15 * time.Second,
 		ReadTimeout:  15 * time.Second,
 	}
@@ -52,4 +61,8 @@ func (a *App) Run() {
 func (a *App) Close() {
 	// TODO: https://github.com/gorilla/mux#graceful-shutdown
 	a.Manager.Db.Close()
+}
+
+func (a *App) ServeHTTP(w http.ResponseWriter, req *http.Request) {
+	a.router.ServeHTTP(w, req)
 }

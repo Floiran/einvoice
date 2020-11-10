@@ -10,19 +10,19 @@ import (
 )
 
 type Manager struct {
-	cache cache.Cache
+	Cache cache.Cache
 	Db    db.Connector
 }
 
 func Init(appConfig config.Configuration) Manager {
 	return Manager{
-		cache: cache.NewRedis(appConfig.RedisUrl, appConfig.TokenExpiration),
-		Db:    db.Connect(appConfig.Db),
+		cache.NewRedis(appConfig.RedisUrl, appConfig.TokenExpiration),
+		db.Connect(appConfig.Db),
 	}
 }
 
 func (m *Manager) GetUserIdByToken(token string) (string, error) {
-	id, err := m.cache.GetUserId(token)
+	id, err := m.Cache.GetUserId(token)
 	if err != nil {
 		return "", err
 	}
@@ -42,7 +42,7 @@ func (m *Manager) UpdateUser(user *db.UserUpdate) (*db.User, error) {
 }
 
 func (m *Manager) LogoutUser(token string) error {
-	deleted := m.cache.RemoveUserToken(token)
+	deleted := m.Cache.RemoveUserToken(token)
 	if !deleted {
 		return errors.New("Token not found")
 	}
@@ -61,6 +61,6 @@ func (m *Manager) CreateUser(id, name string) (*db.User, error) {
 
 func (m *Manager) CreateUserToken(userId string) string {
 	token := random.String(50)
-	m.cache.SaveUserToken(token, userId)
+	m.Cache.SaveUserToken(token, userId)
 	return token
 }

@@ -3,9 +3,7 @@ package main
 import "github.com/slovak-egov/einvoice/authproxy/app"
 
 func main() {
-	a := app.App{}
-
-	a.Initialize()
+	a := app.NewApp()
 
 	defer a.Close()
 

@@ -57,3 +57,7 @@ func (redis *redisCache) GetUserId(token string) (string, error) {
 func (redis *redisCache) RemoveUserToken(token string) bool {
 	return redis.client.Del(ctx, userIdKey(token)).Val() == 1
 }
+
+func (redis *redisCache) FlushAll() {
+	redis.client.FlushAll(ctx)
+}
